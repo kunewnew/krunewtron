@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>✨ เครื่องมือสร้าง QR Code อัจฉริยะ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Sarabun:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/qr-code-styling@1.5.0-rc.2/lib/qr-code-styling.js" type="text/javascript"></script>
+
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --border: #334155;
+    --text: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #ef4444;
+    --primary-hover: #dc2626;
+    --primary-light: rgba(239, 68, 68, 0.15);
+    --success: #10b981;
+    --font: "Sarabun", "Outfit", -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: var(--font);
+    background-color: var(--bg);
+    color: var(--text);
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  .back-btn {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    transition: all 0.2s;
+  }
+  .back-btn:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+    background: rgba(255,255,255,0.05);
+  }
+
+  /* Main Grid Layout */
+  .grid-layout {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Card Styles */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    border-bottom: 1px dashed var(--border);
+    padding-bottom: 8px;
+  }
+
+  /* Custom Tabs for Data Types */
+  .type-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .tab-item {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.88rem;
+    white-space: nowrap;
+    transition: all 0.2s;
+    color: var(--text-muted);
+  }
+  .tab-item:hover {
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+  }
+  .tab-item.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+  }
+
+  /* Inputs and Fields */
+  .form-group {
+    margin-bottom: 16px;
+  }
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  input, textarea, select {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--primary);
+  }
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
+  /* Input fields groups */
+  .input-panel {
+    display: none;
+  }
+  .input-panel.active {
+    display: block;
+    animation: fadeIn 0.3s;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Row layouts for styling options */
+  .row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  /* Customizer Accordion Sections */
+  .accordion-sec {
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .accordion-hdr {
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.02);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+  .accordion-body {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    background: rgba(15, 23, 42, 0.2);
+    display: none;
+  }
+  .accordion-sec.open .accordion-body {
+    display: block;
+  }
+
+  /* Color Input Wrapper */
+  .color-input-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .color-picker-custom {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    overflow: hidden;
+    background: none;
+  }
+  
+  /* Toggle Switch */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 22px;
+  }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #475569;
+    transition: .3s;
+    border-radius: 22px;
+  }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+  }
+  input:checked + .slider {
+    background-color: var(--primary);
+  }
+  input:checked + .slider:before {
+    transform: translateX(22px);
+  }
+
+  /* File upload */
+  .file-dropzone {
+    border: 2.5px dashed var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    background: rgba(15, 23, 42, 0.4);
+    transition: all 0.2s;
+  }
+  .file-dropzone:hover {
+    border-color: var(--primary);
+    background: rgba(239, 68, 68, 0.03);
+  }
+  .file-dropzone p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .file-dropzone .logo-preview {
+    max-height: 40px;
+    margin-top: 8px;
+    display: none;
+  }
+
+  /* QR Code Preview Side */
+  .preview-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 24px;
+  }
+  
+  .qr-container-wrap {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    min-height: 232px;
+    min-width: 232px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Action Buttons */
+  .btn-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  button {
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);
+  }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+  .btn-outline:hover {
+    background: rgba(255,255,255,0.03);
+    border-color: var(--text-muted);
+  }
+
+  /* History list */
+  .history-list {
+    margin-top: 16px;
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .history-item:hover {
+    background: rgba(255,255,255,0.03);
+    border-color: var(--primary);
+  }
+  .history-info {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
+  }
+  .history-type {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+  }
+  .history-time {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* Toast Notification */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--success);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: none;
+    z-index: 100;
+    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes slideIn {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div>
+      <h1>✨ เครื่องมือสร้าง QR Code อัจฉริยะ</h1>
+      <p>สร้าง แก้ไข ดาวน์โหลด และปรับแต่งรูปสไตล์ QR Code ได้เองแบบเรียลไทม์</p>
+    </div>
+    <a href="../index.html" class="back-btn">🏠 กลับหน้าหลัก</a>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="grid-layout">
+    
+    <!-- Left Panel: Input Forms & Customizer -->
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+      
+      <!-- Card: Data Input -->
+      <div class="card">
+        <h2>✏️ 1. เลือกประเภทข้อมูลและกรอกรายละเอียด</h2>
+        
+        <!-- Type Tabs -->
+        <div class="type-tabs" id="typeTabs">
+          <div class="tab-item active" data-type="url">🔗 ลิงก์ (URL)</div>
+          <div class="tab-item" data-type="text">📝 ข้อความ (Text)</div>
+          <div class="tab-item" data-type="wifi">📶 รหัส Wi-Fi</div>
+          <div class="tab-item" data-type="phone">📞 เบอร์โทร (Phone)</div>
+          <div class="tab-item" data-type="sms">💬 ข้อความสั้น (SMS)</div>
+        </div>
+
+        <!-- Input Panels -->
+        <!-- URL Panel -->
+        <div class="input-panel active" id="panel-url">
+          <div class="form-group">
+            <label for="input-url">🌐 ป้อนที่อยู่เว็บ (URL)</label>
+            <input type="url" id="input-url" placeholder="https://example.com" value="https://google.com">
+          </div>
+        </div>
+
+        <!-- Text Panel -->
+        <div class="input-panel" id="panel-text">
+          <div class="form-group">
+            <label for="input-text">📝 ป้อนข้อความทั่วไป</label>
+            <textarea id="input-text" placeholder="พิมพ์ข้อความที่ต้องการใส่ใน QR Code..."></textarea>
+          </div>
+        </div>
+
+        <!-- Wi-Fi Panel -->
+        <div class="input-panel" id="panel-wifi">
+          <div class="row-2">
+            <div class="form-group">
+              <label for="input-wifi-ssid">📶 ชื่อเครือข่าย Wi-Fi (SSID)</label>
+              <input type="text" id="input-wifi-ssid" placeholder="Home_WiFi">
+            </div>
+            <div class="form-group">
+              <label for="input-wifi-type">🔒 รูปแบบความปลอดภัย</label>
+              <select id="input-wifi-type">
+                <option value="WPA">WPA/WPA2</option>
+                <option value="WEP">WEP</option>
+                <option value="nopass">ไม่มีความปลอดภัย (Open)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" id="wifi-pass-wrap">
+            <label for="input-wifi-pass">🔑 รหัสผ่าน Wi-Fi</label>
+            <input type="password" id="input-wifi-pass" placeholder="ป้อนรหัสผ่าน Wi-Fi">
+          </div>
+        </div>
+
+        <!-- Phone Panel -->
+        <div class="input-panel" id="panel-phone">
+          <div class="form-group">
+            <label for="input-phone">📞 เบอร์โทรศัพท์</label>
+            <input type="tel" id="input-phone" placeholder="เช่น 0812345678">
+          </div>
+        </div>
+
+        <!-- SMS Panel -->
+        <div class="input-panel" id="panel-sms">
+          <div class="form-group">
+            <label for="input-sms-phone">📞 เบอร์ผู้รับ SMS</label>
+            <input type="tel" id="input-sms-phone" placeholder="เช่น 0812345678">
+          </div>
+          <div class="form-group">
+            <label for="input-sms-msg">💬 ข้อความที่ต้องการส่ง</label>
+            <textarea id="input-sms-msg" placeholder="ข้อความสั้น SMS..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Customizer Options -->
+      <div class="card">
+        <h2>🎨 2. ปรับแต่งดีไซน์ QR Code</h2>
+
+        <!-- Accordion 1: Colors -->
+        <div class="accordion-sec open">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span>🎨 ปรับแต่งสีสัน</span>
+            <span>▼</span>
+          </div>
+          <div class="accordion-body">
+            <!-- Background Color -->
+            <div class="form-group">
+              <label>สีพื้นหลัง</label>
+              <div class="color-input-wrap">
+                <input type="color" class="color-picker-custom" id="color-bg" value="#ffffff">
+                <input type="text" id="color-bg-text" value="#ffffff" style="width: 100px;">
+              </div>
+            </div>
+            
+            <!-- Foreground / Dots Color Mode -->
+            <div class="toggle-wrap">
+              <label style="margin: 0; font-weight: 600;">ไล่ระดับสี (Color Gradient)</label>
+              <label class="switch">
+                <input type="checkbox" id="fg-gradient-toggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <!-- Single Color Input -->
+            <div id="fg-single-wrap" class="form-group">
+              <label>สีของรหัส QR</label>
+              <div class="color-input-wrap">
+                <input type="color" class="color-picker-custom" id="color-fg" value="#0f172a">
+                <input type="text" id="color-fg-text" value="#0f172a" style="width: 100px;">
+              </div>
+            </div>
+
+            <!-- Gradient Inputs -->
+            <div id="fg-gradient-wrap" class="row-2" style="display: none;">
+              <div class="form-group">
+                <label>สีเริ่มต้น (Start)</label>
+                <div class="color-input-wrap">
+                  <input type="color" class="color-picker-custom" id="color-grad-1" value="#7b1325">
+                  <input type="text" id="color-grad-1-text" value="#7b1325">
+                </div>
+              </div>
+              <div class="form-group">
+                <label>สีปลายทาง (End)</label>
+                <div class="color-input-wrap">
+                  <input type="color" class="color-picker-custom" id="color-grad-2" value="#dc2626">
+                  <input type="text" id="color-grad-2-text" value="#dc2626">
+                </div>
+              </div>
+            </div>
+            
+            <div id="gradient-type-wrap" class="row-2" style="display: none; margin-top: 10px;">
+              <div class="form-group">
+                <label>ทิศทาง/รูปแบบ</label>
+                <select id="color-grad-type">
+                  <option value="linear">แนวเส้นตรง (Linear)</option>
+                  <option value="radial">แนวรัศมีวงกลม (Radial)</option>
+                </select>
+              </div>
+              <div class="form-group" id="gradient-angle-wrap">
+                <label>มุมองศา (0 - 360°)</label>
+                <input type="number" id="color-grad-angle" value="0" min="0" max="360">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion 2: Patterns -->
+        <div class="accordion-sec">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span>🧩 รูปแบบลายจุดและกรอบมุม</span>
+            <span>▼</span>
+          </div>
+          <div class="accordion-body">
+            <div class="form-group">
+              <label for="style-dots">รูปแบบลายจุดด้านใน (Dots Style)</label>
+              <select id="style-dots">
+                <option value="square">สี่เหลี่ยมปกติ (Square)</option>
+                <option value="rounded">โค้งมนธรรมดา (Rounded)</option>
+                <option value="extra-rounded">โค้งกลมหนา (Extra-rounded)</option>
+                <option value="dots">กลมจุดแยก (Dots)</option>
+                <option value="classy">เรียบหรูเหลี่ยมหยดน้ำ (Classy)</option>
+                <option value="classy-rounded">เรียบหรูขอบมน (Classy Rounded)</option>
+              </select>
+            </div>
+            
+            <div class="row-2">
+              <div class="form-group">
+                <label for="style-corners">กรอบมุมสี่เหลี่ยม (Corner Square)</label>
+                <select id="style-corners">
+                  <option value="square">สี่เหลี่ยม (Square)</option>
+                  <option value="dot">วงกลมจุด (Dot)</option>
+                  <option value="extra-rounded">ขอบกลมหนา (Extra-rounded)</option>
+                  <option value="outround">ขอบมนนอก (Outround)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="style-corners-dot">จุดด้านในกรอบมุม (Corner Dot)</label>
+                <select id="style-corners-dot">
+                  <option value="square">สี่เหลี่ยม (Square)</option>
+                  <option value="dot">วงกลมจุด (Dot)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Accordion 3: Logo Upload -->
+        <div class="accordion-sec">
+          <div class="accordion-hdr" onclick="toggleAccordion(this)">
+            <span>🖼️ อัปโหลดโลโก้ตรงกลาง</span>
+            <span>▼</span>
+          </div>
+          <div class="accordion-body">
+            <div class="file-dropzone" onclick="document.getElementById('logoFile').click()">
+              <p>📂 คลิกที่นี่เพื่อเลือกรูปภาพหรือโลโก้ (.PNG, .JPG)</p>
+              <p style="font-size:0.75rem; margin-top:4px;">แนะนำรูปทรงจัตุรัสและพื้นหลังโปร่งใส</p>
+              <img id="logo-preview-img" class="logo-preview" alt="Preview">
+            </div>
+            <input type="file" id="logoFile" accept="image/*" style="display: none;" onchange="handleLogoUpload(this)">
+            
+            <div class="toggle-wrap" style="margin-top: 14px;" id="hide-bg-dots-wrap">
+              <label style="margin: 0; font-size: 0.85rem;">ซ่อนจุดรหัสที่โดนโลโก้บัง (แนะนำเปิดไว้)</label>
+              <label class="switch">
+                <input type="checkbox" id="hide-bg-dots" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+            
+            <div id="btn-remove-logo-wrap" style="display: none; text-align: right; margin-top: 8px;">
+              <button class="btn-outline" style="padding: 6px 12px; font-size: 0.8rem; border-color: var(--primary); color: var(--primary);" onclick="removeLogo()">✕ ลบรูปโลโก้</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Right Panel: Preview and Exports -->
+    <div>
+      <div class="card preview-card">
+        <h2>🔎 3. ตัวอย่างรหัส QR Code</h2>
+        
+        <div class="qr-container-wrap">
+          <div id="qr-canvas-container"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="btn-group">
+          <button class="btn-primary" onclick="downloadQR('png')">📥 ดาวน์โหลดภาพ PNG</button>
+          <button class="btn-outline" onclick="downloadQR('svg')">📐 ดาวน์โหลดไฟล์เวกเตอร์ SVG</button>
+          <button class="btn-outline" onclick="copyQR()">📋 คัดลอกภาพไปยัง Clipboard</button>
+        </div>
+      </div>
+
+      <!-- Card: History Log -->
+      <div class="card" style="margin-top: 20px;">
+        <h2>🕰️ ประวัติการสร้างล่าสุด</h2>
+        <div class="history-list" id="historyContainer">
+          <div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding: 12px;">ยังไม่มีการสร้างล่าสุดในเซสชันนี้</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toastBox">คัดลอกรูปภาพแล้ว!</div>
+
+<script>
+  let qrCodeGenerator = null;
+  let activeType = 'url';
+  let uploadedLogoUrl = '';
+  const HISTORY_KEY = 'qr_generator_history_v1';
+
+  // เริ่มต้นตั้งค่า
+  function init() {
+    setupColorPickers();
+    setupInputsListener();
+    setupTabs();
+    
+    // ตั้งค่าตัวสร้าง QR Code ของ qr-code-styling
+    qrCodeGenerator = new QRCodeStyling({
+      width: 280,
+      height: 280,
+      type: "svg",
+      data: getQRData(),
+      dotsOptions: {
+        color: "#0f172a",
+        type: "square"
+      },
+      backgroundOptions: {
+        color: "#ffffff",
+      },
+      imageOptions: {
+        crossOrigin: "anonymous",
+        margin: 6,
+        hideBackgroundDots: true
+      }
+    });
+
+    qrCodeGenerator.append(document.getElementById("qr-canvas-container"));
+    updateQR();
+    renderHistory();
+  }
+
+  // ดึงค่าข้อมูลจากฟอร์มที่กำลังเปิดใช้
+  function getQRData() {
+    switch(activeType) {
+      case 'url':
+        return document.getElementById('input-url').value.trim() || 'https://google.com';
+      case 'text':
+        return document.getElementById('input-text').value || 'Hello';
+      case 'wifi':
+        const ssid = document.getElementById('input-wifi-ssid').value.trim();
+        const type = document.getElementById('input-wifi-type').value;
+        const pass = document.getElementById('input-wifi-pass').value;
+        if (!ssid) return 'WIFI:S:;T:;P:;;';
+        // WIFI:S:MySSID;T:WPA;P:MyPass;;
+        return `WIFI:S:${ssid};T:${type};P:${pass};;`;
+      case 'phone':
+        const phone = document.getElementById('input-phone').value.trim();
+        return phone ? `tel:${phone}` : '';
+      case 'sms':
+        const smsPhone = document.getElementById('input-sms-phone').value.trim();
+        const smsMsg = document.getElementById('input-sms-msg').value;
+        return smsPhone ? `SMSTO:${smsPhone}:${smsMsg}` : '';
+    }
+  }
+
+  // อัปเดตการแสดงผลของ QR Code
+  function updateQR() {
+    const data = getQRData();
+    const dotsType = document.getElementById('style-dots').value;
+    const cornerSquareType = document.getElementById('style-corners').value;
+    const cornerDotType = document.getElementById('style-corners-dot').value;
+    
+    const bgColor = document.getElementById('color-bg').value;
+    
+    const useGradient = document.getElementById('fg-gradient-toggle').checked;
+    
+    let dotsOptions = { type: dotsType };
+
+    if (useGradient) {
+      dotsOptions.gradient = {
+        type: document.getElementById('color-grad-type').value,
+        rotation: parseFloat(document.getElementById('color-grad-angle').value || 0) * Math.PI / 180,
+        colorStops: [
+          { offset: 0, color: document.getElementById('color-grad-1').value },
+          { offset: 1, color: document.getElementById('color-grad-2').value }
+        ]
+      };
+    } else {
+      dotsOptions.color = document.getElementById('color-fg').value;
+    }
+
+    const options = {
+      data: data,
+      dotsOptions: dotsOptions,
+      backgroundOptions: {
+        color: bgColor
+      },
+      cornersSquareOptions: {
+        type: cornerSquareType,
+        color: useGradient ? document.getElementById('color-grad-1').value : document.getElementById('color-fg').value
+      },
+      cornersDotOptions: {
+        type: cornerDotType,
+        color: useGradient ? document.getElementById('color-grad-2').value : document.getElementById('color-fg').value
+      }
+    };
+
+    if (uploadedLogoUrl) {
+      options.image = uploadedLogoUrl;
+      options.imageOptions = {
+        margin: 6,
+        hideBackgroundDots: document.getElementById('hide-bg-dots').checked,
+        imageSize: 0.4
+      };
+    } else {
+      options.image = '';
+    }
+
+    qrCodeGenerator.update(options);
+  }
+
+  // บันทึกข้อมูลประวัติลง LocalStorage
+  function saveToHistory() {
+    const data = getQRData();
+    if (!data || data === 'https://google.com' || data === 'WIFI:S:;T:;P:;;' || data === 'tel:') return;
+
+    let history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    
+    // ตรวจสอบข้อมูลซ้ำ
+    history = history.filter(item => item.data !== data);
+    
+    // เพิ่มเข้าไปรายการแรก
+    history.unshift({
+      data: data,
+      type: activeType,
+      time: new Date().toLocaleTimeString('th-TH', {hour: '2-digit', minute:'2-digit'})
+    });
+
+    // จำกัดแค่ 10 รายการ
+    if (history.length > 10) history.pop();
+    
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    renderHistory();
+  }
+
+  // แสดงผลประวัติล่าสุด
+  function renderHistory() {
+    const container = document.getElementById('historyContainer');
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    
+    if (history.length === 0) {
+      container.innerHTML = '<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding: 12px;">ยังไม่มีการสร้างล่าสุดในเซสชันนี้</div>';
+      return;
+    }
+
+    container.innerHTML = history.map((item, idx) => {
+      let icon = '🔗';
+      if (item.type === 'text') icon = '📝';
+      if (item.type === 'wifi') icon = '📶';
+      if (item.type === 'phone') icon = '📞';
+      if (item.type === 'sms') icon = '💬';
+
+      return `
+        <div class="history-item" onclick="loadHistoryItem(${idx})">
+          <div class="history-info">
+            <span class="history-type">${icon} ${item.type}</span> - <span title="${escapeHtml(item.data)}">${escapeHtml(item.data)}</span>
+          </div>
+          <span class="history-time">${item.time}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ดึงรายการประวัติย้อนกลับมาแก้ไข
+  function loadHistoryItem(idx) {
+    const history = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+    const item = history[idx];
+    if (!item) return;
+
+    // เปลี่ยนประเภทแท็บ
+    activeType = item.type;
+    document.querySelectorAll('#typeTabs .tab-item').forEach(tab => {
+      tab.classList.toggle('active', tab.getAttribute('data-type') === activeType);
+    });
+    document.querySelectorAll('.input-panel').forEach(panel => {
+      panel.classList.toggle('active', panel.id === `panel-${activeType}`);
+    });
+
+    // ใส่ค่าข้อมูล
+    if (item.type === 'url') {
+      document.getElementById('input-url').value = item.data;
+    } else if (item.type === 'text') {
+      document.getElementById('input-text').value = item.data;
+    } else if (item.type === 'phone') {
+      document.getElementById('input-phone').value = item.data.replace('tel:', '');
+    } else if (item.type === 'sms') {
+      const parts = item.data.split(':');
+      if (parts.length >= 3) {
+        document.getElementById('input-sms-phone').value = parts[1];
+        document.getElementById('input-sms-msg').value = parts.slice(2).join(':');
+      }
+    } else if (item.type === 'wifi') {
+      const matchSsid = item.data.match(/S:([^;]+)/);
+      const matchType = item.data.match(/T:([^;]+)/);
+      const matchPass = item.data.match(/P:([^;]+)/);
+      if (matchSsid) document.getElementById('input-wifi-ssid').value = matchSsid[1];
+      if (matchType) document.getElementById('input-wifi-type').value = matchType[1];
+      if (matchPass) document.getElementById('input-wifi-pass').value = matchPass[1];
+    }
+
+    updateQR();
+  }
+
+  // ฟังก์ชันดาวน์โหลดรูปภาพ
+  function downloadQR(extension) {
+    saveToHistory();
+    const data = getQRData();
+    const filename = `qrcode-${activeType}-${Date.now()}`;
+    qrCodeGenerator.download({ name: filename, extension: extension });
+  }
+
+  // คัดลอกภาพ QR ไปยัง Clipboard
+  async function copyQR() {
+    saveToHistory();
+    try {
+      const svgElement = document.querySelector('#qr-canvas-container svg');
+      if (!svgElement) return;
+
+      const svgString = new XMLSerializer().serializeToString(svgElement);
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const URL = window.URL || window.webkitURL || window;
+      const blobURL = URL.createObjectURL(svgBlob);
+
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = svgElement.clientWidth || 280;
+        canvas.height = svgElement.clientHeight || 280;
+        const context = canvas.getContext('2d');
+        context.drawImage(image, 0, 0);
+
+        canvas.toBlob(async (blob) => {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]);
+            showToast('📋 คัดลอกภาพ QR Code ไปยัง Clipboard แล้ว!');
+          } catch(e) {
+            console.error(e);
+            alert('❌ เบราว์เซอร์ของคุณไม่รองรับการคัดลอกไฟล์รูปภาพผ่านสคริปต์ แนะนำใช้การคลิกขวาบันทึกรูปภาพหรือปุ่มดาวน์โหลดแทนครับ');
+          }
+        }, 'image/png');
+      };
+      image.src = blobURL;
+    } catch (err) {
+      console.error(err);
+      alert('❌ ไม่สามารถคัดลอกรูปภาพได้');
+    }
+  }
+
+  // แสดงผลป๊อปอัปข้อความ (Toast)
+  function showToast(text) {
+    const toast = document.getElementById('toastBox');
+    toast.textContent = text;
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+    }, 2500);
+  }
+
+  // ฟังก์ชันลบโลโก้
+  function removeLogo() {
+    uploadedLogoUrl = '';
+    document.getElementById('logoFile').value = '';
+    document.getElementById('logo-preview-img').style.display = 'none';
+    document.getElementById('btn-remove-logo-wrap').style.display = 'none';
+    updateQR();
+  }
+
+  // จัดการอัปโหลดโลโก้
+  function handleLogoUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      uploadedLogoUrl = e.target.result;
+      const img = document.getElementById('logo-preview-img');
+      img.src = uploadedLogoUrl;
+      img.style.display = 'inline-block';
+      document.getElementById('btn-remove-logo-wrap').style.display = 'block';
+      updateQR();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // จัดการเปิด/ปิด Accordion ปรับแต่งดีไซน์
+  function toggleAccordion(hdr) {
+    const sec = hdr.parentElement;
+    const isOpen = sec.classList.contains('open');
+    
+    document.querySelectorAll('.accordion-sec').forEach(el => {
+      el.classList.remove('open');
+    });
+
+    if (!isOpen) {
+      sec.classList.add('open');
+    }
+  }
+
+  // เชื่อมโยงสี Picker กับช่องพิมพ์ตัวอักษรรหัสสี Hex
+  function setupColorPickers() {
+    const pairs = [
+      { picker: 'color-bg', text: 'color-bg-text' },
+      { picker: 'color-fg', text: 'color-fg-text' },
+      { picker: 'color-grad-1', text: 'color-grad-1-text' },
+      { picker: 'color-grad-2', text: 'color-grad-2-text' }
+    ];
+
+    pairs.forEach(pair => {
+      const pickerEl = document.getElementById(pair.picker);
+      const textEl = document.getElementById(pair.text);
+
+      pickerEl.addEventListener('input', (e) => {
+        textEl.value = e.target.value.toUpperCase();
+        updateQR();
+      });
+
+      textEl.addEventListener('input', (e) => {
+        let val = e.target.value;
+        if (!val.startsWith('#')) val = '#' + val;
+        if (val.length === 7) {
+          pickerEl.value = val;
+          updateQR();
+        }
+      });
+    });
+
+    // ตัวเลือกแสดงรูปแบบไล่โทนสี
+    const gradToggle = document.getElementById('fg-gradient-toggle');
+    gradToggle.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      document.getElementById('fg-single-wrap').style.display = isChecked ? 'none' : 'block';
+      document.getElementById('fg-gradient-wrap').style.display = isChecked ? 'grid' : 'none';
+      document.getElementById('gradient-type-wrap').style.display = isChecked ? 'grid' : 'none';
+      updateQR();
+    });
+
+    document.getElementById('color-grad-type').addEventListener('change', (e) => {
+      const isRadial = e.target.value === 'radial';
+      document.getElementById('gradient-angle-wrap').style.display = isRadial ? 'none' : 'block';
+      updateQR();
+    });
+  }
+
+  // ตรวจจับการเปลี่ยนแปลงของช่องป้อนข้อมูลและตัวเลือกดีไซน์
+  function setupInputsListener() {
+    const fields = [
+      'input-url', 'input-text', 'input-wifi-ssid', 'input-wifi-type', 'input-wifi-pass',
+      'input-phone', 'input-sms-phone', 'input-sms-msg',
+      'style-dots', 'style-corners', 'style-corners-dot',
+      'color-grad-type', 'color-grad-angle', 'hide-bg-dots'
+    ];
+
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', updateQR);
+        el.addEventListener('change', updateQR);
+      }
+    });
+
+    document.getElementById('input-wifi-type').addEventListener('change', (e) => {
+      const isNopass = e.target.value === 'nopass';
+      document.getElementById('wifi-pass-wrap').style.display = isNopass ? 'none' : 'block';
+    });
+  }
+
+  // จัดการตัวเลือกเปลี่ยนแท็บประเภทข้อมูล
+  function setupTabs() {
+    const tabs = document.querySelectorAll('#typeTabs .tab-item');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+
+        activeType = tab.getAttribute('data-type');
+        
+        document.querySelectorAll('.input-panel').forEach(panel => {
+          panel.classList.remove('active');
+        });
+        document.getElementById(`panel-${activeType}`).classList.add('active');
+
+        updateQR();
+      });
+    });
+  }
+
+  // ป้องกันการแฮ็ค XSS สำหรับข้อมูลประวัติ
+  function escapeHtml(text) {
+    if (!text) return '';
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // เรียกทำงานเมื่อโหลด
+  window.onload = init;
+</script>
+</body>
+</html>

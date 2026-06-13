@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🖨️ ระบบสร้างการ์ด QR Code นักเรียน</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #7B1325;
+    --primary-light: #9B1A30;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --font: "Sarabun", -apple-system, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); padding: 24px; min-height: 100vh; }
+  
+  /* ส่วนควบคุม (ซ่อนเวลาพิมพ์) */
+  .control-panel {
+    max-width: 800px;
+    margin: 0 auto 24px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+  .control-panel h2 { font-size: 1.3rem; font-weight: 800; color: var(--primary); margin-bottom: 6px; }
+  .control-panel p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px; }
+  
+  .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 16px; }
+  .form-field { flex: 1; min-width: 180px; }
+  .form-field label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  
+  select, input {
+    font-family: inherit; font-size: 0.9rem; padding: 8px 12px; border: 1.5px solid var(--border);
+    border-radius: 8px; width: 100%; outline: none; background: #fff;
+  }
+  select:focus, input:focus { border-color: var(--primary-light); }
+  
+  button {
+    font-family: inherit; font-size: 0.95rem; font-weight: 700; border: none; border-radius: 8px;
+    padding: 9px 20px; cursor: pointer; background: var(--primary); color: #fff;
+    transition: background 0.2s; display: inline-flex; align-items: center; gap: 8px;
+  }
+  button:hover { background: var(--primary-light); }
+  button.secondary { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+  button.secondary:hover { background: #f1f5f9; }
+
+  /* พรีวิวหน้าการ์ด */
+  .preview-wrap { max-width: 1000px; margin: 0 auto; }
+  
+  /* การ์ดสไตล์ตาราง Grid พิมพ์ */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(6.8cm, 1fr));
+    gap: 10px;
+    justify-content: center;
+  }
+
+  /* บัตรรายบุคคล */
+  .student-card {
+    width: 6.8cm;
+    height: 4.4cm;
+    background: #fff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+  
+  /* เปลี่ยนธีมสีบัตรตามห้อง */
+  .theme-red { border-top: 5px solid #ef4444; }
+  .theme-blue { border-top: 5px solid #3b82f6; }
+  .theme-green { border-top: 5px solid #22c55e; }
+  .theme-amber { border-top: 5px solid #f59e0b; }
+  .theme-purple { border-top: 5px solid #a855f7; }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1.5px dashed #e2e8f0;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .school-name { font-size: 7.5px; font-weight: 800; color: var(--text-muted); }
+  .card-title { font-size: 8.5px; font-weight: 800; color: var(--primary); letter-spacing: 0.5px; }
+  .room-badge { background: #f1f5f9; border: 1px solid #cbd5e1; font-size: 8px; font-weight: 800; padding: 1px 6px; border-radius: 4px; }
+  
+  .card-body {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  
+  .qr-code-img {
+    width: 2.1cm;
+    height: 2.1cm;
+    object-fit: contain;
+    border: 1px solid #e2e8f0;
+    padding: 2px;
+    background: #fff;
+    border-radius: 4px;
+  }
+  
+  .stu-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .stu-name { font-size: 11.5px; font-weight: 700; color: var(--text); line-height: 1.3; margin-bottom: 2px; }
+  .stu-id { font-size: 8.5px; color: var(--text-muted); font-weight: 600; }
+  .stu-no { font-size: 11px; font-weight: 800; color: var(--primary); }
+
+  .card-footer {
+    font-size: 7px;
+    color: var(--text-dim);
+    text-align: center;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 3px;
+    margin-top: 3px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ตั้งค่าการพิมพ์ PDF */
+  @media print {
+    body { background: #fff; padding: 0; margin: 0; }
+    .control-panel { display: none !important; }
+    .preview-wrap { max-width: 100%; }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 6.8cm);
+      gap: 12px;
+      padding: 10px;
+    }
+    .student-card {
+      border: 1px solid #000 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ส่วนควบคุม -->
+  <div class="control-panel" style="position: relative;">
+    <a href="../index.html" style="position: absolute; top: 20px; right: 20px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; background: #f1f5f9; border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 14px; color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';">
+      🏠 กลับหน้าหลัก
+    </a>
+    <h2>🖨️ ระบบจัดทำการ์ด QR Code ประจำตัวนักเรียน</h2>
+    <p>ระบบจะดึงทะเบียนรายชื่อห้องเรียนมาจัดทำบัตรที่มี **คิวอาร์โค้ดรหัสประจำตัว** และ **ชื่อ-นามสกุล** พิมพ์อยู่คู่กัน ทำให้นักเรียนใช้สแกนเช็คชื่อ/ส่งงานได้ทันที แก้ปัญหาการจำเลขที่ไม่ได้ หรือเลขที่สลับกัน</p>
+    
+    <div class="form-row">
+      <div class="form-field">
+        <label>🏫 เลือกห้องเรียน</label>
+        <select id="roomSelect" onchange="loadRoomStudents()">
+          <option value="">-- กำลังโหลดห้องเรียน... --</option>
+        </select>
+      </div>
+      
+      <div class="form-field" style="max-width: 150px;">
+        <label>🎨 ธีมสีบัตร</label>
+        <select id="themeSelect" onchange="renderCards()">
+          <option value="theme-red">แดงเข้ม (Maroon)</option>
+          <option value="theme-blue">น้ำเงิน (Blue)</option>
+          <option value="theme-green">เขียว (Green)</option>
+          <option value="theme-amber">ส้ม/เหลือง (Amber)</option>
+          <option value="theme-purple">ม่วง (Purple)</option>
+        </select>
+      </div>
+
+      <div class="form-field" style="max-width: 160px;">
+        <label>🔗 ชนิดข้อมูลใน QR</label>
+        <select id="qrTypeSelect" onchange="renderCards()">
+          <option value="id">รหัสประจำตัวนักเรียน</option>
+          <option value="no">เลขที่ธรรมดา (เช่น 1, 2, 3)</option>
+        </select>
+      </div>
+
+      <div>
+        <button onclick="window.print()">🖨️ พิมพ์บัตร (Print / PDF)</button>
+      </div>
+    </div>
+    <div style="font-size: 0.8rem; color: var(--text-muted);">
+      💡 <b>คำแนะนำการพิมพ์:</b> ในหน้าต่างพิมพ์ของบราวเซอร์ ให้ตั้งค่า <b>Margins: None (ไม่มี)</b> และเลือกติ๊กถูกที่ <b>Background graphics (ภาพพื้นหลัง)</b> เพื่อให้สีขอบบนพิมพ์ออกมาด้วยครับ
+    </div>
+  </div>
+
+  <!-- พรีวิวบัตร -->
+  <div class="preview-wrap">
+    <div class="cards-grid" id="cardsContainer"></div>
+  </div>
+
+<script>
+  let ROSTER_DATA = null;
+  let activeStudents = [];
+
+  // โหลดรายชื่อห้องเรียนจากทะเบียนกลางผ่าน Local Server
+  async function init() {
+    try {
+      const response = await fetch('roster.json');
+      if (!response.ok) throw new Error('ไม่สามารถเชื่อมต่อไฟล์ทะเบียนได้');
+      ROSTER_DATA = await response.json();
+      
+      // อัปเดตรายชื่อห้อง
+      const select = document.getElementById('roomSelect');
+      select.innerHTML = '<option value="">-- เลือกห้องเรียน --</option>';
+      
+      // เพิ่มห้อง ม.1 - ม.6
+      Object.keys(ROSTER_DATA).forEach(room => {
+        const option = document.createElement('option');
+        option.value = room;
+        option.textContent = room;
+        select.appendChild(option);
+      });
+
+      // หากเป็นครูเตรียมวิศวะ อาจจะดึงห้องหลัก ม.6/1 เป็นค่าเริ่มต้น
+      if(ROSTER_DATA['ม.6/1']) {
+        select.value = 'ม.6/1';
+        loadRoomStudents();
+      }
+    } catch(err) {
+      console.error(err);
+      alert('❌ ไม่สามารถโหลดไฟล์รายชื่อทะเบียน ม.1-ม.6 ได้อัตโนมัติ กรุณาตรวจสอบว่าเปิดใช้งานผ่าน http://localhost:8080/ หรือยัง');
+    }
+  }
+
+  function loadRoomStudents() {
+    const room = document.getElementById('roomSelect').value;
+    if (!room || !ROSTER_DATA[room]) {
+      activeStudents = [];
+      document.getElementById('cardsContainer').innerHTML = '';
+      return;
+    }
+    
+    activeStudents = ROSTER_DATA[room];
+    renderCards();
+  }
+
+  function renderCards() {
+    const container = document.getElementById('cardsContainer');
+    const theme = document.getElementById('themeSelect').value;
+    const qrType = document.getElementById('qrTypeSelect').value;
+    const room = document.getElementById('roomSelect').value;
+    
+    container.innerHTML = '';
+    
+    if (activeStudents.length === 0) return;
+    
+    activeStudents.forEach(student => {
+      // ตรวจสอบข้อมูลรหัส
+      const studentId = student.id ? String(student.id).trim() : '';
+      
+      // ข้อมูลที่จะใส่ใน QR Code
+      const qrData = (qrType === 'id' && studentId) ? studentId : student.no;
+      
+      // ลิงก์รูปภาพคิวอาร์โค้ด
+      const qrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrData)}&ecLevel=M&margin=1&size=120`;
+      
+      const card = document.createElement('div');
+      card.className = `student-card ${theme}`;
+      card.innerHTML = `
+        <div class="card-header">
+          <div>
+            <div class="school-name">ส.พ.ร. (เทศบาลเมืองราชบุรี)</div>
+            <div class="card-title">บัตรเช็คชื่อ / ส่งงาน</div>
+          </div>
+          <div class="room-badge">${room}</div>
+        </div>
+        <div class="card-body">
+          <img class="qr-code-img" src="${qrUrl}" alt="QR Code">
+          <div class="stu-info">
+            <div class="stu-name">${student.name}</div>
+            <div class="stu-id">รหัส: ${studentId || '—'}</div>
+            <div class="stu-no">เลขที่ ${student.no}</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span>ปีการศึกษา 2569</span>
+          <span> scan to record </span>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  // เรียกใช้เมื่อโหลดหน้าเว็บ
+  init();
+</script>
+</body>
+</html>

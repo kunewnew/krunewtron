@@ -1,0 +1,1951 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📦 ติดตามงาน / ข้อสอบ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Itim&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<style>
+  :root{
+    --green:#1f6f3e;--green-d:#0f3d20;--green-l:#e8f3ec;
+    --card:#fffdf7;--line:#e2e0d4;--text:#26302a;--muted:#6b7770;
+    --send:#1f6f3e;--miss:#c0392b;--miss-bg:#fceae8;--exam:#8a5a00;--exam-bg:#fff6e6;
+    --board:#2c4a39;--board-d:#21392c;--chalk:#f4f1e6;--chalk-dim:rgba(244,241,230,.78);
+    --chalk-line:rgba(244,241,230,.45);
+    --font:"Sarabun","Noto Sans Thai",-apple-system,"Segoe UI",sans-serif;
+    --font-chalk:"Itim",var(--font);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);font-size:15px;line-height:1.55;color:var(--text);
+    background:
+      radial-gradient(120% 90% at 50% -10%, rgba(255,255,255,.07), transparent 60%),
+      radial-gradient(80% 60% at 80% 110%, rgba(0,0,0,.18), transparent 60%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,.012) 0 3px, transparent 3px 7px),
+      linear-gradient(160deg, var(--board) 0%, var(--board-d) 100%);
+    background-attachment:fixed;min-height:100vh}
+  header{background:rgba(15,30,22,.35);color:var(--chalk);padding:14px 18px;display:flex;align-items:center;
+    gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20;border-bottom:2px solid var(--chalk-line);
+    box-shadow:0 4px 18px rgba(0,0,0,.28);backdrop-filter:blur(4px)}
+  header h1{font-family:var(--font-chalk);font-size:23px;margin:0;flex:1;min-width:170px;letter-spacing:.3px;
+    text-shadow:0 1px 0 rgba(0,0,0,.25),0 0 8px rgba(244,241,230,.18)}
+  #save{font-size:13px;color:var(--chalk-dim);white-space:nowrap}
+  .wrap{max-width:1150px;margin:0 auto;padding:18px 16px 44px}
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+  .tab{background:transparent;border:1.5px dashed var(--chalk-line);border-radius:12px;padding:9px 18px;
+    cursor:pointer;font-family:var(--font-chalk);font-size:16px;color:var(--chalk-dim);transition:.15s}
+  .tab:hover{border-color:var(--chalk);color:var(--chalk)}
+  .tab.active{background:var(--chalk);color:var(--green-d);border:1.5px solid var(--chalk);box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;
+    box-shadow:0 8px 24px rgba(0,0,0,.22)}
+  .card h2{font-family:var(--font-chalk);font-size:20px;margin:0 0 12px;color:var(--green-d);
+    display:inline-block;border-bottom:2px dashed #cdd8d0;padding-bottom:3px}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px;font-weight:600}
+  input,select,textarea{font-family:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);
+    border-radius:9px;background:#fff;color:var(--text);width:100%}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--green-l);border-color:var(--green)}
+  button{font-family:var(--font-chalk);font-size:16px;font-weight:600;border:none;border-radius:10px;
+    padding:9px 18px;cursor:pointer;background:var(--green);color:#fff;box-shadow:0 2px 6px rgba(31,111,62,.3)}
+  button:hover{background:var(--green-d)}
+  button.ghost{background:#fff;color:var(--green-d);border:1.5px solid var(--green);box-shadow:none}
+  button.danger{background:#fff;color:var(--miss);border:1.5px solid var(--miss);box-shadow:none}
+  button.small{padding:5px 12px;font-size:14px}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .pill{background:var(--green-l);color:var(--green-d);border-radius:20px;padding:3px 12px;font-size:13px;font-weight:600;display:inline-block}
+  .hint{font-size:12px;color:var(--muted);margin-top:8px}
+  .muted{color:var(--muted);font-size:13px}
+  .ok{color:var(--green)}.err{color:var(--miss);font-weight:600}
+  /* set chips */
+  .sets{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .chip{background:#fff;border:1.5px solid var(--line);border-radius:12px;padding:7px 14px;cursor:pointer;
+    font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px}
+  .chip:hover{border-color:var(--green)}
+  .chip.active{background:var(--green);color:#fff;border-color:var(--green)}
+  .chip small{opacity:.8;font-weight:400}
+  /* table */
+  table{border-collapse:collapse;font-size:14px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:center;white-space:nowrap}
+  th{background:var(--green-l);color:var(--green-d)}
+  .tbl-scroll{overflow:auto;max-height:66vh;border-radius:10px;border:1px solid var(--line)}
+  #grid th.no,#grid td.no{position:sticky;left:0;z-index:2;background:var(--card);width:42px}
+  #grid th.nm,#grid td.nm{position:sticky;left:42px;z-index:2;background:var(--card);text-align:left;min-width:150px}
+  #grid thead th{position:sticky;top:0;z-index:4}
+  #grid thead th.no{left:0;z-index:6}#grid thead th.nm{left:42px;z-index:6}
+  /* แถวสรุปท้ายตาราง */
+  #grid tfoot th{position:sticky;bottom:0;z-index:5;background:#d8ebe0;color:var(--green-d);
+    font-size:12.5px;line-height:1.35;padding:6px 6px;border-top:2px solid var(--green)}
+  #grid tfoot th.no,#grid tfoot th.nm{left:0;z-index:7;background:#d8ebe0;text-align:left;font-weight:700}
+  #grid tfoot th.nm{left:42px}
+  #grid tfoot th .ft-pct{font-weight:800;font-size:14px}
+  #grid tfoot th.ft-exam{background:#f3e4c4}
+  #grid tfoot th .ft-sub{color:var(--muted);font-weight:400}
+  #grid tfoot th .ft-rpt{display:inline-block;margin-top:4px;font-size:11.5px;font-weight:700;color:#fff;
+    background:var(--green);border-radius:6px;padding:2px 8px;cursor:pointer;font-family:var(--font-chalk)}
+  #grid tfoot th .ft-rpt:hover{background:var(--green-d)}
+  #workRptDlg{max-width:760px}
+  #wrPreview{max-height:60vh;overflow:auto;background:#e8eee9;border-radius:10px;padding:14px}
+  th.exam{background:var(--exam-bg);color:var(--exam)}
+  td.examcell{background:var(--exam-bg)}
+  td.examcell input{width:62px;text-align:center;padding:5px 4px;border-radius:6px}
+  .cell{cursor:pointer;font-weight:700;user-select:none;min-width:58px}
+  .s-send{background:var(--green);color:#fff}
+  .s-miss{background:var(--miss-bg);color:var(--miss)}
+  .pend{font-weight:800;color:var(--miss)}.pend0{color:var(--green)}
+  .work-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+  .tag-send,.tag-exam{font-size:11px;font-weight:700;border-radius:5px;padding:2px 8px}
+  .tag-send{background:#cfe9d8;color:#155029}.tag-exam{background:#fbe2b0;color:#7a5200}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .stat{background:var(--green-l);border-radius:12px;padding:12px;text-align:center}
+  .stat .num{font-size:25px;font-weight:800;color:var(--green-d)}
+  .stat .cap{font-size:12px;color:var(--muted)}
+  .barline{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .barline .nm{width:180px;font-size:13px;text-align:right;flex-shrink:0}
+  .barbg{flex:1;background:#eceae0;border-radius:6px;overflow:hidden;height:20px}
+  .barfill{height:100%;background:var(--green);border-radius:6px}
+  ul.miss-list{margin:0;padding-left:18px}ul.miss-list li{margin-bottom:4px}
+  dialog{border:none;border-radius:16px;padding:0;max-width:460px;width:92%}
+  dialog::backdrop{background:rgba(0,0,0,.45)}
+  .dlg-body{padding:20px}
+  .dlg-body h2{font-family:var(--font-chalk);color:var(--green-d);margin:0 0 14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  .field{flex:1;min-width:130px}
+  .hide{display:none!important}
+  /* ===== drawer เมนูเว็บ ===== */
+  #menu-btn{background:rgba(244,241,230,.16);border:1.5px solid var(--chalk-line);color:var(--chalk);
+    border-radius:12px;width:40px;height:40px;font-size:20px;cursor:pointer;font-family:inherit;flex-shrink:0;line-height:1}
+  #menu-btn:active{background:rgba(244,241,230,.3)}
+  #drawer{position:fixed;top:0;left:0;bottom:0;width:252px;max-width:80vw;background:var(--card);z-index:301;
+    transform:translateX(-105%);transition:transform .25s ease;box-shadow:4px 0 18px rgba(0,0,0,.35);
+    display:flex;flex-direction:column;border-right:2px solid var(--line)}
+  #drawer.open{transform:none}
+  #drawer-backdrop{position:fixed;inset:0;background:rgba(15,30,22,.5);z-index:300;opacity:0;
+    pointer-events:none;transition:opacity .25s}
+  #drawer-backdrop.show{opacity:1;pointer-events:auto}
+  .drawer-head{padding:16px;background:linear-gradient(135deg,var(--green-d),var(--green));color:var(--chalk);
+    font-family:var(--font-chalk);font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px}
+  .drawer-head .x{margin-left:auto;background:none;border:none;color:var(--chalk);font-size:20px;cursor:pointer;
+    font-family:inherit;box-shadow:none;padding:0}
+  .drawer-head .x:hover{background:none}
+  .drawer-link{display:flex;align-items:center;gap:10px;padding:14px 16px;color:var(--text);text-decoration:none;
+    font-size:14px;font-weight:600;border-bottom:1px dashed var(--line)}
+  .drawer-link:active{background:var(--green-l)}
+  .drawer-link .ic{font-size:18px}
+  .drawer-note{margin-top:auto;padding:12px 16px;font-size:11.5px;color:var(--muted);border-top:1px dashed var(--line)}
+  /* Workspace landing overlay styling */
+  .ws-landing-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(120% 90% at 50% -10%, rgba(255,255,255,.05), transparent 60%),
+                linear-gradient(160deg, var(--board) 0%, var(--board-d) 100%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    backdrop-filter: blur(8px);
+  }
+  .ws-landing-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 12px 36px rgba(0,0,0,.4);
+    animation: wsFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes wsFadeIn {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .ws-cards-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 240px;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 12px;
+  }
+  .ws-card-item {
+    background: #fff;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+  }
+  .ws-card-item:hover {
+    border-color: var(--green);
+    background: var(--green-l);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  }
+  .ws-card-item .ws-name {
+    font-size: 16px;
+    font-family: var(--font-chalk);
+  }
+  .ws-card-item .ws-arrow {
+    color: var(--muted);
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<!-- หน้า Landing Screen สำหรับเลือกครู / สร้างห้องใหม่ -->
+<div id="wsLandingScreen" class="ws-landing-overlay">
+  <div class="ws-landing-card">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <span style="font-size: 50px;">📦</span>
+      <h2 style="font-family: var(--font-chalk); color: var(--green-d); margin-top: 10px; font-size: 24px; letter-spacing: 0.5px;">ระบบติดตามงาน / ข้อสอบ</h2>
+      <p style="font-size: 14px; color: var(--muted); margin-top: 4px;">กรุณาเลือกห้องทำงานครูเพื่อเริ่มต้น</p>
+    </div>
+    
+    <!-- หน้า 1: เลือกครู / สร้างใหม่ -->
+    <div id="wsLandingPageSelect">
+      <div id="wsCardsContainer" class="ws-cards-list">
+        <!-- Filled by JS -->
+      </div>
+      <button id="btnLandingCreateWs" style="width: 100%; margin-top: 8px; background: var(--green-d);">➕ สร้างห้องทำงานครูใหม่</button>
+      <a href="../index.html" class="ghost" style="width: 100%; margin-top: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; text-decoration: none; border-radius: 12px; padding: 9px 18px; font-size: 14.5px; font-weight: 600; color: var(--muted); border: 1.5px solid var(--line); background: transparent; cursor: pointer;">
+        🏠 กลับหน้าแรกเว็บรวมหลัก
+      </a>
+    </div>
+    
+    <!-- หน้า 2: ใส่รหัสผ่านของครูที่เลือก -->
+    <div id="wsLandingPageLogin" class="hide">
+      <h3 id="wsLoginTitle" style="font-family: var(--font-chalk); color: var(--green-d); margin-bottom: 12px; font-size: 18px; text-align: center;">👤 ครูนิวตรอน</h3>
+      <div class="field" style="margin-bottom: 12px;">
+        <label>รหัสผ่านเข้าบันทึก</label>
+        <input id="wsLoginPw" type="password" placeholder="••••" autocomplete="off" style="text-align: center; font-size: 18px; letter-spacing: 4px; padding: 10px;">
+      </div>
+      <div id="wsLoginMsg" style="color: var(--miss); font-size: 13.5px; text-align: center; min-height: 18px; margin-bottom: 12px; font-weight: bold;"></div>
+      
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <button id="wsLoginUnlock" style="width: 100%;">🔓 ปลดล็อกและเข้าทำงาน</button>
+        <button id="wsLoginReadOnly" class="ghost" style="width: 100%;">👁️ เข้าดูอย่างเดียว (ไม่บันทึก)</button>
+        <button id="wsLoginBack" class="ghost" style="width: 100%; border: none; color: var(--muted); background: transparent; box-shadow: none;">‹ ย้อนกลับ</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="drawer-backdrop" onclick="closeDrawer()"></div>
+<nav id="drawer">
+  <div class="drawer-head">🔗 เว็บทั้งหมด <button class="x" onclick="closeDrawer()" aria-label="ปิด">✕</button></div>
+  <div id="drawer-links"></div>
+  <div class="drawer-note">โรงเรียนสาธิตพหลโยธินรามินทรภักดี</div>
+</nav>
+<header>
+  <button id="menu-btn" onclick="openDrawer()" aria-label="เมนู">☰</button>
+  <a href="../index.html" style="background: rgba(244, 241, 230, 0.16); border: 1.5px solid var(--chalk-line); color: var(--chalk); border-radius: 8px; font-size: 13.5px; font-weight: 600; padding: 6px 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-family: var(--font); cursor: pointer; line-height: 1; flex-shrink: 0; margin-left: 12px; margin-right: 12px;">
+    🏠 กลับหน้าหลัก
+  </a>
+  <h1 style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+    <span>📦 ติดตามงาน / ข้อสอบ</span>
+    <button id="btnSwitchWsHeader" style="font-size: 13.5px; font-weight: normal; font-family: var(--font); background: rgba(255,255,255,0.12); padding: 4px 12px; border-radius: 20px; border: 1px solid var(--chalk-line); color: var(--chalk); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: none; line-height: 1;">
+      👤 ครู: <span id="lblActiveWs" style="font-weight: bold; font-family: var(--font-chalk);">ครูนิวตรอน</span> 🔄
+    </button>
+  </h1>
+  <button id="lockBtn" onclick="toggleLock()" style="margin-left:auto;background:#fff;color:var(--green-d);border:1.5px solid #fff;box-shadow:none;font-size:14px;padding:6px 12px">🔒 บันทึกถูกล็อก</button>
+  <span id="save">พร้อมใช้งาน</span>
+</header>
+
+<div class="wrap">
+  <!-- เลือก/สร้างห้องวิชา -->
+  <div class="card">
+    <h2>ห้องเรียน · รายวิชา</h2>
+    <div class="sets" id="setBar"></div>
+    <div class="toolbar" style="margin-top:12px;margin-bottom:0">
+      <button id="btnCreate">➕ สร้างห้อง/วิชา</button>
+      <button id="btnDeleteSet" class="danger small">🗑️ ลบห้อง/วิชาที่เปิดอยู่</button>
+      <button id="btnDeleteWs" class="danger small" style="background:#7b1325;color:#fff;border-color:#7b1325">🗑️ ลบห้องทำงานครูนี้</button>
+      <button id="btnRefresh" class="ghost small">🔄 ดึงข้อมูลล่าสุด</button>
+      <button id="btnCfg" class="ghost small">⚙️ ตั้งค่าคลาวด์</button>
+      <button id="btnBackup" class="ghost small">⬇️ สำรองข้อมูล</button>
+      <button id="btnRestore" class="ghost small">⬆️ กู้คืน</button>
+      <input type="file" id="restoreFile" accept="application/json" class="hide">
+    </div>
+    <div class="hint">ข้อมูลเก็บบน <b>คลาวด์ส่วนกลาง</b> — เปิดเครื่องไหน/มือถือไหนก็เห็นข้อมูลชุดเดียวกัน • <b>ดูได้ทุกคน แต่การบันทึกต้องใส่รหัส</b> (กดปุ่ม 🔒 มุมขวาบนเพื่อปลดล็อก) • กด "🔄 ดึงข้อมูลล่าสุด" เมื่อมีการแก้จากเครื่องอื่น • "สำรองข้อมูล" เก็บไฟล์ไว้กันเหนียว</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="grid">✅ ตารางงาน</div>
+    <div class="tab" data-tab="manage">⚙️ จัดการงาน/นักเรียน</div>
+    <div class="tab" data-tab="summary">📈 สรุป</div>
+    <div class="tab" data-tab="all">🗂️ สรุปรวมทุกห้อง</div>
+  </div>
+
+  <!-- ตาราง -->
+  <section id="tab-grid">
+    <div class="card">
+      <div class="toolbar">
+        <span class="pill" id="curLabel">— ยังไม่ได้เลือกห้อง —</span>
+        <button class="ghost small" style="background:var(--green-l);color:var(--green-d);border-color:var(--green)" onclick="openScannerModal()">📷 สแกนส่งงาน/สอบ</button>
+      </div>
+      <div style="font-size:13px;margin-bottom:10px;color:var(--muted)">
+        <b style="color:var(--green-d)">งานส่ง</b> : คลิกช่องสลับ <span class="cell s-send" style="padding:1px 7px;border-radius:5px">ส่ง</span> / <span class="cell s-miss" style="padding:1px 7px;border-radius:5px;border:1px solid #e0c4c0">ไม่ส่ง</span> &nbsp;·&nbsp;
+        <b style="color:var(--exam)">ข้อสอบ</b> : กรอกคะแนนในช่อง
+      </div>
+      <div class="tbl-scroll"><table id="grid"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+    </div>
+  </section>
+
+  <!-- จัดการ -->
+  <section id="tab-manage" class="hide">
+    <div class="card">
+      <h2>งาน / ข้อสอบ</h2>
+      <div id="workList"></div>
+      <div class="row" style="margin-top:10px">
+        <div class="field" style="flex:2"><label>ชื่องาน</label><input id="newWorkName" placeholder="เช่น ใบงาน 1 / สอบเก็บคะแนนบทที่ 2"></div>
+        <div class="field"><label>ชนิด</label>
+          <select id="newWorkType"><option value="ส่ง">งานส่ง (ติ๊ก)</option><option value="สอบ">ข้อสอบ (คะแนน)</option></select></div>
+        <div class="field" id="maxWrap" style="max-width:120px"><label>คะแนนเต็ม</label><input id="newWorkMax" type="number" min="0" value="10"></div>
+        <div><button id="btnAddWork">➕ เพิ่ม</button></div>
+      </div>
+      <div class="hint">งานส่ง = ช่องติ๊กส่ง/ไม่ส่ง • ข้อสอบ = ช่องกรอกคะแนน (ใส่คะแนนเต็มไว้คำนวณค่าเฉลี่ย)</div>
+    </div>
+    <div class="card">
+      <h2>นักเรียน</h2>
+      <div class="toolbar">
+        <button id="btnRoster" class="ghost small">👥 ดึงรายชื่อจากทะเบียนห้องนี้</button>
+        <button id="btnAddStudent" class="ghost small">➕ เพิ่มนักเรียน</button>
+        <button id="btnFile" class="ghost small">📁 นำเข้าจากไฟล์ (Excel/CSV)</button>
+        <input type="file" id="rosterFile" accept=".xlsx,.xls,.csv" class="hide">
+        <button id="btnImport" class="ghost small">📋 วางรายชื่อ (เลขที่,ชื่อ)</button>
+        <select id="copyFrom" style="max-width:260px"><option value="">📥 คัดลอกรายชื่อจากห้อง/วิชาอื่น…</option></select>
+        <button class="ghost small" style="background:#7b1325;color:#fff;border-color:#7b1325" onclick="window.open('qr-card.html','_blank')">🖨️ จัดทำบัตร QR Code</button>
+        <span class="pill" id="stuCount">0 คน</span>
+      </div>
+      <div class="tbl-scroll" style="max-height:52vh">
+        <table id="stuTable" style="width:100%"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- สรุป -->
+  <section id="tab-summary" class="hide">
+    <div class="card">
+      <h2>ภาพรวม <span id="sumLabel" class="muted"></span></h2>
+      <div class="stat-grid" id="statGrid"></div>
+    </div>
+    <div class="card">
+      <h2>อัตราการส่งงาน (เฉพาะงานส่ง)</h2>
+      <div id="workBars"></div>
+    </div>
+    <div class="card">
+      <h2>นักเรียนที่ค้างส่งงาน</h2>
+      <div class="toolbar"><button id="btnLine" class="ghost small">🖼️ ส่งรูปสรุปเข้า LINE</button>
+        <input id="reportTitle" placeholder="ชื่อโรงเรียน/หัวรายงาน (ไม่บังคับ)" style="max-width:260px"></div>
+      <div id="missList"></div>
+    </div>
+  </section>
+
+  <!-- สรุปรวมทุกห้อง -->
+  <section id="tab-all" class="hide">
+    <div class="card">
+      <h2>ภาพรวมทุกห้อง / ทุกวิชา</h2>
+      <div class="toolbar">
+        <button id="btnExportXLSX">📊 Export Excel ทั้งหมด</button>
+        <button id="btnLineAll" class="ghost small">🖼️ ส่งรูปสรุปรวมเข้า LINE</button>
+      </div>
+      <div class="stat-grid" id="allStatGrid"></div>
+      <div class="hint">รวมทุกห้อง/วิชาที่สร้างไว้ • Export Excel จะได้ไฟล์ .xlsx แยกชีตรายห้อง พร้อมชีตสรุปรวม</div>
+    </div>
+    <div class="card">
+      <h2>สรุปรายห้อง · รายงาน</h2>
+      <div id="allRoomList"></div>
+    </div>
+    <div class="card">
+      <h2>นักเรียนที่ค้างส่งงาน (รวมทุกห้อง)</h2>
+      <div id="allMissList"></div>
+    </div>
+  </section>
+</div>
+
+<!-- dialog ปลดล็อกการบันทึก -->
+<dialog id="pwDlg"><div class="dlg-body">
+  <h2>🔒 ใส่รหัสเพื่อบันทึก</h2>
+  <div class="hint" style="margin-bottom:10px">ดูข้อมูลได้โดยไม่ต้องใส่รหัส แต่การบันทึก/แก้ไขต้องใส่รหัสผ่าน</div>
+  <div class="field"><label>รหัสผ่าน</label>
+    <input id="pwInput" type="password" inputmode="numeric" autocomplete="off" placeholder="••••"></div>
+  <div id="pwMsg" style="color:var(--miss);font-size:14px;min-height:18px;margin-top:6px"></div>
+  <div class="row" style="margin-top:12px;justify-content:flex-end">
+    <button class="ghost" id="pwCancel">ยกเลิก</button><button id="pwOk">ปลดล็อก</button>
+  </div>
+</div></dialog>
+
+<!-- dialog สร้างห้องทำงานครูใหม่ -->
+<dialog id="wsCreateDlg"><div class="dlg-body">
+  <h2>👤 สร้างห้องทำงานครูใหม่</h2>
+  <div class="hint" style="margin-bottom:12px">สร้างห้องแยกของคุณครูแต่ละคนเพื่อแยกข้อมูลห้องเรียนและตั้งรหัสผ่านของตนเอง</div>
+  <div class="field" style="margin-bottom:12px"><label>ชื่อครู / ชื่อห้องทำงาน</label>
+    <input id="wsNewName" type="text" autocomplete="off" placeholder="เช่น ครูสมชาย, ครูสมหญิง"></div>
+  <div class="field" style="margin-bottom:12px"><label>รหัสผ่านสำหรับเข้าบันทึก</label>
+    <input id="wsNewPw" type="password" autocomplete="off" placeholder="รหัสผ่านสำหรับแก้ไขข้อมูล"></div>
+  <div class="field" style="margin-bottom:12px"><label>ยืนยันรหัสผ่าน</label>
+    <input id="wsNewPwConfirm" type="password" autocomplete="off" placeholder="ยืนยันรหัสผ่านอีกครั้ง"></div>
+  <div id="wsCreateMsg" style="color:var(--miss);font-size:14px;min-height:18px;margin-top:6px"></div>
+  <div class="row" style="margin-top:16px;justify-content:flex-end">
+    <button class="ghost" id="wsCreateCancel">ยกเลิก</button><button id="wsCreateOk">สร้างห้องทำงาน</button>
+  </div>
+</div></dialog>
+
+<!-- dialog ตั้งค่าคลาวด์ -->
+<dialog id="cfgDlg"><div class="dlg-body">
+  <h2>⚙️ ตั้งค่าคลาวด์</h2>
+  <div class="hint" style="margin-bottom:10px">วางลิงก์ Web app (ลงท้าย /exec) ที่ได้จากการ Deploy Google Apps Script ครั้งเดียว แล้วทุกเครื่องจะใช้คลาวด์เดียวกัน</div>
+  <div class="field"><label>ลิงก์คลาวด์ (Apps Script /exec)</label>
+    <input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/..../exec"></div>
+  <div id="cfgMsg" style="font-size:14px;min-height:18px;margin-top:6px"></div>
+  <div class="row" style="margin-top:12px;justify-content:flex-end">
+    <button class="ghost" id="cfgCancel">ปิด</button><button id="cfgOk">บันทึกลิงก์</button>
+  </div>
+</div></dialog>
+
+<!-- dialog สร้างห้อง/วิชา -->
+<dialog id="createDlg"><div class="dlg-body">
+  <h2>สร้างห้อง / วิชา</h2>
+  <div class="row">
+    <div class="field"><label>ห้อง / ชั้น</label><input id="cRoom" list="roomOpts" placeholder="เช่น ม.6/1"><datalist id="roomOpts"></datalist></div>
+    <div class="field"><label>รายวิชา</label><input id="cSubject" placeholder="เช่น คณิตศาสตร์ 5"></div>
+  </div>
+  <div id="cRoomHint" class="hint" style="margin-top:8px"></div>
+  <div class="row" style="margin-top:14px;justify-content:flex-end">
+    <button class="ghost" id="cCancel">ยกเลิก</button><button id="cOk">สร้าง</button>
+  </div>
+</div></dialog>
+
+<!-- dialog วางรายชื่อ -->
+<dialog id="importDlg"><div class="dlg-body">
+  <h2>วางรายชื่อนักเรียน</h2>
+  <p class="muted">หนึ่งคนต่อบรรทัด: <b>เลขที่ , ชื่อ-สกุล</b> (เว้นด้วยจุลภาคหรือ Tab)</p>
+  <textarea id="importText" rows="9" placeholder="1, สมชาย ใจดี&#10;2, สมหญิง รักเรียน"></textarea>
+  <div class="row" style="margin-top:12px;justify-content:flex-end">
+    <button class="ghost" id="iCancel">ยกเลิก</button><button id="iOk">นำเข้า</button>
+  </div>
+</div></dialog>
+
+<!-- dialog รายงานรายชิ้นงาน -->
+<dialog id="workRptDlg"><div class="dlg-body">
+  <h2 id="wrTitle">รายงาน</h2>
+  <p class="muted" style="margin:-6px 0 10px">ตัวอย่างรูปที่จะส่ง — กดปุ่มด้านล่างเพื่อบันทึก/แชร์เข้า LINE</p>
+  <div id="wrPreview"></div>
+  <div class="row" style="margin-top:14px;justify-content:flex-end">
+    <button class="ghost" id="wrClose">ปิด</button>
+    <button id="wrLine">🖼️ ส่งรูปเข้า LINE</button>
+  </div>
+</div></dialog>
+
+<dialog id="scanDlg">
+  <div class="dlg-body" style="max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; padding: 16px;">
+    <h2 style="margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; font-family: var(--font-chalk);">📷 สแกนเนอร์ QR / Barcode</h2>
+    
+    <!-- พื้นที่แสดงกล้อง -->
+    <div id="scanner-view-container" style="position: relative; width: 100%; height: 240px; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 12px; border: 1.5px solid var(--line);">
+      <div id="scanner-view" style="width: 100%; height: 100%;"></div>
+      <!-- กรอบนำทางสายตา -->
+      <div style="position: absolute; inset: 35px; border: 2px dashed rgba(255, 255, 255, 0.7); border-radius: 8px; pointer-events: none; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);"></div>
+    </div>
+    
+    <!-- เลือกชิ้นงาน -->
+    <div style="margin-bottom: 10px;">
+      <label style="margin-bottom: 2px; font-weight: bold;">เลือกงาน / ข้อสอบ:</label>
+      <select id="scanner-work-select" style="padding: 6px; border-radius: 8px; font-family: inherit; font-size: 14px;"></select>
+    </div>
+
+    <!-- ตั้งค่าสถานะ/คะแนนเมื่อสแกนได้ -->
+    <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+      <div style="flex: 1;">
+        <label style="margin-bottom: 2px; font-weight: bold;">การกระทำ:</label>
+        <select id="scanner-action" style="padding: 6px; border-radius: 8px; font-family: inherit; font-size: 14px;" onchange="toggleScannerScoreInput()">
+          <option value="toggle">สลับ ส่ง/ไม่ส่ง</option>
+          <option value="sent" selected>เช็คเป็น ส่ง (✓)</option>
+          <option value="miss">เช็คเป็น ไม่ส่ง (–)</option>
+          <option value="score">กรอกคะแนนสอบ</option>
+        </select>
+      </div>
+      <div id="scanner-score-wrap" style="width: 110px; display: none;">
+        <label id="scanner-score-label" style="margin-bottom: 2px; font-weight: bold;">คะแนน:</label>
+        <input type="number" id="scanner-score-value" min="0" value="10" style="padding: 5px; border-radius: 8px; text-align: center;">
+      </div>
+    </div>
+
+    <!-- เลือกกล้อง -->
+    <div style="margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px;">
+      <label style="margin: 0; color: var(--muted); flex-shrink: 0;">กล้อง:</label>
+      <select id="scanner-camera-select" style="width: auto; max-width: 250px; padding: 4px 8px; border-radius: 8px; font-size: 12px; font-family: inherit;"></select>
+    </div>
+
+    <!-- ผลการสแกนล่าสุด -->
+    <div id="scanner-status-log" style="padding: 8px; border-radius: 10px; background: var(--green-l); color: var(--green-d); font-size: 13.5px; text-align: center; font-weight: bold; min-height: 38px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; border: 1px solid var(--line); font-family: var(--font-chalk);">
+      พร้อมสแกน... นำรหัสมาส่อง
+    </div>
+
+    <!-- ประวัติการสแกนล่าสุด -->
+    <div style="flex: 1; overflow-y: auto; max-height: 100px; border-top: 1px dashed var(--line); padding-top: 6px;">
+      <p style="font-size: 11px; font-weight: bold; color: var(--muted); margin-bottom: 2px;">ประวัติล่าสุด:</p>
+      <div id="scanner-history" style="font-size: 12px; line-height: 1.45; font-family: var(--font-chalk);"></div>
+    </div>
+    
+    <div style="margin-top: 12px; display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="ghost" onclick="closeScannerModal()">✕ ปิดเครื่องสแกน</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* ===== เมนูเว็บ (drawer) — เพิ่มเว็บใหม่: ก๊อปบรรทัด {icon,label,url} วางต่อท้าย ===== */
+var SITE_LINKS=[
+  {icon:'🏠', label:'กลับหน้าแรกเว็บรวมหลัก', url:'../index.html'},
+  {icon:'📝', label:'ติดตามการส่งงาน (เว็บนี้)', url:''},
+  {icon:'🖨️', label:'พิมพ์การ์ด QR Code', url:'qr-card.html'},
+  {icon:'✨', label:'เครื่องมือสร้าง QR Code', url:'qr-generator.html'},
+  {icon:'📚', label:'เช็คชื่อรายวิชา', url:'../เช็คชื่อรายวิชา/index.html'},
+  {icon:'⚙️', label:'เช็คชื่อห้องเตรียมวิศวะ', url:'../เช็คชื่อ-เตรียมวิศวะ.html'},
+  {icon:'📊', label:'จัดการคะแนน & ตัดเกรด', url:'../คะแนนเกรด/index-เกรด.html'},
+  {icon:'🦆', label:'สุ่มเลขที่ เป็ดแข่งวิ่ง', url:'../สุ่มเลขที่/index.html'},
+  {icon:'🎲', label:'เว็บบอร์ดเกมคลับ', url:'../boardgame/index.html'},
+];
+document.getElementById('drawer-links').innerHTML=SITE_LINKS.map(function(l){
+  return l.url
+    ? '<a class="drawer-link" href="'+l.url+'" target="_blank" rel="noopener"><span class="ic">'+l.icon+'</span>'+l.label+' ›</a>'
+    : '<span class="drawer-link" style="opacity:.55"><span class="ic">'+l.icon+'</span>'+l.label+'</span>';
+}).join('');
+function openDrawer(){document.getElementById('drawer').classList.add('open');document.getElementById('drawer-backdrop').classList.add('show');}
+function closeDrawer(){document.getElementById('drawer').classList.remove('open');document.getElementById('drawer-backdrop').classList.remove('show');}
+
+/* ===== ที่เก็บข้อมูล: localStorage (บันทึกอัตโนมัติ) ===== */
+var LS_KEY='hwTrackerApp_v1';
+var DB={sets:{}};
+var curKey=null, cur=null;
+
+/* ===== ครูแต่ละคนแยกห้องทำงาน (Teacher Workspaces) ===== */
+var WS_LIST_KEY = 'hw_workspaces_list';
+var ACTIVE_WS_KEY = 'hw_active_workspace';
+
+var workspaces = [];
+var activeWorkspace = 'ครูนิวตรอน';
+
+function initWorkspaces() {
+  try {
+    workspaces = JSON.parse(localStorage.getItem(WS_LIST_KEY));
+  } catch(e) {
+    workspaces = null;
+  }
+  
+  if (!workspaces || !Array.isArray(workspaces) || workspaces.length === 0) {
+    workspaces = [
+      { name: 'ครูนิวตรอน', password: 'ครูนิวตรอน' }
+    ];
+    
+    // ย้ายข้อมูลเดิมถ้ามี (Data Migration)
+    var oldDb = localStorage.getItem('hwTrackerApp_v1');
+    if (oldDb) {
+      localStorage.setItem('hwTrackerApp_data_ครูนิวตรอน', oldDb);
+    }
+    var oldCloudUrl = localStorage.getItem('hwCloudUrl');
+    if (oldCloudUrl) {
+      localStorage.setItem('hwCloudUrl_ครูนิวตรอน', oldCloudUrl);
+    }
+    var oldReportTitle = localStorage.getItem('hwReportTitle');
+    if (oldReportTitle) {
+      localStorage.setItem('hwReportTitle_ครูนิวตรอน', oldReportTitle);
+    }
+    
+    localStorage.setItem(WS_LIST_KEY, JSON.stringify(workspaces));
+  }
+  
+  activeWorkspace = localStorage.getItem(ACTIVE_WS_KEY) || 'ครูนิวตรอน';
+  var exists = workspaces.some(function(w) { return w.name === activeWorkspace; });
+  if (!exists) {
+    activeWorkspace = workspaces[0].name;
+  }
+  localStorage.setItem(ACTIVE_WS_KEY, activeWorkspace);
+}
+
+// โหลดห้องทำงานเมื่อเริ่ม
+initWorkspaces();
+var ROSTER={"ม.1/1":[{"no":1,"id":"7420","name":"เด็กชายรชานนท์ กาญจนะวสิต"},{"no":2,"id":"7446","name":"เด็กชายพุฒิพงศ์ พุ่มนิล"},{"no":3,"id":"7447","name":"เด็กชายภูผา สุขเจริญ"},{"no":4,"id":"7823","name":"เด็กชายสุพจน์"},{"no":5,"id":"7832","name":"เด็กชายสุวรรณ"},{"no":6,"id":"7835","name":"เด็กชายธีรภัทร จันลิ้มมะดัน"},{"no":7,"id":"8214","name":"เด็กชายชัชพล ภู่พานทอง"},{"no":8,"id":"8631","name":"เด็กชายศิวพักตร์ แสงชุ่ม"},{"no":9,"id":"9335","name":"เด็กชายปัณณวิชญ์ ยิ่งงามแก้ว"},{"no":10,"id":"10193","name":"เด็กชายเทพสิทธิ์ จูมาศ"},{"no":11,"id":"10194","name":"เด็กชายพิชาภพ"},{"no":12,"id":"10941","name":"เด็กชายธีรดนย์ ศิลานิล"},{"no":13,"id":"10942","name":"เด็กชายวีรภาพ สุขเจริญ"},{"no":14,"id":"10943","name":"เด็กชายกัมพล นาคพัตน์"},{"no":15,"id":"10944","name":"เด็กชายพุฒิภัทร เสนีย์วงค์ ณ อยุธยา"},{"no":16,"id":"10945","name":"เด็กชายนัฐภัทร ยอดศรีคำ"},{"no":17,"id":"10946","name":"เด็กชายปุญญพัฒน์ สิฉิน"},{"no":18,"id":"10947","name":"เด็กชายศุภณัฐ เจริญรักษา"},{"no":19,"id":"10948","name":"นายมิตรชัย"},{"no":20,"id":"10949","name":"เด็กชายบุญยวัฒน์ ขันทองดี"},{"no":21,"id":"10950","name":"เด็กชายภาสกร ภาคบงกช"},{"no":22,"id":"10951","name":"เด็กชายฟริตตรี อาแซ็ง"},{"no":23,"id":"7453","name":"เด็กหญิงกษมล บัวงาม"},{"no":24,"id":"7456","name":"เด็กหญิงณิชาภา คำเหลี่ยม"},{"no":25,"id":"7458","name":"เด็กหญิงเบญญทิพย์ อักษรพันธ์"},{"no":26,"id":"7826","name":"เด็กหญิงขวัญนรี เดชกิต"},{"no":27,"id":"7839","name":"เด็กหญิงธัญญาภรณ์ สายชนะพันธ์"},{"no":28,"id":"8914","name":"เด็กหญิงปาริชาติ เที่ยงธรรม"},{"no":29,"id":"9753","name":"เด็กหญิงปิยะดา แซ่ลิ้ม"},{"no":30,"id":"9755","name":"เด็กหญิงวันวิสา เจริญขุน"},{"no":31,"id":"10494","name":"เด็กหญิงเดือน มูฮัมมัด"},{"no":32,"id":"10952","name":"เด็กหญิงสุมิตตา จิตต์นิยม"},{"no":33,"id":"10953","name":"เด็กหญิงอุรัสยา คล้ำพักตร์"},{"no":34,"id":"10954","name":"เด็กหญิงวิลาวัณย์ สาวสุดชาติ"},{"no":35,"id":"10955","name":"เด็กหญิงกีตาร์"},{"no":36,"id":"10956","name":"เด็กหญิงนปภัช ศรีสุวรรณ"},{"no":37,"id":"10957","name":"เด็กหญิงกัรมี เซี่ยงจง"},{"no":38,"id":"10958","name":"เด็กหญิงณัฏฐธิดา เอี่ยมสอาด"},{"no":39,"id":"10959","name":"เด็กหญิงธัญวาภรณ์ ภู่ระหงษ์"},{"no":40,"id":"10960","name":"เด็กหญิงเทพี"},{"no":41,"id":"10961","name":"เด็กหญิงกานต์ธิดา โกสุม"},{"no":42,"id":"10962","name":"เด็กหญิงณัฐธิดา จันทรชิต"},{"no":43,"id":"10963","name":"เด็กหญิงเนติยา อินต๊ะนิล"},{"no":44,"id":"10964","name":"เด็กหญิงธาริณี กลอนโพธิ์"},{"no":45,"id":"10965","name":"เด็กหญิงวรรณรสา ไพรเขียว"},{"no":46,"id":"10966","name":"เด็กหญิงจิตรลดา กล่ำแก้ว"}],"ม.1/2":[{"no":1,"id":"7424","name":"เด็กชายอัครพงษ์ แก้วโผงเผง"},{"no":2,"id":"7443","name":"เด็กชายตฤณ ชมทรัพย์"},{"no":3,"id":"8130","name":"เด็กชายวรวัฒน์ จันทร์ฉาย"},{"no":4,"id":"8215","name":"เด็กชายธีรพงษ์ หว่านพืช"},{"no":5,"id":"10195","name":"เด็กชายปฏิพัทธ์ ทิพย์บำรุง"},{"no":6,"id":"10196","name":"เด็กชายพีรศักดิ์ เนื้อนิ่ม"},{"no":7,"id":"","name":"เด็กชายอานัท คงมณี"},{"no":8,"id":"10967","name":"เด็กชายฤทธิเดช อ้นเนียม"},{"no":9,"id":"10968","name":"เด็กชายญานกฤต พิมพาเรือ"},{"no":10,"id":"10969","name":"เด็กชายอาทิตย์"},{"no":11,"id":"10970","name":"เด็กชายธามไท รัศมี"},{"no":12,"id":"10971","name":"เด็กชายปริทัศน์ รุ่งเรือง"},{"no":13,"id":"10972","name":"เด็กชายสุทธิภัทร ศรีนิ่ม"},{"no":14,"id":"10973","name":"เด็กชายรัชพล พุ่มทอง"},{"no":15,"id":"10974","name":"เด็กชายนพเกล้า ราษฎร์นิยม"},{"no":16,"id":"10975","name":"เด็กชายกวีรัช คงเพ็ชร"},{"no":17,"id":"10976","name":"เด็กชายอภิชัย นาคอ่อน"},{"no":18,"id":"10977","name":"เด็กชายธนพัฒน์ รอดรัตน์"},{"no":19,"id":"10978","name":"เด็กชายธนบุญ ลิ้มสุวรรณ"},{"no":20,"id":"10979","name":"เด็กชายสนธยา โสพีพัฒน์"},{"no":21,"id":"10980","name":"เด็กชายสิทธิโชค ลิ้มติ้ว"},{"no":22,"id":"10981","name":"เด็กชายรบชนะศึก ทับทรวง"},{"no":23,"id":"10982","name":"เด็กชายสุวชัช บำรุงผล"},{"no":24,"id":"","name":"เด็กหญิงศรันย์มณี เลิศสุวรรณ"},{"no":25,"id":"7437","name":"เด็กหญิงภวรัญชน์ สุขเจริญ"},{"no":26,"id":"7455","name":"เด็กหญิงจิราพร จันทร์แดง"},{"no":27,"id":"7464","name":"เด็กหญิงปิยะดา พรโครกรวด"},{"no":28,"id":"7836","name":"เด็กหญิงวิสุตา"},{"no":29,"id":"7838","name":"เด็กหญิงวันวิสาข์ วารีนิล"},{"no":30,"id":"8217","name":"เด็กหญิงจารุพิชญา เกิดลอย"},{"no":31,"id":"9243","name":"เด็กหญิงสกาวรัตน์ ตัณฑุลเศรษฐ์"},{"no":32,"id":"9284","name":"เด็กหญิงลภัสรดา พิบูลแถว"},{"no":33,"id":"10983","name":"เด็กหญิงอริสา หมั่นจิตร"},{"no":34,"id":"10984","name":"เด็กหญิงพลอย"},{"no":35,"id":"10985","name":"เด็กหญิงณัฐวรา ศิริมะตัง"},{"no":36,"id":"10986","name":"เด็กหญิงกันยาวีร์ เจียมแท้"},{"no":37,"id":"10987","name":"เด็กหญิงธิดา บุญคุ้ม"},{"no":38,"id":"10988","name":"เด็กหญิงปรียาภรณ์ เมืองอินทร์"},{"no":39,"id":"10989","name":"เด็กหญิงเบญ"},{"no":40,"id":"10990","name":"เด็กหญิงธัญชนก เปล่งภู่"},{"no":41,"id":"10991","name":"เด็กหญิงชุติภา จันทร"},{"no":42,"id":"10992","name":"เด็กหญิงพิมพ์ลภัส ยิ่งยงค์"},{"no":43,"id":"10993","name":"เด็กหญิงวนิดา"},{"no":44,"id":"10994","name":"เด็กหญิงลดา"},{"no":45,"id":"10995","name":"เด็กหญิงธันย์ชนก เนตร์ยอง"},{"no":46,"id":"10996","name":"เด็กหญิงปิติภัทร คุ้มครอง"},{"no":47,"id":"10997","name":"เด็กหญิงชิดชนก ชมพารา"}],"ม.1/3":[{"no":1,"id":"7421","name":"เด็กชายรัศมิ์ธศิลป์ สร้างสีเทา"},{"no":2,"id":"7448","name":"เด็กชายวรากรณ์ ยอดแก้ว"},{"no":3,"id":"7451","name":"เด็กชายพชร หวังดี"},{"no":4,"id":"7822","name":"เด็กชายพิสิษฐ์ ทับประเสริฐ"},{"no":5,"id":"","name":"เด็กชายอนุวัฒน์ พลศักดิ์"},{"no":6,"id":"","name":"เด็กชายรังสิมันต์ แก้วเลื่อนมา"},{"no":7,"id":"10998","name":"เด็กชายธนกฤต ผ่องพูลผล"},{"no":8,"id":"10999","name":"เด็กชายชนนน ครุฑนาค"},{"no":9,"id":"11000","name":"เด็กชายวัชรชัย ทองใย"},{"no":10,"id":"11001","name":"เด็กชายธนดล บุญรอด"},{"no":11,"id":"11002","name":"เด็กชายณัชพล ฟากฟื้น"},{"no":12,"id":"11003","name":"เด็กชายทินภัทร ตะสาริกา"},{"no":13,"id":"11004","name":"เด็กชายชีวานนท์ วรรณชะนะ"},{"no":14,"id":"11005","name":"เด็กชายเอกภัคอัฏฐ ลาภเปี่ยม"},{"no":15,"id":"11006","name":"เด็กชายคุณภัทร บุตรรักษ์"},{"no":16,"id":"11007","name":"เด็กชายนาวี น้อยแสง"},{"no":17,"id":"11008","name":"เด็กชายคีรินทร์ เข็มผะกา"},{"no":18,"id":"11009","name":"เด็กชายสิงโต สุริยาอารักษ์"},{"no":19,"id":"11010","name":"เด็กชายสงกรานต์ สีทอง"},{"no":20,"id":"11011","name":"เด็กชายพชร วงษ์ขุนเณร"},{"no":21,"id":"11012","name":"เด็กชายจิรายุ จันทร์แก้ว"},{"no":22,"id":"11013","name":"เด็กชายพงศภร มิตรดี"},{"no":23,"id":"11014","name":"เด็กชายอับดุลฮารีฟ เปาะมา"},{"no":24,"id":"11015","name":"เด็กชายกรวิชญ์ หรั่งเจริญ"},{"no":25,"id":"11218","name":"เด็กชายอังกฤษ แผนสมบูรณ์"},{"no":26,"id":"9281","name":"เด็กหญิงกัญจนพร ธานินพงค์"},{"no":27,"id":"9338","name":"เด็กหญิงวนิดา นิ่มนวล"},{"no":28,"id":"9754","name":"เด็กหญิงเบญญาภา จุ้ยเย็น"},{"no":29,"id":"10570","name":"เด็กหญิงพิมพ์พรรณ นามแจ่มเดชสกุล"},{"no":30,"id":"11016","name":"เด็กหญิงวรัญญา รสโสภา"},{"no":31,"id":"11017","name":"เด็กหญิงรดาธร เพ็ญพานิช"},{"no":32,"id":"11018","name":"เด็กหญิงกาญจนา สามะกิจ"},{"no":33,"id":"11019","name":"เด็กหญิงณิชกานต์ ปลื้มทรัพย์"},{"no":34,"id":"11020","name":"เด็กหญิงณัฏฐณิชา จำปานาค"},{"no":35,"id":"11021","name":"เด็กหญิงเขมจิรา"},{"no":36,"id":"11022","name":"เด็กหญิงปัทมนิภา หอมหา"},{"no":37,"id":"11023","name":"เด็กหญิงปพิชญา ช้างน้อย"},{"no":38,"id":"11024","name":"เด็กหญิงพิชญธิดา ปัญญาโสด"},{"no":39,"id":"11025","name":"เด็กหญิงฐิติภรณ์ วิจิตรานนท์"},{"no":40,"id":"11026","name":"เด็กหญิงชนัญชิดา เล็กชิน"},{"no":41,"id":"11027","name":"เด็กหญิงอมลวัทน์ เรืองยังมี"},{"no":42,"id":"11028","name":"เด็กหญิงเขมิสรา ศรีเนียม"},{"no":43,"id":"11029","name":"เด็กหญิงอริสรา งามยิ่งงวด"},{"no":44,"id":"11030","name":"เด็กหญิงศุภิสรา แสงสด"},{"no":45,"id":"11031","name":"เด็กหญิงศุภิสรา เทียมเต็ง"},{"no":46,"id":"11032","name":"เด็กหญิงนัฐรดา เอี่ยมฉลาด"},{"no":47,"id":"11033","name":"เด็กหญิงปุณยาพร ปะโพทิง"},{"no":48,"id":"11034","name":"เด็กหญิงวรางคณา จันทร์สวัสดิ์"}],"ม.1/4":[{"no":1,"id":"7444","name":"เด็กชายธิติสรณ์ บุญญฤทธิ์"},{"no":2,"id":"8208","name":"เด็กชายจิราพัชร ทรัพย์สมบูรณ์"},{"no":3,"id":"8210","name":"เด็กชายศุภวัชร นิลสุขุม"},{"no":4,"id":"","name":"เด็กชายธนวัฒน์ สกลนิมิตร"},{"no":5,"id":"9336","name":"เด็กชายกมลเทพ พรมมา"},{"no":6,"id":"10037","name":"เด็กชายศุกลวัฒน์ ฮะบุญมี"},{"no":7,"id":"11035","name":"เด็กชายอภิรักษ์ สายพิณ"},{"no":8,"id":"11036","name":"เด็กชายกิตติพัฒน์ บริรักษ์"},{"no":9,"id":"11037","name":"เด็กชายรัชชานนท์ เสนีย์วงค์ ณ อยุธยา"},{"no":10,"id":"11038","name":"เด็กชายวรวุฒิ แก้วไทรหาญ"},{"no":11,"id":"11039","name":"เด็กชายจารุพัฒน์ ดวงแก้ว"},{"no":12,"id":"11040","name":"เด็กชายรัชชานนท์ นวมนาฆะ"},{"no":13,"id":"11041","name":"เด็กชายสุวพิชญ์ เพชรประดับ"},{"no":14,"id":"11042","name":"เด็กชายนนทพัทธ์ สุวภาพกุล"},{"no":15,"id":"11043","name":"เด็กชายธนกร ปุณฑริกกุล"},{"no":16,"id":"11044","name":"เด็กชายศุภฤกษ์ คนซื่อ"},{"no":17,"id":"11045","name":"เด็กชายณัฐวุฒิ บุญรักษ์"},{"no":18,"id":"11046","name":"เด็กชายธีรเดช พวงแย้ม"},{"no":19,"id":"11047","name":"เด็กชายชยดล ระนาดแก้ว"},{"no":20,"id":"11048","name":"เด็กชายระพีพัฒน์ ภาคภูมิ"},{"no":21,"id":"11222","name":"เด็กชายธีรชัย แซ่ตั๊น"},{"no":22,"id":"8636","name":"เด็กหญิงธิติมา ใสใหม"},{"no":23,"id":"","name":"เด็กหญิงน้ำฝน"},{"no":24,"id":"","name":"เด็กหญิงปราณปริยา พอกพูน"},{"no":25,"id":"","name":"เด็กหญิงธนาภรณ์ เผ่าสุทอ"},{"no":26,"id":"11049","name":"เด็กหญิงวนัชพร สุวรรณศรี"},{"no":27,"id":"11050","name":"เด็กหญิงปีใหม่"},{"no":28,"id":"11051","name":"เด็กหญิงสุฑาทิพย์ ชื่นจิตร"},{"no":29,"id":"11052","name":"เด็กหญิงนทณัฐ นุชคุ้ม"},{"no":30,"id":"11053","name":"เด็กหญิงสุธิดา พุทธรังษี"},{"no":31,"id":"11054","name":"เด็กหญิงภัทราภร ปะวันโน"},{"no":32,"id":"11055","name":"เด็กหญิงจรรยพร เล้งคำ"},{"no":33,"id":"11056","name":"เด็กหญิงเล็ก หงษา"},{"no":34,"id":"11057","name":"เด็กหญิงธนารีย์ ทุกข์เปลื้อง"},{"no":35,"id":"11058","name":"เด็กหญิงฐิตาภา ฮวดเจริญ"},{"no":36,"id":"11059","name":"เด็กหญิงธมนวรรณ แหลมไพบูรณ์"},{"no":37,"id":"11060","name":"เด็กหญิงธนาทิพย์ บำเรอจิตร์"},{"no":38,"id":"11061","name":"เด็กหญิงธนารัตน์ ชัดช่วงโชติ"},{"no":39,"id":"11062","name":"เด็กหญิงกฤติมา โหมดมี"},{"no":40,"id":"11063","name":"เด็กหญิงกรรณิการ์ ต้นภูเขียว"},{"no":41,"id":"11064","name":"เด็กหญิงกัญญาวีร์ บัวสุข"},{"no":42,"id":"11065","name":"เด็กหญิงเขมิกา ขุนเณร"},{"no":43,"id":"11066","name":"เด็กหญิงปรางทิพย์ จรเข้น้อย"},{"no":44,"id":"11067","name":"เด็กหญิงณัฐธิดา คำนวนสกุณี"},{"no":45,"id":"11068","name":"เด็กหญิงอภิรดา เชื้อแก้ว"},{"no":46,"id":"11069","name":"เด็กหญิงสุพิชญา ศรีนวลจันทร์"}],"ม.1/5":[{"no":1,"id":"7423","name":"เด็กชายศรัณยู ทับไกรสกล"},{"no":2,"id":"7450","name":"เด็กชายนิติเทพ สุศิริ"},{"no":3,"id":"7824","name":"เด็กชายธนภูมิ ริ้วกุลประเสริฐ"},{"no":4,"id":"8209","name":"เด็กชายอภิวิชญ์ กิมเปา"},{"no":5,"id":"8625","name":"เด็กชายธนกร สมศรี"},{"no":6,"id":"","name":"เด็กชายอนุชิต เฮงทอง"},{"no":7,"id":"","name":"เด็กชายสุทิวัส ตั้งทอง"},{"no":8,"id":"10572","name":"เด็กชายสุฐิพัฒน์ นุ่มทองคำ"},{"no":9,"id":"","name":"เด็กชายพัชรวัฒน์ คำทอง"},{"no":10,"id":"11070","name":"เด็กชายภัคพล ประจวบวัน"},{"no":11,"id":"11071","name":"เด็กชายสุเทพ"},{"no":12,"id":"11072","name":"เด็กชายศุภโชค รักประเสริฐ"},{"no":13,"id":"11073","name":"เด็กชายวงศพัทธ์ ฉ่ำอารีย์"},{"no":14,"id":"11074","name":"เด็กชายอชรายุ ไตรกุล"},{"no":15,"id":"11075","name":"เด็กชายกาญจน์ปพน แก้วแสง"},{"no":16,"id":"11076","name":"เด็กชายฤทธากาจ ศรีสมัย"},{"no":17,"id":"11077","name":"เด็กชายปัญญา กุลจรัสอนันต์"},{"no":18,"id":"11078","name":"เด็กชายรัฐศาสตร์ แสงทอง"},{"no":19,"id":"11079","name":"เด็กชายณัฎฐกิตต์ สินบริสุทธิ์"},{"no":20,"id":"11080","name":"เด็กชายไชยภพ"},{"no":21,"id":"11081","name":"เด็กชายธนันชัย สวัสดิผล"},{"no":22,"id":"11082","name":"เด็กชายนพคูณ เล็กจินดา"},{"no":23,"id":"11083","name":"เด็กชายมงคล แก้วนาคูณ"},{"no":24,"id":"11084","name":"เด็กชายอาณัติ"},{"no":25,"id":"11085","name":"เด็กชายธนวัฒน์ บุญสุด"},{"no":26,"id":"7431","name":"เด็กหญิงเกตุมณี พิมพา"},{"no":27,"id":"7827","name":"เด็กหญิงอรณิชชา ฤทธิ"},{"no":28,"id":"7828","name":"เด็กหญิงกัลยรัตน์ กลั่นวารี"},{"no":29,"id":"7829","name":"เด็กหญิงมัณฑนาภรณ์ แสงนารีย์"},{"no":30,"id":"7841","name":"เด็กหญิงวันทนีย์ เกตุมณี"},{"no":31,"id":"9242","name":"เด็กหญิงกัณห์ชลี กะลาโท"},{"no":32,"id":"9339","name":"เด็กหญิงปพิชญา เกตุเต็ม"},{"no":33,"id":"10571","name":"เด็กหญิงสิริกัญญานี จันทร"},{"no":34,"id":"11086","name":"เด็กหญิงพลอยชฎา เจรจาศิลป"},{"no":35,"id":"11087","name":"เด็กหญิงปภัสตานันท์ จอมเผือก"},{"no":36,"id":"11088","name":"เด็กหญิงอำ"},{"no":37,"id":"11089","name":"เด็กหญิงชนาภร จิตรลัดดา"},{"no":38,"id":"11090","name":"เด็กหญิงชวัลลักษณ์ ขุนพิทักษ์"},{"no":39,"id":"11091","name":"เด็กหญิงจุฑาทิพย์ อุ่นภักดิ์"},{"no":40,"id":"11092","name":"เด็กหญิงชโลธร อัสสะสิทธิ์"},{"no":41,"id":"11093","name":"เด็กหญิงณัฐฌา มอขุนทด"},{"no":42,"id":"11094","name":"เด็กหญิงนัทชญา หงษ์คำ"},{"no":43,"id":"11095","name":"เด็กหญิงศิริรัตน์ ศิริพจนาวรรณ"},{"no":44,"id":"11096","name":"เด็กหญิงพัชรดา ใจซื่อ"},{"no":45,"id":"11097","name":"เด็กหญิงดิษยา สุดแจ้ง"},{"no":46,"id":"11098","name":"เด็กหญิงนัทธมน เดชเดชากร"},{"no":47,"id":"11099","name":"เด็กหญิงณัฐชนันท์พร อ่วมอิ่ม"},{"no":48,"id":"11100","name":"เด็กหญิงนวลปรางค์"}],"ม.2/1":[{"no":1,"id":"7158","name":"เด็กชายฐิติวุฒิ ทิพย์วรรณ"},{"no":2,"id":"7167","name":"เด็กชายภาณุพงษ์ มะกาว"},{"no":3,"id":"7471","name":"เด็กชายสุภทัต ยุติธรรม"},{"no":4,"id":"8222","name":"เด็กชายอธิวัฒน์ พรมจรรย์"},{"no":5,"id":"8231","name":"เด็กชายณัฐภูมิ สมสุดใจ"},{"no":6,"id":"9757","name":"เด็กชายศุภกฤษ จุ้ยเย็น"},{"no":7,"id":"","name":"เด็กชายธวัฒน์ เทศนา"},{"no":8,"id":"","name":"เด็กชายพลาทิป สุขอยู่"},{"no":9,"id":"10675","name":"เด็กชายอานนท์ มีบุญมา"},{"no":10,"id":"10676","name":"เด็กชายเอกบารมี แย้มสกุล"},{"no":11,"id":"10677","name":"เด็กชายสมชาย ศิริธรรมมงคล"},{"no":12,"id":"10678","name":"เด็กชายภัทราวุธ ลายคล้ายดอก"},{"no":13,"id":"10679","name":"เด็กชายภัทรดนัย เทพนิมิตร"},{"no":14,"id":"10680","name":"เด็กชายศักดิ์ชัย หมั่นหา"},{"no":15,"id":"10681","name":"เด็กชายอฆรพงศ์ ตรีประเสริฐวุฒิ"},{"no":16,"id":"10682","name":"เด็กชายศุภณัฐ ทับประเสริฐ"},{"no":17,"id":"10683","name":"เด็กชายศุภากร จันทร์มั่งคั่ง"},{"no":18,"id":"10684","name":"เด็กชายธนพัฒน์ อมเฉลียง"},{"no":19,"id":"10685","name":"เด็กชายภูวเนตร ตัวจาย"},{"no":20,"id":"10686","name":"เด็กชายทิวัตถ์"},{"no":21,"id":"10688","name":"เด็กชายวันทู หงษา"},{"no":22,"id":"10689","name":"เด็กชายทินภัทร"},{"no":23,"id":"10843","name":"เด็กชายภาณุวิชญ์ ล้อดี"},{"no":24,"id":"7152","name":"เด็กหญิงพุทธิดา กำลังหาญ"},{"no":25,"id":"7176","name":"เด็กหญิงบุณญานุช ภู่ทับทิม"},{"no":26,"id":"7411","name":"เด็กหญิงรินรดา ดวงอาจ"},{"no":27,"id":"7482","name":"เด็กหญิงหทัยกาญจน์ กาซาง"},{"no":28,"id":"7483","name":"เด็กหญิงณิชากร พรโคกกรวด"},{"no":29,"id":"7842","name":"เด็กหญิงฉัตรรวี สุขคโพธิ์"},{"no":30,"id":"9247","name":"เด็กหญิงฐิติรัตน์ แก้วขาว"},{"no":31,"id":"10690","name":"เด็กหญิงพิชชญธิดา อนันตะศิริ"},{"no":32,"id":"10692","name":"เด็กหญิงกัลยรัตน์ สาวสุดชาติ"},{"no":33,"id":"10693","name":"เด็กหญิงกิ่งกนก รุณนก"},{"no":34,"id":"10694","name":"เด็กหญิงฑิฆัมพร สุขเหมือน"},{"no":35,"id":"10695","name":"เด็กหญิงนันทิชา รสชุ่ม"},{"no":36,"id":"10696","name":"เด็กหญิงกาญจน์เกล้า ภู่ขำ"},{"no":37,"id":"10697","name":"เด็กหญิงน้อย ชุมลัง"},{"no":38,"id":"10698","name":"เด็กหญิงญาดา พรรุ่ง"},{"no":39,"id":"10699","name":"เด็กหญิงแวว"},{"no":40,"id":"10700","name":"เด็กหญิงณัฐวรรณ ทองก้อน"},{"no":41,"id":"10701","name":"เด็กหญิงงามตา แตงเพ็ชร์"},{"no":42,"id":"10702","name":"เด็กหญิงปุญญิศา โพธิ์ทอง"},{"no":43,"id":"10703","name":"เด็กหญิงพิชญาภา โคฮุด"},{"no":44,"id":"10704","name":"เด็กหญิงชนัญชิดา เสาหงษ์"},{"no":45,"id":"10705","name":"เด็กหญิงอริสา อัญญโพธิ์"},{"no":46,"id":"11101","name":"เด็กหญิงปาริฉัตร ศุภรัตนชาติพันธ์"}],"ม.2/2":[{"no":1,"id":"7163","name":"เด็กชายนภาพัฒน์ ยอดย้อย"},{"no":2,"id":"7173","name":"เด็กชายศุภสิทธิ์ ลีลาวรรณเขต"},{"no":3,"id":"8220","name":"เด็กชายพงศกร นุภาพ"},{"no":4,"id":"","name":"เด็กชายอัศวิน คำทอง"},{"no":5,"id":"10023","name":"เด็กชายกันตพัฒน์ จิตรสุวรรณ์"},{"no":6,"id":"10199","name":"เด็กชายวิษณุ จูมาศ"},{"no":7,"id":"","name":"เด็กชายธันวา ทองอินทร์"},{"no":8,"id":"10706","name":"เด็กชายศิราวุฒิ มีแสง"},{"no":9,"id":"10707","name":"เด็กชายไทวกฤต มุสิกรัตน์"},{"no":10,"id":"10708","name":"เด็กชายตะวัน"},{"no":11,"id":"10709","name":"เด็กชายอภิเชษฐ์ ปัญญาโสด"},{"no":12,"id":"10710","name":"เด็กชายปวรุฒน์ นาคซื่อตรง"},{"no":13,"id":"10711","name":"เด็กชายวุฒิภัทร สิงหา"},{"no":14,"id":"10712","name":"เด็กชายสงกรานต์ หมื่นวิลาศ"},{"no":15,"id":"10713","name":"เด็กชายศุภชัย ผอบทอง"},{"no":16,"id":"10714","name":"เด็กชายสราวุธ สวัสดี"},{"no":17,"id":"10715","name":"เด็กชายรัฐธรรมนูญ แดงสาย"},{"no":18,"id":"10716","name":"เด็กชายรัฐวิทย์ ขำดี"},{"no":19,"id":"10717","name":"เด็กชายนาวิน น้อยแสง"},{"no":20,"id":"10718","name":"เด็กชายนันทิพัฒน์ ดาทอง"},{"no":21,"id":"7185","name":"เด็กหญิงอาจรีย์ อยู่สมบูรณ์"},{"no":22,"id":"7475","name":"เด็กหญิงธนวรรณ เวนะ"},{"no":23,"id":"7478","name":"เด็กหญิงสุนันทา เมืองเกษม"},{"no":24,"id":"7488","name":"เด็กหญิงชญาณ์นุช ศิริมงคล"},{"no":25,"id":"8236","name":"เด็กหญิงบุณยาพร ท้าวปราบภัย"},{"no":26,"id":"","name":"เด็กหญิงปานฟ้า จันทร์ศิริ"},{"no":27,"id":"9341","name":"เด็กหญิงนริศรา บรรดาศักดิ์"},{"no":28,"id":"9342","name":"เด็กหญิงกัญญาณัฐ นาคหนู"},{"no":29,"id":"","name":"เด็กหญิงสุภัสสรา เกษเสณีย์"},{"no":30,"id":"10720","name":"เด็กหญิงวารีรัตน์ จันทร์ชีวา"},{"no":31,"id":"10721","name":"เด็กหญิงกัญญารัตน์ วงศ์ปราชญ์"},{"no":32,"id":"10722","name":"เด็กหญิงณัฐมล สีนิ่ม"},{"no":33,"id":"10723","name":"เด็กหญิงมานิตา อ้นตลบ"},{"no":34,"id":"10725","name":"เด็กหญิงณิชาภัทร อินทร์วัฒนา"},{"no":35,"id":"10726","name":"เด็กหญิงธนภรณ์ โสภา"},{"no":36,"id":"10727","name":"เด็กหญิงวริศรา ชูนาค"},{"no":37,"id":"10728","name":"เด็กหญิงสุณัฐฐา สู่สุข"},{"no":38,"id":"10729","name":"เด็กหญิงเกวลิน เต็มดี"},{"no":39,"id":"10731","name":"เด็กหญิงญาณิศา จันทร์มูล"},{"no":40,"id":"10732","name":"เด็กหญิงธนภัทร แก้วประดิษฐ"},{"no":41,"id":"10733","name":"เด็กหญิงณัฐนันท์ จรัสเอี่ยม"},{"no":42,"id":"10734","name":"เด็กหญิงชนิดาภา ตองติน"},{"no":43,"id":"10735","name":"เด็กหญิงขวัญรัตน์ โรจนบุญญานนท์"},{"no":44,"id":"10736","name":"เด็กหญิงอาภัสรา อู่ชนะ"},{"no":45,"id":"10737","name":"เด็กหญิงบุษยมาศ โพธินาคะ"},{"no":46,"id":"10738","name":"เด็กหญิงวันวิสา แสงทองใส"},{"no":47,"id":"11102","name":"เด็กหญิงอมลวรรณ ทูลมาลย์"}],"ม.2/3":[{"no":1,"id":"7161","name":"เด็กชายชิติพัทธ์ บุญทรง"},{"no":2,"id":"","name":"เด็กชายสิทธิพล สุขสว่าง"},{"no":3,"id":"","name":"เด็กชายไตรรัตน์ ทัพประเสริฐ"},{"no":4,"id":"10198","name":"เด็กชายบรรณวิชญ์ พระแก้ว"},{"no":5,"id":"","name":"เด็กชายปาน"},{"no":6,"id":"","name":"เด็กชายฉัตรมงคล ศรีทอง"},{"no":7,"id":"10739","name":"เด็กชายสมพงษ์ คุณทองคำ"},{"no":8,"id":"10740","name":"เด็กชายวัฒธนากร เมืองวิลัย"},{"no":9,"id":"10741","name":"เด็กชายทวีชัย ศิริทองสา"},{"no":10,"id":"10743","name":"เด็กชายณัฐพัฒน์ สิริวัฒนากรณ์"},{"no":11,"id":"10744","name":"เด็กชายกัมปนาท มั่นคง"},{"no":12,"id":"10746","name":"เด็กชายณฐพัชร จันทร์แก้ว"},{"no":13,"id":"10747","name":"เด็กชายพิชิต พรมประสิทธิ์"},{"no":14,"id":"10748","name":"เด็กชายภานุพงศ์ ชาติดี"},{"no":15,"id":"10751","name":"เด็กชายวิสุทธปราชญ์ ตระหง่านเกียรติ"},{"no":16,"id":"10752","name":"เด็กชายตรัยยชญ์ วิจิตร์วงษ์"},{"no":17,"id":"10753","name":"เด็กชายธนารักษ์ ทองเก่งกล้า"},{"no":18,"id":"10754","name":"เด็กชายเรืองเดช สมบุญ"},{"no":19,"id":"10755","name":"เด็กชายศรัณย์ภัทร พันธ์ขาว"},{"no":20,"id":"10756","name":"เด็กชายทีฆายุ นัดประสบ"},{"no":21,"id":"10757","name":"เด็กชายพีรณัฐ พุกสุข"},{"no":22,"id":"10758","name":"เด็กชายธนธรณ์ บาทาสุข"},{"no":23,"id":"10759","name":"เด็กชายนนทกร สุวภาพกุล"},{"no":24,"id":"11103","name":"เด็กชายธีรภัทร พุ่มบาน"},{"no":25,"id":"7182","name":"เด็กหญิงสุธิดา อินกระโทก"},{"no":26,"id":"7489","name":"เด็กหญิงธารีรัตน์ วารีนิล"},{"no":27,"id":"7491","name":"เด็กหญิงโยษิตา"},{"no":28,"id":"7750","name":"เด็กหญิงพิชญาภัค วันทอง"},{"no":29,"id":"7751","name":"เด็กหญิงพิชญาภา วันทอง"},{"no":30,"id":"8238","name":"เด็กหญิงสมิตานัน อักษร"},{"no":31,"id":"8240","name":"เด็กหญิงจิรัชญา แก้วงาม"},{"no":32,"id":"10760","name":"เด็กหญิงธนัชญา อุทัยนา"},{"no":33,"id":"10761","name":"เด็กหญิงแป้ง ผึ้งทอง"},{"no":34,"id":"10762","name":"เด็กหญิงวสุรัตน์ ผมน้อย"},{"no":35,"id":"10763","name":"เด็กหญิงเพชรไพลิน ชูเอี่ยม"},{"no":36,"id":"10765","name":"เด็กหญิงธิดารัตน์ แสงอุทัย"},{"no":37,"id":"10766","name":"เด็กหญิงวนิดา วันดี"},{"no":38,"id":"10767","name":"เด็กหญิงนภัสวรรณ์ จิตรจวง"},{"no":39,"id":"10768","name":"เด็กหญิงสุรีย์วรรณ รัตนเนตร"},{"no":40,"id":"10769","name":"เด็กหญิงธัญชนก ครุฑสิงห์"},{"no":41,"id":"10770","name":"เด็กหญิงฟ้าใส ศรีโสภา"},{"no":42,"id":"10771","name":"เด็กหญิงธิดารัตน์ จาอ่อน"},{"no":43,"id":"10772","name":"เด็กหญิงสโรชา บุลา"},{"no":44,"id":"10773","name":"เด็กหญิงนิจชิตา สูญไกร"},{"no":45,"id":"11104","name":"เด็กหญิงจีระนันท์ แซ่หยอ"},{"no":46,"id":"10872","name":"เด็กหญิงมณฑกาญจน์ วัฒนสุนทร"}],"ม.2/4":[{"no":1,"id":"","name":"เด็กชายคำรน แซ่ยี่"},{"no":2,"id":"6836","name":"เด็กชายสุพศิน ทรายสอาด"},{"no":3,"id":"7133","name":"เด็กชายกฤษกร แจ้งกระจ่าง"},{"no":4,"id":"7159","name":"เด็กชายณัฐภูมิ คงนิล"},{"no":5,"id":"7165","name":"เด็กชายปภาวิชญ์ ยางเดิม"},{"no":6,"id":"7170","name":"เด็กชายสิทธิชัย มะกาว"},{"no":7,"id":"7466","name":"เด็กชายกิตติภพ คะเชนทร"},{"no":8,"id":"8221","name":"เด็กชายภูภูมิ หล้าหิบ"},{"no":9,"id":"8639","name":"เด็กชายณัฐพงศ์ ศรีเลย"},{"no":10,"id":"8907","name":"เด็กชายสุฬณัฐ คำมุงคุณ"},{"no":11,"id":"9340","name":"เด็กชายบุญญลักษณ์ บาเปีย"},{"no":12,"id":"9758","name":"เด็กชายบอล"},{"no":13,"id":"","name":"เด็กชายพัสกร ช่างเสนา"},{"no":14,"id":"","name":"เด็กชายชิติสรรค์ รักขุมแก้ว"},{"no":15,"id":"","name":"เด็กชายประมนัส ฮวดเจริญ"},{"no":16,"id":"","name":"เด็กชายสมชาย"},{"no":17,"id":"10774","name":"เด็กชายคณิสร์ธนา วรรณโยชน์"},{"no":18,"id":"10775","name":"เด็กชายปรัชญา สมณะ"},{"no":19,"id":"10777","name":"เด็กชายอธิน ภูมิศิลป"},{"no":20,"id":"10778","name":"เด็กชายวิศรุต วันอยู่"},{"no":21,"id":"10779","name":"เด็กชายธนะวิชญ์ ทับทิม"},{"no":22,"id":"10780","name":"เด็กชายมลทน สุริยจันทร์"},{"no":23,"id":"10781","name":"เด็กชายชลชาติ ทองรอด"},{"no":24,"id":"10782","name":"เด็กชายพณธร รูปทอง"},{"no":25,"id":"7149","name":"เด็กหญิงเกวลิน นิลน้อย"},{"no":26,"id":"7177","name":"เด็กหญิงปุณยาวีร์ แป้นโก๋"},{"no":27,"id":"7183","name":"เด็กหญิงหนูดี"},{"no":28,"id":"7480","name":"เด็กหญิงอโนมา ฉวีวรรณ"},{"no":29,"id":"8225","name":"เด็กหญิงนภาพิน ชาติมนตรี"},{"no":30,"id":"9248","name":"เด็กหญิงวราการ หาญละคร"},{"no":31,"id":"9855","name":"เด็กหญิงอวยพร พวงเพ็ชร"},{"no":32,"id":"10200","name":"เด็กหญิงชรินทร์ทิพย์ สังหาร"},{"no":33,"id":"10783","name":"เด็กหญิงสมัชญา คงสุคนธ์"},{"no":34,"id":"10784","name":"เด็กหญิงอภิสรา พงรัตน์"},{"no":35,"id":"10785","name":"เด็กหญิงธนพร เอี่ยมในเมือง"},{"no":36,"id":"10786","name":"เด็กหญิงปวริศา ทองถม"},{"no":37,"id":"10787","name":"เด็กหญิงทิพามณี มีเย็น"},{"no":38,"id":"10788","name":"เด็กหญิงจรรยพร ลิ้มไพเราะ"},{"no":39,"id":"10789","name":"เด็กหญิงแอ"},{"no":40,"id":"10790","name":"เด็กหญิงธัญลักษณ์ พูลพิพัฒน์"},{"no":41,"id":"10792","name":"เด็กหญิงจุฬาลักษณ์ จินดาโชติ"},{"no":42,"id":"10793","name":"เด็กหญิงนภาวดี ทาอิ่ม"},{"no":43,"id":"10794","name":"เด็กหญิงกมลเนตร พวงแฉล้ม"},{"no":44,"id":"10795","name":"เด็กหญิงกฤตนรากรณ์ ดวงอำพร"},{"no":45,"id":"10797","name":"เด็กหญิงปวริศา นวมนาม"},{"no":46,"id":"10798","name":"เด็กหญิงณัชชา ตาแจ่ม"},{"no":47,"id":"11105","name":"เด็กหญิงณัฐณิชา อินทร์วัฒนา"}],"ม.2/5":[{"no":1,"id":"7139","name":"เด็กชายธีรภัทร สานุ"},{"no":2,"id":"7145","name":"เด็กชายรัชชานนท์ ขยันคิด"},{"no":3,"id":"8107","name":"เด็กชายธนชาต เกสรินทร์"},{"no":4,"id":"","name":"เด็กชายธนกร สิงห์นา"},{"no":5,"id":"","name":"เด็กชายธีรภัทร์ ศรีวรานนท์"},{"no":6,"id":"","name":"เด็กชายพลพล เอี่ยมสอาด"},{"no":7,"id":"","name":"เด็กชายศิรชัช รสชุ่ม"},{"no":8,"id":"","name":"เด็กชายนรากร ใกล้ชิด"},{"no":9,"id":"10799","name":"เด็กชายกฤษฏ์ สิงห์โตทอง"},{"no":10,"id":"10800","name":"เด็กชายนภดล มีบุญมา"},{"no":11,"id":"10801","name":"เด็กชายชัยธวัช นุภาพ"},{"no":12,"id":"10802","name":"เด็กชายศรศิลป์ สมประสงค์"},{"no":13,"id":"10803","name":"เด็กชายเทวกฤต เมือบศรี"},{"no":14,"id":"10804","name":"เด็กชายอิทธิกร หม่อมกระโทก"},{"no":15,"id":"10805","name":"เด็กชายชัชรินทร์ เปรมพวง"},{"no":16,"id":"10806","name":"เด็กชายโสทร ทองเปราะ"},{"no":17,"id":"10808","name":"เด็กชายนรวิชญ์ มิ่งมูล"},{"no":18,"id":"10811","name":"เด็กชายธนชาต ฉวีศักดิ์"},{"no":19,"id":"10812","name":"เด็กชายปิยะพงษ์ กล้าผจญ"},{"no":20,"id":"10813","name":"เด็กชายวันชัย เสียรู้หลัก"},{"no":21,"id":"10814","name":"เด็กชายธนมินทร์ ไทรชมภู"},{"no":22,"id":"10815","name":"เด็กชายปวริศน์ เบญจพลกุล"},{"no":23,"id":"10816","name":"เด็กชายสิงหา แม้นกลิ่นเนียม"},{"no":24,"id":"10817","name":"เด็กชายจิรายุ สาลีวรรณ"},{"no":25,"id":"7176","name":"เด็กหญิงเมษา ชั่งเย็น"},{"no":26,"id":"7487","name":"เด็กหญิงกมลพร เข็มทอง"},{"no":27,"id":"7494","name":"เด็กหญิงแสงนวล ลุงซอ"},{"no":28,"id":"7844","name":"เด็กหญิงณัฐกาญจน์ ลีฬหสุรพันธุ์"},{"no":29,"id":"8227","name":"เด็กหญิงธนมนต์ ริ้วกุลประเสริฐ"},{"no":30,"id":"8642","name":"เด็กหญิงอัญญารินทร์ บรรจงแก้ว"},{"no":31,"id":"8643","name":"เด็กหญิงขวัญจิรา ภู่ทอง"},{"no":32,"id":"9555","name":"เด็กหญิงสุพิชชา มียอด"},{"no":33,"id":"10818","name":"เด็กหญิงณัฐวิภา เจริญพร"},{"no":34,"id":"10819","name":"เด็กหญิงพิชญาพร โคฮุด"},{"no":35,"id":"10820","name":"เด็กหญิงสรัลพร อินทร์โชติ"},{"no":36,"id":"10821","name":"เด็กหญิงณัฐฏรียา ภู่ทับทิม"},{"no":37,"id":"10822","name":"เด็กหญิงณัฐสุรางค์ ภัชรอัครโยธิน"},{"no":38,"id":"10823","name":"เด็กหญิงวันดี เลามาสุวพันธ์"},{"no":39,"id":"10824","name":"เด็กหญิงเพ็ญนภา ชุ่มดวงใจ"},{"no":40,"id":"10825","name":"เด็กหญิงธิดารัตน์ โซวเซ็ง"},{"no":41,"id":"10826","name":"เด็กหญิงวนิดา ชาวไร่อ้อย"},{"no":42,"id":"10827","name":"เด็กหญิงพิมชนก กินวรวงศ์"},{"no":43,"id":"10828","name":"เด็กหญิงสุนันทา ชัยสงค์"},{"no":44,"id":"10830","name":"เด็กหญิงธัญชนก ดอนจันเยี่ยม"},{"no":45,"id":"10831","name":"เด็กหญิงสุพัฒตา บุญแต่ง"},{"no":46,"id":"10832","name":"เด็กหญิงพรลภัส ภูฆัง"},{"no":47,"id":"11106","name":"เด็กหญิงนาริน สังข์กระแสร์"}],"ม.3/1":[{"no":1,"id":"6831","name":"เด็กชายกรวิชญ์ จันทร์ตอน"},{"no":2,"id":"6834","name":"เด็กชายพัชรพล ศิริสม"},{"no":3,"id":"6866","name":"เด็กชายธนกฤต พลอยงาม"},{"no":4,"id":"7752","name":"เด็กชายประภาส ม่วงทาราม"},{"no":5,"id":"7846","name":"เด็กชายอลงกรณ์ เดชกิต"},{"no":6,"id":"7861","name":"เด็กชายปภังกร โฆศิการันต์"},{"no":7,"id":"10201","name":"เด็กชายภัทรกฤติ ชนะกุล"},{"no":8,"id":"10202","name":"เด็กชายพีรดนย์ สุขเจริญ"},{"no":9,"id":"10204","name":"เด็กชายก้องฟ้า ซื่อสัตย์"},{"no":10,"id":"10205","name":"เด็กชายภูสิทธิ พงไพร"},{"no":11,"id":"10206","name":"เด็กชายธนพนธ์ บัวแย้ม"},{"no":12,"id":"10207","name":"เด็กชายศิวกร แสงจันทร์"},{"no":13,"id":"10575","name":"เด็กชายชัยวัฒน์ บุญมามาก"},{"no":14,"id":"6851","name":"เด็กหญิงพีรดา บุญเรือน"},{"no":15,"id":"6871","name":"เด็กหญิงชญาภา ด้วงพิบูลย์"},{"no":16,"id":"6876","name":"เด็กหญิงเพ็ญพิชชา หีบรวย"},{"no":17,"id":"6881","name":"เด็กหญิงสุวิมล สุวรรณบัตร"},{"no":18,"id":"6882","name":"เด็กหญิงอักษราภัค เจริญใจ"},{"no":19,"id":"7127","name":"เด็กหญิงศิริปนดา แซ่ว่าง"},{"no":20,"id":"7855","name":"เด็กหญิงไอยวริน สุขสมแดน"},{"no":21,"id":"7859","name":"เด็กหญิงเมษา สุธาพจน์"},{"no":22,"id":"7870","name":"เด็กหญิงสมัญตชิฎา ดีโชติ"},{"no":23,"id":"10208","name":"เด็กหญิงจุฑาภรณ์ ธิบดี"},{"no":24,"id":"10209","name":"เด็กหญิงวรรณวนัช แซ่ซิ้ม"},{"no":25,"id":"10210","name":"เด็กหญิงรชดา มานิตย์"},{"no":26,"id":"10211","name":"เด็กหญิงธิดารัตน์ จันทร์ชีวา"},{"no":27,"id":"10212","name":"เด็กหญิงเพชรรัตน์ อำนวลใจ"},{"no":28,"id":"10213","name":"เด็กหญิงปภัสสร ชมหมู่"},{"no":29,"id":"10214","name":"เด็กหญิงสมิตานัน นิลจันทร์"},{"no":30,"id":"10215","name":"เด็กหญิงกัยจน์อภษฎา วิธูชุลี"},{"no":31,"id":"10216","name":"เด็กหญิงณิรดา กสิผล"},{"no":32,"id":"10217","name":"เด็กหญิงส้ม"},{"no":33,"id":"10218","name":"เด็กหญิงพชรมล อินทวงษ์"},{"no":34,"id":"10219","name":"เด็กหญิงเกวลิน อุดมมงคลไพศาล"},{"no":35,"id":"10220","name":"เด็กหญิงสรัลรัตน์ นาคเหนือ"},{"no":36,"id":"10221","name":"เด็กหญิงพิชชา โชติการุณสวัสดิ์"},{"no":37,"id":"10222","name":"เด็กหญิงศิรภัสสร รักอก"},{"no":38,"id":"10223","name":"เด็กหญิงกิตติญา มหาดเล็ก"}],"ม.3/2":[{"no":1,"id":"6832","name":"เด็กชายกุลณพัฒน์ นุชเจริญ"},{"no":2,"id":"6862","name":"เด็กชายภูวณัฎฐ์ จิตรขาวผ่อง"},{"no":3,"id":"7192","name":"เด็กชายศิวกร แก้วพร้อมตรึก"},{"no":4,"id":"7847","name":"เด็กชายพัสกร ทับทิม"},{"no":5,"id":"8528","name":"เด็กชายญาณพัฒน์ น้อยบริบูรณ์"},{"no":6,"id":"10224","name":"เด็กชายวุฒิชินพัฒน์"},{"no":7,"id":"10225","name":"เด็กชายธันวา"},{"no":8,"id":"10229","name":"เด็กชายธีรภัทร บุญเที่ยง"},{"no":9,"id":"10230","name":"เด็กชายบัญญพนต์ ปะสะนะ"},{"no":10,"id":"10231","name":"เด็กชายปุณณพัฒน์ โชติกเสถียร"},{"no":11,"id":"10233","name":"เด็กชายวุฒิกร"},{"no":12,"id":"10235","name":"เด็กชายเทพฤทธิ์ ทองสลับ"},{"no":13,"id":"10236","name":"เด็กชายประสิทธิชัย หวังสม"},{"no":14,"id":"10237","name":"เด็กชายธีรพงษ์ กรประดิษฐ"},{"no":15,"id":"10576","name":"เด็กชายภูมิพัฒน์ ธุวะคำ"},{"no":16,"id":"11107","name":"นายบุญมี อยู่พิพัฒน์"},{"no":17,"id":"6844","name":"เด็กหญิงคอดีญะฮ์ ซาร์ยีด"},{"no":18,"id":"7200","name":"เด็กหญิงณัฐธิดา ขำเสงี่ยม"},{"no":19,"id":"7867","name":"เด็กหญิงจันจิรา ฟ้าคะนอง"},{"no":20,"id":"8650","name":"เด็กหญิงวดีณัฏฐ์ วงศ์สุทธิผล"},{"no":21,"id":"9310","name":"เด็กหญิงพัณณิตา บุญมา"},{"no":22,"id":"9802","name":"เด็กหญิงศิลป์ศุภา นิ่มคง"},{"no":23,"id":"10238","name":"เด็กหญิงพัชรินทร์ เมฆฉาย"},{"no":24,"id":"10240","name":"เด็กหญิงธิชา ใจดี"},{"no":25,"id":"10241","name":"เด็กหญิงปภาวรินท์ มั่งลิ้ม"},{"no":26,"id":"10243","name":"เด็กหญิงมณฑกาญจน์ จันทร์อร่าม"},{"no":27,"id":"10245","name":"เด็กหญิงกวินธิดา ชาวกรุง"},{"no":28,"id":"10246","name":"เด็กหญิงนันทิชา แก้วกลัด"},{"no":29,"id":"10247","name":"เด็กหญิงพลอยชมพู"},{"no":30,"id":"10248","name":"เด็กหญิงอารยา หอมทวนลม"},{"no":31,"id":"10249","name":"เด็กหญิงชญานิศ เริ่มภักดิ์"},{"no":32,"id":"10250","name":"เด็กหญิงอนัญญา ใจเลื่อม"},{"no":33,"id":"10577","name":"เด็กหญิงพัชรพร เกิดบัณฑิต"},{"no":34,"id":"11108","name":"เด็กหญิงชนากานต์ แถวนาม"},{"no":35,"id":"11109","name":"เด็กหญิงนวนิษฐ์ เงินบาท"},{"no":36,"id":"11110","name":"เด็กหญิงพิชชา เครืออารีย์"}],"ม.3/3":[{"no":1,"id":"7848","name":"เด็กชายพนิชกร แย้มมา"},{"no":2,"id":"8254","name":"เด็กชายภคพล เชาว์เฉียบ"},{"no":3,"id":"9759","name":"เด็กชายธีรภัทร"},{"no":4,"id":"10252","name":"เด็กชายอุดม อุดมกัน"},{"no":5,"id":"10255","name":"เด็กชายธนภัทร แดงแสง"},{"no":6,"id":"10257","name":"เด็กชายพฤทธิ์ ทิมพิทักษ์"},{"no":7,"id":"10258","name":"เด็กชายกิตติศักดิ์ ระย้าย้อย"},{"no":8,"id":"10259","name":"เด็กชายณัฐฐนันท์ โพธิ์แก้ว"},{"no":9,"id":"10260","name":"เด็กชายจักธพันธ์ เอี๊ยไจ๊"},{"no":10,"id":"10261","name":"เด็กชายกันต์กวี รุ่งอรุณ"},{"no":11,"id":"10262","name":"เด็กชายญาณพล เขียวนิล"},{"no":12,"id":"10263","name":"เด็กชายจุมพล แฟงตะคุ"},{"no":13,"id":"10264","name":"เด็กชายรชต กานดา"},{"no":14,"id":"10265","name":"เด็กชายนฤพล จึงศรีเจริญ"},{"no":15,"id":"10266","name":"เด็กชายปภาวินท์ พันธ์คำภา"},{"no":16,"id":"10267","name":"เด็กชายจตุรภัทร ชวลิตชลวิทย์"},{"no":17,"id":"7854","name":"เด็กหญิงกัลยาณี แก้วรอดฟ้า"},{"no":18,"id":"8645","name":"เด็กหญิงเสาวลักษณ์ โตแทน"},{"no":19,"id":"8648","name":"เด็กหญิงอรษา นาเมือง"},{"no":20,"id":"10268","name":"เด็กหญิงเล็ก"},{"no":21,"id":"10269","name":"เด็กหญิงณัฏฐณิชา เพ็ชพลอย"},{"no":22,"id":"10270","name":"เด็กหญิงกฤตวรรณ จอมคีรี"},{"no":23,"id":"10271","name":"เด็กหญิงวรรณทนา กันณะ"},{"no":24,"id":"10272","name":"เด็กหญิงกมลวรรณ ทิมพิทักษ์"},{"no":25,"id":"10273","name":"เด็กหญิงผกามาศ บู่ทอง"},{"no":26,"id":"10274","name":"เด็กหญิงณัฐวรรณ หอมสนิท"},{"no":27,"id":"10275","name":"เด็กหญิงฟ้า ปาตาล"},{"no":28,"id":"10276","name":"เด็กหญิงภัทรลภา เกตุรามฤทธิ์"},{"no":29,"id":"10277","name":"เด็กหญิงชลณิชา แสนเมือง"},{"no":30,"id":"10278","name":"เด็กหญิงกฤษนา ยอดจันทร์"},{"no":31,"id":"10279","name":"เด็กหญิงพูธิตา สุวรรณหงษ์"},{"no":32,"id":"10280","name":"เด็กหญิงวันวิสา แก้วจำปาสี"},{"no":33,"id":"10281","name":"เด็กหญิงศรัทธนิตย์ นาคหนู"},{"no":34,"id":"10282","name":"เด็กหญิงนันธิชา เนียมเตียง"},{"no":35,"id":"10283","name":"เด็กหญิงกวินตรา เง่อเนิด"},{"no":36,"id":"10284","name":"เด็กหญิงรินรดา เชื้อคำฮด"}],"ม.3/4":[{"no":1,"id":"6827","name":"เด็กชายปฐวีร์ วงศ์จินดา"},{"no":2,"id":"6829","name":"เด็กชายกันต์กวี จีนสักโต"},{"no":3,"id":"6833","name":"เด็กชายชินพงศ์ ด้วงอ่อน"},{"no":4,"id":"6858","name":"เด็กชายกฤตนัย แก้วมณี"},{"no":5,"id":"10286","name":"เด็กชายธนพล เกษมสุข"},{"no":6,"id":"10287","name":"เด็กชายสมยศ เอื้อนยศ"},{"no":7,"id":"10289","name":"เด็กชายเตชทัต ภักดีพันธ์"},{"no":8,"id":"10290","name":"เด็กชายธีรศักดิ์ ปรีเปรม"},{"no":9,"id":"10291","name":"เด็กชายสิรธีร์ สวนทอง"},{"no":10,"id":"10292","name":"เด็กชายดนุพัฒน์ คะยุง"},{"no":11,"id":"10293","name":"เด็กชายศักดา ทิมพิทักษ์"},{"no":12,"id":"10294","name":"เด็กชายพีรศักดิ์ เพิ่มทรัพย์"},{"no":13,"id":"10296","name":"เด็กชายรุ่งตะวัน สีลม"},{"no":14,"id":"10297","name":"เด็กชายภูริณัฐ สร้อยวังวาลย์"},{"no":15,"id":"10847","name":"เด็กชายพชรรัตน์ แว่นแก้ว"},{"no":16,"id":"6850","name":"เด็กหญิงปรัชริญา ทิมอ่อน"},{"no":17,"id":"6870","name":"เด็กหญิงกมลชนก สินบริสุทธิ์"},{"no":18,"id":"8248","name":"เด็กหญิงพิมุกต์ เกลี้ยงเกลา"},{"no":19,"id":"8249","name":"เด็กหญิงพิมล เกลี้ยงเกลา"},{"no":20,"id":"9853","name":"เด็กหญิงกมลวรรณ ศิริวรรณ์"},{"no":21,"id":"10299","name":"เด็กหญิงญาณิศา เงินวิลัย"},{"no":22,"id":"10300","name":"เด็กหญิงอัญชิษฐา เฮงเติม"},{"no":23,"id":"10301","name":"เด็กหญิงปัณฑิตา ทองถม"},{"no":24,"id":"10303","name":"เด็กหญิงหนึ่งธิดา สุขเสมอ"},{"no":25,"id":"10304","name":"เด็กหญิงศิวาการ พวงกิจ"},{"no":26,"id":"10305","name":"เด็กหญิงณัฐธิดา จุลคีรี"},{"no":27,"id":"10306","name":"เด็กหญิงวิชชุดา พรานพนัส"},{"no":28,"id":"10308","name":"เด็กหญิงชญานิศา แก้วประดิษฐ"},{"no":29,"id":"10309","name":"เด็กหญิงภัทรศยา สวัสดิ์ราช"},{"no":30,"id":"10310","name":"เด็กหญิงปภาพัชร ศรีดี"},{"no":31,"id":"10311","name":"เด็กหญิงณัฐพร เจือนาค"},{"no":32,"id":"10312","name":"เด็กหญิงไอรดา วิลัยเกษม"},{"no":33,"id":"10313","name":"เด็กหญิงวริศรา เมืองเกษม"},{"no":34,"id":"10314","name":"เด็กหญิงธนพร เพิ่มทองเผือก"},{"no":35,"id":"10315","name":"เด็กหญิงพัทธนันท์ แสงสว่าง"},{"no":36,"id":"10580","name":"เด็กหญิงบุศราพร ลายคล้ายดอก"}],"ม.3/5":[{"no":1,"id":"7189","name":"เด็กชายธัญวุฒิ วารีนิล"},{"no":2,"id":"8244","name":"เด็กชายปฏิภาณ จันทร์แก้ว"},{"no":3,"id":"9760","name":"เด็กชายพัทธนันท์ เกษมะณี"},{"no":4,"id":"10317","name":"เด็กชายธเนศ ปรีเปรมโอษฐ"},{"no":5,"id":"10318","name":"เด็กชายชัยภัทร แปลกสกุลสมบัติ"},{"no":6,"id":"10321","name":"เด็กชายเกียรติภูมิ โนรา"},{"no":7,"id":"10322","name":"เด็กชายศุภโชค แก้วดี"},{"no":8,"id":"10325","name":"เด็กชายชัยมงคล โภคินอัครวัฒน์"},{"no":9,"id":"10326","name":"เด็กชายเอกชาติ ศรเจริญสมบัติ"},{"no":10,"id":"10328","name":"เด็กชายณัฐวุฒิ ฉันทวิริยวัฒน์"},{"no":11,"id":"6840","name":"เด็กหญิงกัญญาภัค แถวนาม"},{"no":12,"id":"7196","name":"เด็กหญิงวรฤทัย ป้องแถว"},{"no":13,"id":"7199","name":"เด็กหญิงจันทกานต์ ราชสีห์"},{"no":14,"id":"8246","name":"เด็กหญิงปิยพร ทองบุญโท"},{"no":15,"id":"9343","name":"เด็กหญิงศุดากาญจน์ รัตนโชติ"},{"no":16,"id":"10016","name":"เด็กหญิงธนัตพร รังกุพันธ์"},{"no":17,"id":"10329","name":"เด็กหญิงนิสรีน หวันโส้"},{"no":18,"id":"10330","name":"เด็กหญิงจุฑามาศ คงคาคูณ"},{"no":19,"id":"10331","name":"เด็กหญิงวรัญญา วงศา"},{"no":20,"id":"10332","name":"เด็กหญิงสุนิสา"},{"no":21,"id":"10333","name":"เด็กหญิงณัฒฐากร ใจดี"},{"no":22,"id":"10334","name":"เด็กหญิงนิพรรณพร พ่วงฟัก"},{"no":23,"id":"10335","name":"เด็กหญิงปาลญา อาจหาญพิทัก"},{"no":24,"id":"10336","name":"เด็กหญิงปิยรัตน์ ป้องลม"},{"no":25,"id":"10337","name":"เด็กหญิงนมิดา แจ่มรัตน์"},{"no":26,"id":"10338","name":"เด็กหญิงกัญญาณัฐ สามเรืองศรี"},{"no":27,"id":"10339","name":"เด็กหญิงอลิษา"},{"no":28,"id":"10340","name":"เด็กหญิงชนิตฐา จันทร์ทอง"},{"no":29,"id":"10341","name":"เด็กหญิงเบญญา ชาติดี"},{"no":30,"id":"10342","name":"เด็กหญิงหนิง"},{"no":31,"id":"10343","name":"เด็กหญิงธัญชนก นาคอ่อน"}],"ม.3/6":[{"no":1,"id":"7860","name":"เด็กชายอทิวราห์ แสงชุ่ม"},{"no":2,"id":"9253","name":"เด็กชายหาญชัย ชมภูพันธ์"},{"no":3,"id":"10344","name":"เด็กชายเอกชัย จันดาศักดิ์"},{"no":4,"id":"10346","name":"เด็กชายกษิพัฒ ขุนรักษ์"},{"no":5,"id":"10347","name":"เด็กชายศุภโชค กองศรีกุลดิลก"},{"no":6,"id":"10348","name":"เด็กชายนริศ ปูระณะสุวรรณ์"},{"no":7,"id":"10350","name":"เด็กชายธนภัทร รูปทอง"},{"no":8,"id":"10351","name":"เด็กชายชลพรรณ นิยมดุสดี"},{"no":9,"id":"10354","name":"เด็กชายกฤตณพชร ดวงอำพร"},{"no":10,"id":"10356","name":"เด็กชายสิริกร ระย้าย้อย"},{"no":11,"id":"10357","name":"เด็กชายภาณุพงศ์ ทิณวงค์"},{"no":12,"id":"10358","name":"เด็กชายกฤติเดช ท้าวญาติ"},{"no":13,"id":"10359","name":"เด็กชายธนกร ฉินทองประเสริฐ"},{"no":14,"id":"10360","name":"เด็กชายวัชรพล นุ้ยแท่น"},{"no":15,"id":"6880","name":"เด็กหญิงสุพิชฌาย์ กลิ่นเกษร"},{"no":16,"id":"7198","name":"เด็กหญิงกนกนิภา คุณทองคำ"},{"no":17,"id":"7852","name":"เด็กหญิงเปรมิกา บุญทอง"},{"no":18,"id":"7866","name":"เด็กหญิงอนุธิดา วงษ์เทศ"},{"no":19,"id":"7869","name":"เด็กหญิงกัญญาณัฐ พูลสวัสดิ์"},{"no":20,"id":"10361","name":"เด็กหญิงรวงข้าว อ้นทอง"},{"no":21,"id":"10362","name":"เด็กหญิงเตชนันทน์ อินทร์เจริญ"},{"no":22,"id":"10363","name":"เด็กหญิงชลธิชา บำเรอจิตร์"},{"no":23,"id":"10365","name":"เด็กหญิงปลายฟ้า ทับทรวง"},{"no":24,"id":"10366","name":"เด็กหญิงกนิษฐา แววทับเทศ"},{"no":25,"id":"10367","name":"เด็กหญิงฟ้า จีเมะ"},{"no":26,"id":"10368","name":"เด็กหญิงชุติกาญจน์ มหาวงค์"},{"no":27,"id":"10369","name":"เด็กหญิงปุณณภา หารไชย"},{"no":28,"id":"10370","name":"เด็กหญิงณีรนุช ชุณหกาญจน์ดำรง"},{"no":29,"id":"10372","name":"เด็กหญิงกัญญาภัทร องคเชษฐ"},{"no":30,"id":"10373","name":"เด็กหญิงภัทฬาวดี สีแตงเหลือง"},{"no":31,"id":"10548","name":"เด็กหญิงปิยธิดา ก้อนเงิน"},{"no":32,"id":"10839","name":"เด็กหญิงวรรณพร เบญจพลกุล"}],"ม.4/1":[{"no":1,"id":"6513","name":"นายพิชญุตม์ กลิ่นลำภู"},{"no":2,"id":"6515","name":"นายวชิรวิท คำเทียน"},{"no":3,"id":"9764","name":"นายก้อง"},{"no":4,"id":"9765","name":"นายตะวัน"},{"no":5,"id":"9766","name":"นายกิตติกวิน ธิตะปัน"},{"no":6,"id":"9821","name":"นายสมาธิ ดำรงค์"},{"no":7,"id":"10582","name":"นายพงษ์พิชญ์ เรืองยังมี"},{"no":8,"id":"11111","name":"นายณภัทร กุศลอภิบาล"},{"no":9,"id":"11112","name":"นายวรวิทย์ เกิดแก้ว"},{"no":10,"id":"11113","name":"นายชาญยุทธ พวงน้อย"},{"no":11,"id":"11114","name":"นายธีรภัทร ไกลเพชร"},{"no":12,"id":"11115","name":"นายอัถสิทธิ ภู่ทอง"},{"no":13,"id":"11116","name":"นายพีรธัช เกี่ยวคุ้มภัย"},{"no":14,"id":"11117","name":"นายพรชัย จิวบางป่า"},{"no":15,"id":"11118","name":"นายพชรดนัย ปะโพทิง"},{"no":16,"id":"11119","name":"นายสรัช โต๊ะหมาด"},{"no":17,"id":"11120","name":"นายธนาธิป ห่วงนาค"},{"no":18,"id":"11121","name":"นายชยากร อ้นเพชร"},{"no":19,"id":"11122","name":"นายปริญญา ประสมทอง"},{"no":20,"id":"11123","name":"นายจักรพงศ์ ช่างเสียง"},{"no":21,"id":"11124","name":"นายภูวนาถ เกี่ยวสัมพันธ์"},{"no":22,"id":"11125","name":"นายวรวภัทร ศรีเสถียร"},{"no":23,"id":"6519","name":"นางสาวฐิตาภา ยงค์ประดิษฐ"},{"no":24,"id":"6525","name":"นางสาวศศินิภา ทับไกรสกล"},{"no":25,"id":"6898","name":"นางสาวชญาณ์นันท์ ศิริมงคล"},{"no":26,"id":"7206","name":"นางสาวศุภิศรา อัศวไกรศรี"},{"no":27,"id":"8657","name":"นางสาวธัญชนก ขาวสอาด"},{"no":28,"id":"9258","name":"นางสาวบุษกร ดีเหลือ"},{"no":29,"id":"9826","name":"นางสาวกานต์พิชชา จิตอารีวงค์"},{"no":30,"id":"9829","name":"นางสาวอัญชลีพร พิทักษ์สงคราม"},{"no":31,"id":"10378","name":"นางสาวรินรดา ติเยาว์"},{"no":32,"id":"11126","name":"นางสาวสุชาดา ทิพย์ตำแย"},{"no":33,"id":"11127","name":"นางสาวปริญฐ์ดา ขุนนะรา"},{"no":34,"id":"11128","name":"นางสาวสุภัสสร จันทร์คล้าย"},{"no":35,"id":"11129","name":"นางสาวรัตนพรรณ สีหรั่ง"},{"no":36,"id":"11130","name":"นางสาววรรณา พรมจรรย์"},{"no":37,"id":"11131","name":"นางสาวสุธาสินี ทาลา"},{"no":38,"id":"11132","name":"นางสาววิรัญญา อิ่มจิตร"},{"no":39,"id":"11133","name":"นางสาวชัญญานุช เศษเลิศ"},{"no":40,"id":"11134","name":"นางสาวธัญวรัตน์ ธนกิจรุ่งเรือง"},{"no":41,"id":"11135","name":"นางสาวศิริพร แท่นทอง"}],"ม.4/2":[{"no":1,"id":"9772","name":"นายศิรสิฐ ขาวงาม"},{"no":2,"id":"9795","name":"นายนิติกร สมณะ"},{"no":3,"id":"9838","name":"นายจิณพัด ชูศิลป์"},{"no":4,"id":"9839","name":"นายเชษฐพงศ์ ศิริทองสา"},{"no":5,"id":"9845","name":"นายพีรดนย์ จันทร์สังข์"},{"no":6,"id":"11136","name":"นายธนโชติ ภู่ทอง"},{"no":7,"id":"11137","name":"นายเดชณรงค์ เฮงจินดา"},{"no":8,"id":"11138","name":"นายพัสกร เล็บครุฑ"},{"no":9,"id":"11139","name":"นายณัฐวุฒิ หน่อทองคำ"},{"no":10,"id":"11140","name":"นายมาโนชญ์ ชุมแก้ว"},{"no":11,"id":"6497","name":"นางสาวนภาพร ทับทิม"},{"no":12,"id":"6520","name":"นางสาวณัฐชยา สวัสดี"},{"no":13,"id":"8255","name":"นางสาวพิชยา ฮ่มป่า"},{"no":14,"id":"9259","name":"นางสาวนัทธนันท์ อินทรง"},{"no":15,"id":"9346","name":"นางสาวเบญญภา เกตุเต็ม"},{"no":16,"id":"9779","name":"นางสาวณัฐนันท์ จันทร์สังข์"},{"no":17,"id":"9786","name":"นางสาวนิชานาถ เชื้อดี"},{"no":18,"id":"9788","name":"นางสาวฐาปนีย์ เมืองอินทร์"},{"no":19,"id":"9808","name":"นางสาวสุภัสสร คงเจริญ"},{"no":20,"id":"9823","name":"นางสาวกชกร เสียงเอก"},{"no":21,"id":"9824","name":"นางสาวกนกวรรณ สายแสง"},{"no":22,"id":"9874","name":"นางสาวจุฑารัตน์ เนื่องอาชา"},{"no":23,"id":"9896","name":"นางสาววารดา โคฮุด"},{"no":24,"id":"9899","name":"นางสาวอรินดา สุวภาพกุล"},{"no":25,"id":"9902","name":"นางสาวปทุมมา คำพิทูน"},{"no":26,"id":"10028","name":"นางสาวสุภาพร พูลทรัพย์"},{"no":27,"id":"10377","name":"นางสาวเกณิกา บุตรรักษ์"},{"no":28,"id":"10581","name":"นางสาวชนิกานต์ พวงกิจ"},{"no":29,"id":"11141","name":"นางสาวศิริรัตนา หอมสุวรรณ"},{"no":30,"id":"11142","name":"นางสาวขนิษฐา สวัสดิรัก"},{"no":31,"id":"11143","name":"นางสาวกมลชนก บุญเกษม"},{"no":32,"id":"11144","name":"นางสาวสิริกัญญา นิลอ่อน"},{"no":33,"id":"11145","name":"นางสาวกมลวรรณ ชิงชัย"},{"no":34,"id":"11146","name":"นางสาวอชิรญาณ์ ศรีเฮียง"},{"no":35,"id":"11147","name":"นางสาวปริญญา กลิ่นเจริญ"},{"no":36,"id":"11148","name":"นางสาวอัจจิตา หมื่นผดุง"},{"no":37,"id":"11149","name":"นางสาวชนกนันท์ รื่นเย็น"},{"no":38,"id":"11150","name":"นางสาวชุติกาญจน์ โตแท้"},{"no":39,"id":"11151","name":"นางสาวสุนันทา ใจดี"},{"no":40,"id":"11152","name":"นางสาวเบญจมาส เปรมจิตร์"},{"no":41,"id":"11153","name":"นางสาวกมลลักษณ์ นาคนุ"},{"no":42,"id":"11154","name":"นางสาวณิชานันท์ เวชฤทธิ์"}],"ม.4/3":[{"no":1,"id":"6484","name":"นายธีรนาถ ด้วงอ่อน"},{"no":2,"id":"6506","name":"นายจิรายุ มูลเพ็ชร"},{"no":3,"id":"6507","name":"นายไชยพัฒน์ สรรเสริญ"},{"no":4,"id":"6820","name":"นายนัธทวัฒน์ เพียรพันธ์"},{"no":5,"id":"7500","name":"นายวิชญกฤษณ์ แก้วไม้เพชร"},{"no":6,"id":"9776","name":"นายปวริศ สืบนุช"},{"no":7,"id":"9847","name":"นายวัชรพล บุณยะกมล"},{"no":8,"id":"9874","name":"นายธนภัทร ชัดช่วงโชติ"},{"no":9,"id":"9878","name":"นายบัญญพนต์ จันทร์แม้น"},{"no":10,"id":"9883","name":"นายศุภณัฐ ครุฑสิงห์"},{"no":11,"id":"10379","name":"นายธีรนัย ปลิดดอก"},{"no":12,"id":"11155","name":"นายพีมพิพัฒน์ บุญมา"},{"no":13,"id":"11156","name":"นายชัชพิมุข มหาโชติ"},{"no":14,"id":"11157","name":"นายเตชัส มหาโชติ"},{"no":15,"id":"11158","name":"นายกฤตพิรุฬห์ องคเชษฐ"},{"no":16,"id":"8256","name":"นางสาวสุพรรษา อักษร"},{"no":17,"id":"9828","name":"นางสาวจรรยมณฑน์ แก้วเผือก"},{"no":18,"id":"9852","name":"นางสาวกาญจนาวดี แก้วแสง"},{"no":19,"id":"9857","name":"นางสาวฐิติรัตน์ สอพระกาฬ"},{"no":20,"id":"9858","name":"นางสาวเบญญาภา อวชัย"},{"no":21,"id":"9860","name":"นางสาวบุณยาพร รื่นเริง"},{"no":22,"id":"9861","name":"นางสาวนริษา พลแสน"},{"no":23,"id":"9865","name":"นางสาวกานสินี พระพิไชย"},{"no":24,"id":"9869","name":"นางสาวปณิตา จันอินทร์"},{"no":25,"id":"9892","name":"นางสาวธิติมา จันสี"},{"no":26,"id":"9898","name":"นางสาวนภาพร บุญคง"},{"no":27,"id":"10583","name":"นางสาวรัชนี แตงอ่อน"},{"no":28,"id":"11159","name":"นางสาววิลาสินี แสงทอง"},{"no":29,"id":"11160","name":"นางสาวชุติมา จันสม"},{"no":30,"id":"11161","name":"นางสาวพลอย"},{"no":31,"id":"11162","name":"นางสาวณิชกมล กัญญาพัชรกุล"},{"no":32,"id":"11163","name":"นางสาวศุภิสรา ปานเนียม"},{"no":33,"id":"11164","name":"นางสาวณิชา"},{"no":34,"id":"11165","name":"นางสาวกนกพิชญ์ รสชุ่ม"},{"no":35,"id":"11166","name":"นางสาวกมลฉัตร ชมเชย"},{"no":36,"id":"11167","name":"นางสาวภัทรปภา ทิมพิทักษ์"},{"no":37,"id":"11168","name":"นางสาวนฤมล มณีโชติ"},{"no":38,"id":"11169","name":"นางสาวดรัลรัตน์ บุญธรรม"},{"no":39,"id":"11170","name":"นางสาวณิชนันทน์ ศรีวรรณ์ทอง"},{"no":40,"id":"11171","name":"นางสาวพิมพ์ลภัทร ภู่พานทอง"}],"ม.4/4":[{"no":1,"id":"6481","name":"นายไกรวิชญ์ แก้วประดิษฐ์"},{"no":2,"id":"6888","name":"นายศักดิ์ชัย คงสุคนธ์"},{"no":3,"id":"9768","name":"นายสุริยะ"},{"no":4,"id":"9775","name":"นายธรรมสรณ์ แย้มเกษร"},{"no":5,"id":"9814","name":"นายชนาธิป ชุ่มนาค"},{"no":6,"id":"9836","name":"นายกิตตินันท์ เจียมแท้"},{"no":7,"id":"9837","name":"นายกิตติพศ เจียมแท้"},{"no":8,"id":"9846","name":"นายวรัญญู แก้วไทรหาญ"},{"no":9,"id":"9882","name":"นายวิชัย"},{"no":10,"id":"11172","name":"นายอนันต์ชัย วงค์ราช"},{"no":11,"id":"11173","name":"นายดรัล ห้อยระย้า"},{"no":12,"id":"11174","name":"นายจิรทัปต์ แก้วกัลป์"},{"no":13,"id":"11175","name":"นายนพดล ถิระวารินทร์ยุทธ"},{"no":14,"id":"11176","name":"นายสิงหนาท อมรกุลสวัสดิ์"},{"no":15,"id":"11177","name":"นายสิงหา จันทร์ฉวี"},{"no":16,"id":"11178","name":"นายปรเมศ แก้วพลอย"},{"no":17,"id":"11179","name":"นายธีรโชติ แก้วระเวง"},{"no":18,"id":"11180","name":"นายธเนศ สุวรรณสิทธิ์"},{"no":19,"id":"11181","name":"นายปภังกร ชุนเกษา"},{"no":20,"id":"11182","name":"นายวชิรศักดิ์ ทรัพย์เย็น"},{"no":21,"id":"11183","name":"นายเจษฎา เอื้อนยศ"},{"no":22,"id":"11184","name":"นายพัฒน์ธนเดช หวั่นวดี"},{"no":23,"id":"6499","name":"นางสาวปุญญิสา ยางเดิม"},{"no":24,"id":"6521","name":"นางสาวพิมพ์พิสุทธิ์ หงษ์งาม"},{"no":25,"id":"6891","name":"นางสาวปณัฐฐา เจียงสันติสกุล"},{"no":26,"id":"8257","name":"นางสาวนงลักษณ์ ชูตลับ"},{"no":27,"id":"9780","name":"นางสาวพชรมน พานสร้อย"},{"no":28,"id":"9785","name":"นางสาวธัญธร แซ่ลิ้ม"},{"no":29,"id":"9810","name":"นางสาวแต๋ว"},{"no":30,"id":"9893","name":"นางสาวสิริณัฏฐ์ เอี่ยมพุฒ"},{"no":31,"id":"9894","name":"นางสาวกชกร กิมเยื้อน"},{"no":32,"id":"10036","name":"นางสาวโยษิตา พันตรี"},{"no":33,"id":"11185","name":"นางสาวรัตติยาภรณ์ สุดตา"},{"no":34,"id":"11186","name":"นางสาวสุภนิช อร่ามรส"},{"no":35,"id":"11187","name":"นางสาวพิมพ์ชนก พัฒน์จันทร์หอม"},{"no":36,"id":"11188","name":"นางสาวชญาดา พรมปาน"},{"no":37,"id":"11189","name":"นางสาวกัญญาวีร์ แย้มพลาย"},{"no":38,"id":"11190","name":"นางสาวเณชญาณัณย์ ฐิติวิทยาสรรค์"},{"no":39,"id":"11191","name":"นางสาวธันยพร กงวุธ"},{"no":40,"id":"11192","name":"นางสาวสาริศา เลิศล้ำ"},{"no":41,"id":"11193","name":"นางสาวไพลิน ยกกลิ่น"}],"ม.4/5":[{"no":1,"id":"6514","name":"นายมโนเชาว์ ฉวีวรรณ"},{"no":2,"id":"7499","name":"นายสรวิชญ์ คำป้อง"},{"no":3,"id":"9411","name":"นายปรวีร์ อินทรวัตร"},{"no":4,"id":"9770","name":"นายอนุวัฒน์ แสงใจ"},{"no":5,"id":"9818","name":"นายพงศกร คล้ำสกุล"},{"no":6,"id":"9820","name":"นายวัชระ เกตุเรืองโรจน์"},{"no":7,"id":"9842","name":"นายทินภัทร วิลัยเกษม"},{"no":8,"id":"9844","name":"นายธนพนธ์ ตรีรัตน์"},{"no":9,"id":"9871","name":"นายเกตุนพดล บุญเพ็ญ"},{"no":10,"id":"9879","name":"นายปิยพนธ์ แก้วกระจ่าง"},{"no":11,"id":"","name":"นายกันต์กวี พิพิธวณิชการ"},{"no":12,"id":"","name":"นายธนโชติ ศรีชูยงค์"},{"no":13,"id":"","name":"นายธนารัตน์ หลุยแสง"},{"no":14,"id":"","name":"นายพีรพัฒน์ เหล็กเพ็ชร"},{"no":15,"id":"","name":"นายณัฐวัฒน์ ปานเจริญ"},{"no":16,"id":"","name":"นายปิติพรรดิ์ ครุฑน้อย"},{"no":17,"id":"11194","name":"นายคัมภีร์ จันทรา"},{"no":18,"id":"11195","name":"นายศิริวุธ เดชดิษฐ"},{"no":19,"id":"11196","name":"นายสุทธิราต สาวสุดชาติ"},{"no":20,"id":"11197","name":"นายรัชตะ แก้วชัยสา"},{"no":21,"id":"11198","name":"นายชัยโรจน์ ทาเกตุ"},{"no":22,"id":"11199","name":"นายอนุภัทร พรหมน้อย"},{"no":23,"id":"11200","name":"นายศกุลวัฒน์ ทองแก้ว"},{"no":24,"id":"11201","name":"นายภูวิศ พุกสุริย์วงศ์"},{"no":25,"id":"6892","name":"นางสาวอดิวรรณ แจ่มจันทร์"},{"no":26,"id":"9859","name":"นางสาววรัญญา เสลานิ่ม"},{"no":27,"id":"9900","name":"นางสาวมาริษา สุดทวี"},{"no":28,"id":"9904","name":"นางสาวน้องหนึ่ง เสียรู้หลัก"},{"no":29,"id":"","name":"นางสาวณัฐธิดา แก้วงาม"},{"no":30,"id":"","name":"นางสาวดุสิตา กลิ่นชะนะ"},{"no":31,"id":"","name":"นางสาววรรณวิษา สุมารินทร์"},{"no":32,"id":"10875","name":"นางสาวพรณภา กงวุธ"},{"no":33,"id":"10876","name":"นางสาวจุฑาทิพ กงวุธ"},{"no":34,"id":"11202","name":"นางสาวรดา จูอี้"},{"no":35,"id":"11203","name":"นางสาวกนกอร บัวไสว"},{"no":36,"id":"11204","name":"นางสาววรัญญา มาคัชชะ"},{"no":37,"id":"11205","name":"นางสาวณัฐณิชา คำนวนสกุณี"},{"no":38,"id":"11206","name":"นางสาวณภัทร เสือเฒ่า"},{"no":39,"id":"11207","name":"นางสาวมาริศา หนองนา"},{"no":40,"id":"11208","name":"นางสาวณัชชา วิชิตชาญ"},{"no":41,"id":"11209","name":"นางสาววไลภรณ์ สุขทวี"},{"no":42,"id":"11210","name":"นางสาวเพ็ญพิชชา เถื่อนถ้ำแก้ว"},{"no":43,"id":"11211","name":"นางสาวกิ่งกาญจน์ พรหมจันทร์"},{"no":44,"id":"11212","name":"นางสาวอภัสรา ทองคำ"},{"no":45,"id":"11213","name":"นางสาวชนาภา โกมลมุกสิทธิ์"},{"no":46,"id":"11214","name":"นางสาวศุภกานต์ นิ่มนวล"},{"no":47,"id":"11215","name":"นางสาวณัฐริกา หมีสกุล"},{"no":48,"id":"11216","name":"นางสาววรัญฤทัย ทองใหญ่"},{"no":49,"id":"11219","name":"นางสาวมณีกาญจ อีหละ"},{"no":50,"id":"11223","name":"นางสาวอรสา"}],"ม.5/1":[{"no":1,"id":"6397","name":"นายกฤษฎา ทิพย์วรรณ"},{"no":2,"id":"6405","name":"นายภควา แซ่ลี้"},{"no":3,"id":"6435","name":"นายธาวิน ลำทรง"},{"no":4,"id":"7517","name":"นายจิรายุส์ ชัชวาลย์"},{"no":5,"id":"8660","name":"นายจักรภัทร เทียนดำ"},{"no":6,"id":"9410","name":"นายพคินทร์ แสงพันธ์"},{"no":7,"id":"9422","name":"นายชัยสิทธิ์ รามประสิทธิ์"},{"no":8,"id":"9435","name":"นายพชรพล พันธ์ภู"},{"no":9,"id":"9442","name":"นายรชานนท์ ขาวเมฆ"},{"no":10,"id":"9905","name":"นายภัทรวิชช์ ตันติวิศาล"},{"no":11,"id":"10381","name":"นายศุภกิจ กองศรีกุลดิลก"},{"no":12,"id":"10585","name":"นายชินพัฒน์ สังขกุล"},{"no":13,"id":"10587","name":"นายเป็นต่อ อึ้งตระกูล"},{"no":14,"id":"10588","name":"นายกิตติพัฒน์ เฟื่องแก้ว"},{"no":15,"id":"10589","name":"นายวรวรรธ จิตงามขำ"},{"no":16,"id":"10590","name":"นายอดิศร สุวรรณมาโจ"},{"no":17,"id":"10591","name":"นายสุพจน์ ประทุมพร"},{"no":18,"id":"10592","name":"นายณัฐวัฒน์ สุขอร่าม"},{"no":19,"id":"6414","name":"นางสาวจุฑามาศ สรรเสริญ"},{"no":20,"id":"6443","name":"นางสาวพิมพ์พิชชา จิตรสุวรรณ์"},{"no":21,"id":"6447","name":"นางสาวอชิรญาณ์ เจริญใจ"},{"no":22,"id":"6906","name":"นางสาวนันทนัช สุริบุตร"},{"no":23,"id":"9458","name":"นางสาววรกานต์ บุญมา"},{"no":24,"id":"9461","name":"นางสาวเพ็ญพิชชา หลวงบุญมา"},{"no":25,"id":"9466","name":"นางสาวเกตน์สิรี มั่งลิ้ม"},{"no":26,"id":"9478","name":"นางสาวเกศราภรณ์ อินทร์วัฒนา"},{"no":27,"id":"9481","name":"นางสาวจันทิมา แย้มมา"},{"no":28,"id":"9486","name":"นางสาวจิราพร ฝอยทอง"},{"no":29,"id":"9488","name":"นางสาวณัฐณิชา อินทร์พรม"},{"no":30,"id":"9500","name":"นางสาวนรีรัตน์ ปล้องลาภ"},{"no":31,"id":"9528","name":"นางสาวพรธนัญญา ทุ่งศรีแก้ว"},{"no":32,"id":"10013","name":"นางสาวพชพร เอี่ยมสอาด"},{"no":33,"id":"10385","name":"นางสาวดลยา ชมภูพันธ์"},{"no":34,"id":"10595","name":"นางสาวอัจฉรา ศิริ"},{"no":35,"id":"10597","name":"นางสาวปพิชญา สัทธาผล"}],"ม.5/2":[{"no":1,"id":"9409","name":"นายวายุ เหรียญทอง"},{"no":2,"id":"9419","name":"นายกษิดิ์คณิน แสนสนุก"},{"no":3,"id":"9439","name":"นายธีรวัฒน์ ไพรี"},{"no":4,"id":"9446","name":"นายกิตติกร ฝัดสุภาพ"},{"no":5,"id":"9584","name":"นายจิรัฒน์ จวนชัยนาท"},{"no":6,"id":"10598","name":"นายทวีศักดิ์ โค้วไล้"},{"no":7,"id":"10599","name":"นายปวิตร ยงศรีปัญญฤทธิ์"},{"no":8,"id":"10603","name":"นายภาณุพงศ์ เก่งธัญการ"},{"no":9,"id":"10604","name":"นายพงศ์ธร อินทศร"},{"no":10,"id":"10605","name":"นายศุภกร ชวนชื่น"},{"no":11,"id":"10607","name":"นายพัฒนศักดิ์ สุวภาพกุล"},{"no":12,"id":"10608","name":"นายธาระศิลปิ์ เรืองยังมี"},{"no":13,"id":"6421","name":"นางสาวหทัยทิพย์ แสนพยุง"},{"no":14,"id":"7211","name":"นางสาวกาญจนา ถ้ำกลาง"},{"no":15,"id":"9474","name":"นางสาวสวิตา แก้วแดง"},{"no":16,"id":"9475","name":"นางสาวอัคษราภัค ธนมาก"},{"no":17,"id":"9482","name":"นางสาวปุณณภา หมายพึ่งโพธิ์"},{"no":18,"id":"9487","name":"นางสาวณัฐชา บุตรา"},{"no":19,"id":"9498","name":"นางสาวเน็กมล"},{"no":20,"id":"9501","name":"นางสาวหทัยภัทร์ คำศรี"},{"no":21,"id":"9507","name":"นางสาวจินต์จุฑา ยามช่วง"},{"no":22,"id":"","name":"นางสาววิมล เจืออรุณ"},{"no":23,"id":"10609","name":"นางสาวจินต์จุฑา เลี่ยงสกุล"},{"no":24,"id":"10610","name":"นางสาวดารัน จันทร์หอม"},{"no":25,"id":"10611","name":"นางสาววิภาพร คุ้มชาติ"},{"no":26,"id":"10612","name":"นางสาวดวงนภา วงศจันทร์"},{"no":27,"id":"10613","name":"นางสาวภัทรวดี เดชเกิด"},{"no":28,"id":"10614","name":"นางสาวสุณิสา แก้วพริ้ง"},{"no":29,"id":"10617","name":"นางสาวสุภานิดา ศรีสยาม"},{"no":30,"id":"10618","name":"นางสาวกานต์พิชชา บุญฤทธิ์"},{"no":31,"id":"10619","name":"นางสาวมัลลิกา แย้มสกุล"},{"no":32,"id":"10620","name":"นางสาวพชรปพร รัตนประทีปพร"},{"no":33,"id":"10621","name":"นางสาวสุพัชชา แม่น้ำ"},{"no":34,"id":"10622","name":"นางสาวฑิฆัมภรณ์ ตะสาริกา"},{"no":35,"id":"10625","name":"นางสาวสุจิตรา"},{"no":36,"id":"10873","name":"นางสาวกมลรัตน์ จารแก้ว"}],"ม.5/3":[{"no":1,"id":"6406","name":"นายภีระศักดิ์ แถวนาม"},{"no":2,"id":"6429","name":"นายพัชรพล สังขนพเก้า"},{"no":3,"id":"6530","name":"นายภานุวัชร์ สมรวย"},{"no":4,"id":"6531","name":"นายภูมิพัฒน์ คำวรรณาบูลย์"},{"no":5,"id":"7207","name":"นายชยพล ทุกข์เปลื้อง"},{"no":6,"id":"8543","name":"นายพุทธิพงศ์ จิตสุวรรณ"},{"no":7,"id":"8658","name":"นายแก๊ก"},{"no":8,"id":"8664","name":"นายฐิติกร มะลิทอง"},{"no":9,"id":"9434","name":"นายกฤตภาส พลายพงศ์"},{"no":10,"id":"9448","name":"นายธันยพัฒน์ อ่อนอุทัย"},{"no":11,"id":"9525","name":"นายรัฐศาสน์ เพิ่มพูล"},{"no":12,"id":"9913","name":"นายจักราเมธ เทพแสน"},{"no":13,"id":"10626","name":"นายกิตติพงศ์ เจริญภักดี"},{"no":14,"id":"10627","name":"นายวรากร อุ่นใจ"},{"no":15,"id":"10628","name":"นายยศภัทร สัตย์ใหญ่"},{"no":16,"id":"10629","name":"นายธาวิน อนุนาม"},{"no":17,"id":"10631","name":"นายธเนศ สุขยศ"},{"no":18,"id":"6446","name":"นางสาวศศิกานต์ สุขใส"},{"no":19,"id":"","name":"นางสาวกรกช ฟักสอน"},{"no":20,"id":"9468","name":"นางสาวสุภาพร บรรเทา"},{"no":21,"id":"9470","name":"นางสาวอภิญญา น้ำทอง"},{"no":22,"id":"9497","name":"นางสาวปภาวรินทร์ ทองถม"},{"no":23,"id":"","name":"นางสาวณัฎฐกานดา บัวทองเลิศ"},{"no":24,"id":"10632","name":"นางสาวกรกช นวมนาฆะ"},{"no":25,"id":"10633","name":"นางสาวปาริฉัตร บุญเลี้ยง"},{"no":26,"id":"10634","name":"นางสาวปภาวรินทร์ แม่น้ำ"},{"no":27,"id":"10635","name":"นางสาวศุภิสรา สิงห์จูฑะ"},{"no":28,"id":"10636","name":"นางสาวสุภาวิณี กระเจา"},{"no":29,"id":"10637","name":"นางสาวมณฑิดา วรวงค์"},{"no":30,"id":"10638","name":"นางสาวพรรษพร ศรีนวลจันทร์"},{"no":31,"id":"10639","name":"นางสาวธิดารัตน์ ขันธวิชัย"},{"no":32,"id":"10640","name":"นางสาวกฤติยาพรณ์ วิลาวรรณ"},{"no":33,"id":"10641","name":"นางสาวศิรประภา มลสวัสดิ์"},{"no":34,"id":"10642","name":"นางสาวภิรมรัตน์ เปียถนอม"},{"no":35,"id":"10643","name":"นางสาวพิมพ์อัปสร แก้วพริ้ง"},{"no":36,"id":"10644","name":"นางสาวณิชกานต์ จุนทการ"},{"no":37,"id":"10645","name":"นางสาวณัฐณิชา จุนทการ"},{"no":38,"id":"10647","name":"นางสาวพัสวี เชียงกา"},{"no":39,"id":"10648","name":"นางสาวศิรินภา คงเจริญ"},{"no":40,"id":"10649","name":"นางสาวเปียนนท์ บุตรตะ"},{"no":41,"id":"10650","name":"นางสาวปฐมพร เหมือนถม"},{"no":42,"id":"10651","name":"นางสาวสุพรรษา คล้ายสุบรรณ"}],"ม.5/4":[{"no":1,"id":"6902","name":"นายเกียรติศักดิ์ น้อยทะนะ"},{"no":2,"id":"6904","name":"นายไชยวุฒิ พวงทิพย์"},{"no":3,"id":"6905","name":"นายอนุวัฒน์ นิลสุขุม"},{"no":4,"id":"9260","name":"นายศุภกิตติ์ ทองจันทร์สุข"},{"no":5,"id":"9414","name":"นายวรชัย วงศาโรจน์"},{"no":6,"id":"9424","name":"นายวีรพัฒน์ นิลกระจ่าง"},{"no":7,"id":"9427","name":"นายธาดา เจริญภักดี"},{"no":8,"id":"9428","name":"นายพงศ์ปณต ชาวไชยา"},{"no":9,"id":"9436","name":"นายเมธิชัย กลิ่นเพย"},{"no":10,"id":"9451","name":"นายธีระวัฒน์ คำวัง"},{"no":11,"id":"9907","name":"นายเล็ก"},{"no":12,"id":"9909","name":"นายพีรภัทร จันพุฒ"},{"no":13,"id":"10384","name":"นายภัทรดนัย แย้มศรี"},{"no":14,"id":"10652","name":"นายอดุลย์วิทย์ เปรี้ยวหวาน"},{"no":15,"id":"10654","name":"นายอรุชา ทองก้อน"},{"no":16,"id":"10655","name":"นายศักดิ์ชัย มิกราช"},{"no":17,"id":"10656","name":"นายธาดา แจ่มดอนไพร"},{"no":18,"id":"10658","name":"นายฐิติโชติ บุญธรรม"},{"no":19,"id":"10659","name":"นายตะวัน บุญเนตร"},{"no":20,"id":"6416","name":"นางสาวธารวิมล ตาสว่าง"},{"no":21,"id":"6417","name":"นางสาวภัทราพร ฤทธิ์เดช"},{"no":22,"id":"6466","name":"นางสาวอรัชพร พลอยสว่าง"},{"no":23,"id":"8662","name":"นางสาวเสาวรส จันหอม"},{"no":24,"id":"9459","name":"นางสาวธันยธร แก้วคำ"},{"no":25,"id":"9464","name":"นางสาวกิติญา วันแก้ว"},{"no":26,"id":"9483","name":"นางสาวรัชนีกร ชมภูพันธ์"},{"no":27,"id":"9484","name":"นางสาวเนตรชนก โตประกอบ"},{"no":28,"id":"9522","name":"นางสาวธนาวดี บำเรอจิตต์"},{"no":29,"id":"","name":"นางสาวอรทัย บัวสุก"},{"no":30,"id":"","name":"นางสาวอริยา ลิ้มสุวรรณ์"},{"no":31,"id":"10660","name":"นางสาวขวัญข้าว แสงจันทร์งาม"},{"no":32,"id":"10662","name":"นางสาวสาวิตตรี แตงเพ็ชร์"},{"no":33,"id":"10663","name":"นางสาวณภัทร คลังทอง"},{"no":34,"id":"10664","name":"นางสาวสิรินทรา ตาเลิศ"},{"no":35,"id":"10665","name":"นางสาววรางคณา ขุนพิทักษ์"},{"no":36,"id":"10666","name":"นางสาวรัตนาวดี รอดมี"},{"no":37,"id":"10668","name":"นางสาวฐิติรัตน์ สุขสมัย"}],"ม.6/1":[{"no":1,"id":"8990","name":"นายณัฏฐพร โชติช่วง"},{"no":2,"id":"8991","name":"นายชลันธร เจริญพร"},{"no":3,"id":"8993","name":"นายเมธี บุญชอบ"},{"no":4,"id":"8996","name":"นายจิรศักดิ์ ธนมาก"},{"no":5,"id":"8998","name":"นายพีรเดช เมฆสง่า"},{"no":6,"id":"9001","name":"นายณัฐพงศ์ กันกลับ"},{"no":7,"id":"9021","name":"นายธนวัฒน์ คุสิน"},{"no":8,"id":"9028","name":"นายกัน"},{"no":9,"id":"9114","name":"นายสาโรจน์ สร้อยสวัสดิ์"},{"no":10,"id":"9919","name":"นายธีรภัทร เขียวคำ"},{"no":11,"id":"10386","name":"นายคมสัน สร้อยเจริญ"},{"no":12,"id":"10387","name":"นายณชยพล แสงอรุณ"},{"no":13,"id":"10388","name":"นายณัฏฐพล ดำนาน"},{"no":14,"id":"10389","name":"นายเดชาธร คุ้มสมบัติ"},{"no":15,"id":"10390","name":"นายธเนศ จุ้ยวัลลา"},{"no":16,"id":"10391","name":"นายปฏิภาณ อัมพาไพ"},{"no":17,"id":"10392","name":"นายพงศภัค อุดมผล"},{"no":18,"id":"10393","name":"นายภัทรดนัย มั่นใจ"},{"no":19,"id":"10394","name":"นายศุภกร มิ่งดอนไกล"},{"no":20,"id":"10396","name":"นายเสกสรร คงประเสริฐ"},{"no":21,"id":"10837","name":"นายชัพวิชญ์ องควิทยา"},{"no":22,"id":"6811","name":"นางสาวจินดาวดี แก้วไตรรัตน์"},{"no":23,"id":"6925","name":"นางสาวชนัญชิตา สุวรรณกูฏ"},{"no":24,"id":"7526","name":"นางสาวณัฐภัสสร เจริญหงษ์ษา"},{"no":25,"id":"8669","name":"นางสาวสุชานันท์ จันทร์เพชร"},{"no":26,"id":"8670","name":"นางสาวพิมนิภา สุขดวง"},{"no":27,"id":"9007","name":"นางสาววรัญญา จันทา"},{"no":28,"id":"9009","name":"นางสาวอรปรียา พุทธรังษี"},{"no":29,"id":"9014","name":"นางสาวธนภรณ์ วรวงค์"},{"no":30,"id":"9040","name":"นางสาววรรณญา แก่นแก้ว"},{"no":31,"id":"9090","name":"นางสาวอันดา หงษ์ทอง"},{"no":32,"id":"9286","name":"นางสาวกมลชนก นัดประสบ"},{"no":33,"id":"9916","name":"นางสาวพนิตตา แก้วน้ำรอบ"},{"no":34,"id":"10398","name":"นางสาวศศิวิมล ขำจุ้ย"},{"no":35,"id":"10399","name":"นางสาวสุธิดา จะตุคะมา"},{"no":36,"id":"10400","name":"นางสาวสุวรรณรัตน วระนาม"}],"ม.6/2":[{"no":1,"id":"10670","name":"นายปพนวัฒน์ วงศ์ทวีทรัพย์"},{"no":2,"id":"10671","name":"นายวิธิสรรค์ ตุ่มทอง"},{"no":3,"id":"9005","name":"นางสาวพนิดา มูลสวัสดิ์"},{"no":4,"id":"9031","name":"นางสาวศรัญญา สระศรี"},{"no":5,"id":"9035","name":"นางสาวสาวิตรี สี่หมื่น"},{"no":6,"id":"9041","name":"นางสาวพิมลวัลย์"},{"no":7,"id":"9067","name":"นางสาวศศิกาล เพิ่มทรัพย์"},{"no":8,"id":"9087","name":"นางสาวลลิตา ชมหมู่"},{"no":9,"id":"9093","name":"นางสาวเมธาพร สุดแจ้ง"},{"no":10,"id":"9097","name":"นางสาวณัฏนรี เริงใจ"},{"no":11,"id":"9117","name":"นางสาววิลาสินี สังข์ทอง"},{"no":12,"id":"9128","name":"นางสาวเมษญา"},{"no":13,"id":"9351","name":"นางสาวณัฐรัตน์ รามประสิทธิ์"},{"no":14,"id":"10012","name":"นางสาวสุพัตรา ขาวสอาด"},{"no":15,"id":"10404","name":"นางสาวฐิติภัสร์ ชินพัฒน์สกุล"},{"no":16,"id":"10405","name":"นางสาวณัฐกฤตา สีลาดเลา"},{"no":17,"id":"10406","name":"นางสาวธัญชนก แกมทอง"},{"no":18,"id":"10407","name":"นางสาวธัญพิชชา พุ่มสวน"},{"no":19,"id":"10411","name":"นางสาวนวลจันทร์ แสงทองใส"},{"no":20,"id":"10412","name":"นางสาวนิภาพร น้ำนวน"},{"no":21,"id":"10413","name":"นางสาวบุญมา จันทร์พุ่ม"},{"no":22,"id":"10416","name":"นางสาวปวริศา ศรีวันทา"},{"no":23,"id":"10418","name":"นางสาวพิมพ์ชนก อินทวงษ์"},{"no":24,"id":"10419","name":"นางสาวมะลิวรรณ รสชุ่ม"},{"no":25,"id":"10420","name":"นางสาวรสสุคนธ์ ศรีสุวรรณ"},{"no":26,"id":"10423","name":"นางสาววิไลวรรณ เสาหงษ์"},{"no":27,"id":"10425","name":"นางสาวสิริวิมล สมพร"},{"no":28,"id":"10426","name":"นางสาวสุชานาฏ ภู่ทอง"},{"no":29,"id":"10427","name":"นางสาวสุปาณัสม์ ชมโลก"},{"no":30,"id":"10428","name":"นางสาวอมรรัตน์ วงศ์ใหญ่"}],"ม.6/3":[{"no":1,"id":"6078","name":"นายบุณยกร สังข์โสม"},{"no":2,"id":"6103","name":"นายปัญจพล ดาราสุข"},{"no":3,"id":"6109","name":"นายวสุพล กิมเปา"},{"no":4,"id":"6921","name":"นายชัชพิสิฐ เหมสุข"},{"no":5,"id":"8994","name":"นายณฐพล ติดตระกูลชัย"},{"no":6,"id":"8999","name":"นายสุเมธ แซ่ลี้"},{"no":7,"id":"9000","name":"นายชลธี พันธุ์แตง"},{"no":8,"id":"9020","name":"นายชัยวัฒน์ หงษ์ศิริ"},{"no":9,"id":"9022","name":"นายณัฐพนธ์ ยอดแก้ว"},{"no":10,"id":"9027","name":"นายสกุลชาต เพ่งฉ่ำ"},{"no":11,"id":"9079","name":"นายอดิศร พงรัตน์"},{"no":12,"id":"10430","name":"นายถิรวัฒน์ เอื้องกิตติกุล"},{"no":13,"id":"10431","name":"นายธนโชติ เอี่ยมสะอาด"},{"no":14,"id":"10433","name":"นายภาคิน ศรณาราย"},{"no":15,"id":"10672","name":"นายอดิเทพ วุฒิชัย"},{"no":16,"id":"6092","name":"นางสาวพัชญนันท์ คงนิล"},{"no":17,"id":"6097","name":"นางสาวไอศิรา ราชบุญชะ"},{"no":18,"id":"8771","name":"นางสาวอนุตตรา จันทรอุทัย"},{"no":19,"id":"9012","name":"นางสาวทักษอร แก้วงาม"},{"no":20,"id":"9160","name":"นางสาวสุภาวดี พันธ์คำ"},{"no":21,"id":"10434","name":"นางสาวจุฑารัตน์ อินหมอ"},{"no":22,"id":"10435","name":"นางสาวจุฑาลักษณ์ อินหมอ"},{"no":23,"id":"10436","name":"นางสาวณัฐณิชา พัฒน์จันทร์หอม"},{"no":24,"id":"10439","name":"นางสาวน้ำผึ้ง หมื่นณรงค์"},{"no":25,"id":"10440","name":"นางสาวน้ำเพชร ลี้เทียน"},{"no":26,"id":"10441","name":"นางสาวเบญจรัตน์ จิตฉวี"},{"no":27,"id":"10442","name":"นางสาวพัชรพร ปิดงาม"},{"no":28,"id":"10444","name":"นางสาวรุ่งนภา พัวไพบูลย์"},{"no":29,"id":"10445","name":"นางสาววันวิษา ทองประเสริฐ"},{"no":30,"id":"10446","name":"นางสาวสุธิตา คำพิษงู"},{"no":31,"id":"10447","name":"นางสาวสุนิษา อินนิ่ม"},{"no":32,"id":"10448","name":"นางสาวสุพิชญา โสมนัส"},{"no":33,"id":"10449","name":"นางสาวอารดี ศรีเอี่ยมจันทร์"},{"no":34,"id":"10674","name":"นางสาวปรีณาพรรณ ทะมะรมย์"},{"no":35,"id":"10841","name":"นางสาวมติกานต์ แก้วมุกดา"}],"ม.6/4":[{"no":1,"id":"6107","name":"นายพัทธดนย์ ฤทธิ์เม้า"},{"no":2,"id":"6394","name":"นายนิรัตติโชติ คุรุพันธ์"},{"no":3,"id":"7223","name":"นายธนพัต สุวาท"},{"no":4,"id":"7520","name":"นายณรงค์ศักดิ์ เล็กบำรุงสกุล"},{"no":5,"id":"7521","name":"นายดนัยเทพ ณ บางช้าง"},{"no":6,"id":"8995","name":"นายธนากร หนูจีน"},{"no":7,"id":"9030","name":"นายชนภูมิ โกมลมน"},{"no":8,"id":"9069","name":"นายพัชรพล ดาวเรือง"},{"no":9,"id":"9074","name":"นายชนะพล ทองเอีย"},{"no":10,"id":"9078","name":"นายชัยนนท์ อ่อนพรม"},{"no":11,"id":"9080","name":"นายพงศกร ขาวสะอาด"},{"no":12,"id":"9082","name":"นายมนัสนัน เนียมเตียง"},{"no":13,"id":"9086","name":"นายดลชัย ไกรทาสี"},{"no":14,"id":"9099","name":"นายธนชนม์ เถื่อนวิถี"},{"no":15,"id":"9100","name":"นายธีรพงษ์ ประทุมเมือง"},{"no":16,"id":"9105","name":"นายณัฐวุฒิ ยอดแก้ว"},{"no":17,"id":"10450","name":"นายฐิติพันธ์ พัฒน์จันทร์หอม"},{"no":18,"id":"10452","name":"นายธนกฤต รักขุมแก้ว"},{"no":19,"id":"10453","name":"นายธนโชติ ชุ่มชื่น"},{"no":20,"id":"10457","name":"นายธีระศีล แก้วศรีรัง"},{"no":21,"id":"10458","name":"นายนัธทวัฒน์ ภู่เด่นดวง"},{"no":22,"id":"10461","name":"นายราชศักดิ์ ไชยสุวรรณ"},{"no":23,"id":"10462","name":"นายสิทธิกร นวลแตง"},{"no":24,"id":"10463","name":"นายสุรศักดิ์ แหวนเพชร"},{"no":25,"id":"10488","name":"นายคมสันต์ หนองนา"},{"no":26,"id":"9096","name":"นางสาวณัฐกาญจน์ ศรีพรแก้ว"},{"no":27,"id":"10468","name":"นางสาวจันทร์ปภัสร์ เรือนเนตร"},{"no":28,"id":"10469","name":"นางสาวณภัทร พิบูลรัตนากุล"},{"no":29,"id":"10471","name":"นางสาวพัชราภา สำเรือง"},{"no":30,"id":"10472","name":"นางสาวเพลงพระพร ปานแพ"},{"no":31,"id":"10473","name":"นางสาวหทัยวัลลภ์ ทองดอนเหมือน"}]};
+if(typeof ROSTER==='undefined'){var ROSTER={};}
+
+/* ===== คลาวด์ส่วนกลาง (Google Apps Script + Sheet) =====
+   ลิงก์ /exec ตั้งค่าผ่านปุ่ม "⚙️ ตั้งค่าคลาวด์" (เก็บใน localStorage)
+   ถ้าจะฝังลิงก์ให้ทุกเครื่องใช้อัตโนมัติ ใส่ในตัวแปร CLOUD_URL ด้านล่าง */
+var CLOUD_URL='https://script.google.com/macros/s/AKfycbyt0HfLY6ZvCc12rFdJI74KGim_wmLapTKNlvhe7U3O3LlNaaCq97iHkZQ-51mLLVKY/exec';  // ลิงก์คลาวด์ (ฝังให้ทุกเครื่องใช้อัตโนมัติ)
+var SAVE_PW='2301';               // รหัสผ่านสำหรับบันทึก
+var unlocked=(sessionStorage.getItem('hwUnlocked_' + activeWorkspace)==='1');
+var pushTimer=null, cloudBusy=false, pendingPush=false;
+
+function cloudUrl(){
+  var u=(localStorage.getItem('hwCloudUrl_' + activeWorkspace)||CLOUD_URL||'').trim();
+  return /^https?:\/\//.test(u)?u:'';
+}
+function setStatus(txt,cls){
+  var el=document.getElementById('save'); if(!el)return;
+  el.textContent=txt; el.className=cls||''; el.style.color=(cls==='ok')?'var(--chalk)':'';
+}
+function updateLockUI(){
+  var b=document.getElementById('lockBtn'); if(!b)return;
+  if(unlocked){ b.textContent='🔓 แก้ไข/บันทึกได้'; b.style.borderColor='var(--chalk)'; b.style.color='var(--chalk)'; b.title='แตะเพื่อล็อกกลับเป็นดูอย่างเดียว'; }
+  else { b.textContent='🔒 บันทึกถูกล็อก'; b.style.borderColor='#fff'; b.style.color='var(--green-d)'; b.title='แตะเพื่อใส่รหัสปลดล็อกการบันทึก'; }
+}
+
+/* โหลดข้อมูลในเครื่อง (cache) ใช้แสดงทันทีก่อนต่อคลาวด์ */
+function load(){
+  try{ DB=JSON.parse(localStorage.getItem('hwTrackerApp_data_' + activeWorkspace))||{sets:{}}; }catch(e){ DB={sets:{}}; }
+  if(!DB.sets)DB.sets={};
+}
+
+/* บันทึก: เก็บ cache ในเครื่องเสมอ + ผลักขึ้นคลาวด์ (ต้องปลดล็อกก่อน) */
+function save(){
+  try{ localStorage.setItem('hwTrackerApp_data_' + activeWorkspace, JSON.stringify(DB)); }catch(e){}
+  if(!cloudUrl()){ setStatus('⚠️ ยังไม่ตั้งค่าลิงก์คลาวด์ — กด ⚙️ ตั้งค่าคลาวด์'); return; }
+  if(!unlocked){ promptUnlock(); return; }
+  schedulePush();
+}
+function schedulePush(){
+  clearTimeout(pushTimer);
+  setStatus('… กำลังบันทึกขึ้นคลาวด์');
+  pushTimer=setTimeout(pushNow,800);
+}
+function pushNow(){
+  var url=cloudUrl(); if(!url||!unlocked)return;
+  if(cloudBusy){ pendingPush=true; return; }
+  cloudBusy=true; pendingPush=false;
+  var enteredPw=sessionStorage.getItem('hwEnteredPassword_' + activeWorkspace)||'';
+  fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+    body:JSON.stringify({password:enteredPw,data:DB})})
+   .then(function(r){return r.json();})
+   .then(function(j){
+      cloudBusy=false;
+      if(j&&j.ok){ setStatus('☁️ บันทึกขึ้นคลาวด์แล้ว '+new Date().toLocaleTimeString('th-TH'),'ok'); }
+      else { setStatus('❌ บันทึกไม่สำเร็จ: '+((j&&j.error)||'ไม่ทราบสาเหตุ'));
+             if(j&&/รหัส/.test(j.error||'')){ unlocked=false; sessionStorage.removeItem('hwUnlocked_' + activeWorkspace); sessionStorage.removeItem('hwEnteredPassword_' + activeWorkspace); updateLockUI(); } }
+      if(pendingPush)pushNow();
+   })
+   .catch(function(){ cloudBusy=false; setStatus('❌ เชื่อมต่อคลาวด์ไม่ได้ (เช็คเน็ต/ลิงก์)'); });
+}
+
+/* ดึงข้อมูลล่าสุดจากคลาวด์มาแสดง */
+function refreshFromCloud(cb){
+  var url=cloudUrl();
+  if(!url){ load(); afterDataReady(); if(cb)cb(); return; }
+  setStatus('… กำลังโหลดจากคลาวด์');
+  fetch(url,{method:'GET'})
+   .then(function(r){return r.json();})
+   .then(function(j){
+      if(j&&j.ok&&j.data){ DB=j.data; if(!DB.sets)DB.sets={};
+        try{localStorage.setItem('hwTrackerApp_data_' + activeWorkspace,JSON.stringify(DB));}catch(e){}
+        setStatus('☁️ โหลดข้อมูลล่าสุดแล้ว','ok'); }
+      else { load(); setStatus('⚠️ โหลดคลาวด์ไม่ได้ ใช้ข้อมูลในเครื่อง'); }
+      afterDataReady(); if(cb)cb();
+   })
+   .catch(function(){ load(); setStatus('⚠️ ออฟไลน์ — ใช้ข้อมูลในเครื่อง'); afterDataReady(); if(cb)cb(); });
+}
+function afterDataReady(){
+  renderSetBar();
+  var keys=Object.keys(DB.sets);
+  if(curKey&&DB.sets[curKey]) openSet(curKey);
+  else if(keys.length) openSet(keys[0]);
+}
+
+/* ===== ปลดล็อก/ล็อกการบันทึก ===== */
+function toggleLock(){
+  if(unlocked){ unlocked=false; sessionStorage.removeItem('hwUnlocked_' + activeWorkspace); sessionStorage.removeItem('hwEnteredPassword_' + activeWorkspace); updateLockUI(); setStatus('🔒 ล็อกการบันทึกแล้ว (ดูได้อย่างเดียว)'); }
+  else promptUnlock();
+}
+function promptUnlock(){
+  var dlg=document.getElementById('pwDlg');
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwMsg').textContent='';
+  dlg.showModal();
+  setTimeout(function(){document.getElementById('pwInput').focus();},60);
+}
+function uid(p){return p+Math.random().toString(36).slice(2,8);}
+function escapeHtml(s){return String(s||'').replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+/* ===== ค่าในเซลล์ ===== */
+function val(sid,wid){ return cur.data[sid] ? cur.data[sid][wid] : undefined; }
+function setVal(sid,wid,v){ if(!cur.data[sid])cur.data[sid]={}; cur.data[sid][wid]=v; }
+function isSent(sid,wid){ return val(sid,wid)===true; }
+function pendingCount(sid){
+  var n=0; cur.works.forEach(function(w){ if(w.type==='ส่ง' && !isSent(sid,w.id)) n++; });
+  return n;
+}
+
+/* ===== แถบห้อง/วิชา ===== */
+function renderSetBar(){
+  var bar=document.getElementById('setBar'); bar.innerHTML='';
+  var keys=Object.keys(DB.sets);
+  if(!keys.length){ bar.innerHTML='<span class="muted">ยังไม่มีห้อง — กด “สร้างห้อง/วิชา” เพื่อเริ่ม</span>'; return; }
+  keys.forEach(function(k){
+    var s=DB.sets[k];
+    var c=document.createElement('div'); c.className='chip'+(k===curKey?' active':'');
+    c.innerHTML='📚 '+escapeHtml(s.room)+' · '+escapeHtml(s.subject)+' <small>('+s.students.length+' คน)</small>';
+    c.onclick=function(){ openSet(k); };
+    bar.appendChild(c);
+  });
+}
+function openSet(k){
+  curKey=k; cur=DB.sets[k];
+  if(!cur.works)cur.works=[]; if(!cur.students)cur.students=[]; if(!cur.data)cur.data={};
+  document.getElementById('curLabel').textContent=cur.room+' · '+cur.subject+' ('+cur.students.length+' คน, '+cur.works.length+' งาน)';
+  renderSetBar(); renderGrid(); renderWorks(); renderStudents();
+}
+function updateLabel(){
+  if(cur)document.getElementById('curLabel').textContent=cur.room+' · '+cur.subject+' ('+cur.students.length+' คน, '+cur.works.length+' งาน)';
+  renderSetBar();
+}
+
+/* รายชื่อห้องที่เคยสร้าง + ดึงรายชื่อนักเรียนของห้องนั้น (เลือกชุดที่มีคนเยอะสุด) */
+function existingRooms(){
+  var r={}; Object.keys(DB.sets).forEach(function(k){r[DB.sets[k].room]=1;});
+  Object.keys(ROSTER).forEach(function(k){r[k]=1;});   // รวมห้องจากทะเบียน
+  return Object.keys(r);
+}
+// ดึงรายชื่อ: ใช้ของครูที่เคยกรอกก่อน ถ้าไม่มีค่อยใช้ทะเบียนกลางจากไฟล์
+function roomRoster(room){
+  var best=null;
+  Object.keys(DB.sets).forEach(function(k){
+    var s=DB.sets[k]; if(s.room===room && s.students.length && (!best||s.students.length>best.students.length)) best=s;
+  });
+  if(best) return best.students.map(function(s){return {id:uid('s'),no:s.no,name:s.name};});
+  if(ROSTER[room]) return ROSTER[room].map(function(s){return {id:uid('s'),no:s.no,name:s.name};});
+  return [];
+}
+
+/* สร้างห้อง/วิชา */
+var createDlg=document.getElementById('createDlg');
+var cRoomEl=document.getElementById('cRoom'), cRoomHint=document.getElementById('cRoomHint');
+function updateRoomHint(){
+  var room=cRoomEl.value.trim();
+  var n=roomRoster(room).length;
+  cRoomHint.innerHTML = (room&&n) ? '✅ มีรายชื่อห้อง '+escapeHtml(room)+' ในทะเบียน — จะดึง '+n+' คนมาให้อัตโนมัติ (ลบรายคนได้ภายหลัง)' : '';
+}
+cRoomEl.addEventListener('input',updateRoomHint);
+document.getElementById('btnCreate').onclick=function(){
+  cRoomEl.value=''; document.getElementById('cSubject').value=''; cRoomHint.innerHTML='';
+  document.getElementById('roomOpts').innerHTML=existingRooms().map(function(r){return '<option value="'+escapeHtml(r)+'">';}).join('');
+  createDlg.showModal();
+};
+document.getElementById('cCancel').onclick=function(){createDlg.close();};
+document.getElementById('cOk').onclick=function(){
+  var room=cRoomEl.value.trim();
+  var subject=document.getElementById('cSubject').value.trim();
+  if(!room||!subject){alert('กรอกห้องและรายวิชา');return;}
+  var k=room+'|'+subject;
+  if(DB.sets[k]){alert('มีห้อง/วิชานี้อยู่แล้ว');}
+  else { DB.sets[k]={room:room,subject:subject,works:[],students:roomRoster(room),data:{}}; save(); }
+  createDlg.close(); openSet(k);
+};
+document.getElementById('btnDeleteSet').onclick=function(){
+  if(!curKey){alert('ยังไม่ได้เปิดห้อง');return;}
+  if(!confirm('ลบ "'+cur.room+' · '+cur.subject+'" ทั้งหมด?'))return;
+  delete DB.sets[curKey]; curKey=null; cur=null; save();
+  document.querySelector('#grid thead').innerHTML=''; document.querySelector('#grid tbody').innerHTML='';
+  document.getElementById('curLabel').textContent='— ยังไม่ได้เลือกห้อง —';
+  renderSetBar(); renderWorks(); renderStudents();
+};
+
+/* ===== ตารางงาน ===== */
+function renderGrid(){
+  var thead=document.querySelector('#grid thead'), tbody=document.querySelector('#grid tbody'),
+      tfoot=document.querySelector('#grid tfoot');
+  if(!cur){thead.innerHTML='';tbody.innerHTML='';tfoot.innerHTML='';return;}
+  if(!cur.works.length||!cur.students.length){
+    thead.innerHTML='';tfoot.innerHTML='';
+    tbody.innerHTML='<tr><td class="muted" style="padding:20px">'+
+      (cur.works.length?'':'เพิ่ม “งาน” ')+(!cur.works.length&&!cur.students.length?'และ':'')+
+      (cur.students.length?'':'“นักเรียน” ')+'ที่แท็บ ⚙️ ก่อน</td></tr>';
+    return;
+  }
+  var h='<tr><th class="no">เลขที่</th><th class="nm">ชื่อ-สกุล</th>';
+  cur.works.forEach(function(w){
+    var ex=w.type==='สอบ';
+    h+='<th class="'+(ex?'exam':'')+'">'+escapeHtml(w.name)+'<br><span class="'+(ex?'tag-exam':'tag-send')+'">'+(ex?'สอบ /'+(w.max||0):'งานส่ง')+'</span></th>';
+  });
+  h+='<th>ค้างส่ง</th></tr>'; thead.innerHTML=h;
+  tbody.innerHTML='';
+  cur.students.forEach(function(s){
+    var tr=document.createElement('tr');
+    var html='<td class="no">'+escapeHtml(s.no||'')+'</td><td class="nm">'+escapeHtml(s.name||'')+'</td>';
+    cur.works.forEach(function(w){
+      if(w.type==='สอบ'){
+        var sc=val(s.id,w.id); sc=(sc==null?'':sc);
+        html+='<td class="examcell"><input type="number" min="0" max="'+(w.max||999)+'" value="'+sc+'" data-s="'+s.id+'" data-w="'+w.id+'"></td>';
+      } else {
+        var sent=isSent(s.id,w.id);
+        html+='<td class="cell '+(sent?'s-send':'s-miss')+'" data-s="'+s.id+'" data-w="'+w.id+'">'+(sent?'ส่ง':'–')+'</td>';
+      }
+    });
+    var p=pendingCount(s.id);
+    html+='<td class="'+(p?'pend':'pend0')+'" data-pend="'+s.id+'">'+p+'</td>';
+    tr.innerHTML=html; tbody.appendChild(tr);
+  });
+  renderFooter();
+}
+/* แถวสรุปท้ายตาราง: สรุปรายงาน (คอลัมน์) ว่าส่งกี่คน/เฉลี่ยเท่าไร */
+function renderFooter(){
+  var tfoot=document.querySelector('#grid tfoot');
+  if(!cur||!cur.works.length||!cur.students.length){tfoot.innerHTML='';return;}
+  var n=cur.students.length;
+  var h='<tr><th class="no"></th><th class="nm">📊 สรุปรายงาน</th>';
+  cur.works.forEach(function(w){
+    if(w.type==='สอบ'){
+      var sum=0,cnt=0;
+      cur.students.forEach(function(s){var v=val(s.id,w.id); if(v!==''&&v!=null&&!isNaN(v)){sum+=Number(v);cnt++;}});
+      var avg=cnt?Math.round(sum/cnt*100)/100:0;
+      h+='<th class="ft-exam"><span class="ft-pct">'+avg+'</span>/'+(w.max||0)+
+         '<br><span class="ft-sub">กรอก '+cnt+'/'+n+'</span>'+
+         '<br><span class="ft-rpt" data-rptw="'+w.id+'">📤 ผลสอบ/LINE</span></th>';
+    } else {
+      var c=0; cur.students.forEach(function(s){if(isSent(s.id,w.id))c++;});
+      var pct=n?Math.round(c/n*100):0;
+      var miss=n-c;
+      h+='<th><span class="ft-pct">'+c+'/'+n+'</span> ('+pct+'%)'+
+         '<br><span class="ft-sub">ค้าง '+miss+' คน</span>'+
+         '<br><span class="ft-rpt" data-rptw="'+w.id+'">📤 ตามงาน/LINE</span></th>';
+    }
+  });
+  // คอลัมน์ค้างส่งรวม
+  var totPend=0; cur.students.forEach(function(s){totPend+=pendingCount(s.id);});
+  h+='<th><span class="ft-pct" style="color:'+(totPend?'var(--miss)':'var(--green)')+'">'+totPend+'</span><br><span class="ft-sub">ค้างรวม</span></th></tr>';
+  tfoot.innerHTML=h;
+}
+/* คลิกช่องงานส่ง */
+document.querySelector('#grid').addEventListener('click',function(e){
+  var c=e.target; if(!c.classList.contains('cell'))return;
+  var sid=c.getAttribute('data-s'), wid=c.getAttribute('data-w');
+  var sent=!isSent(sid,wid); setVal(sid,wid,sent);
+  c.className='cell '+(sent?'s-send':'s-miss'); c.textContent=sent?'ส่ง':'–';
+  var p=pendingCount(sid); var pe=document.querySelector('[data-pend="'+sid+'"]');
+  if(pe){pe.textContent=p;pe.className=p?'pend':'pend0';}
+  renderFooter(); save();
+});
+/* คลิกลิงก์รายงานในแถวสรุปท้ายตาราง */
+document.querySelector('#grid').addEventListener('click',function(e){
+  var w=e.target.getAttribute('data-rptw'); if(w)openWorkReport(w);
+});
+/* กรอกคะแนนข้อสอบ */
+document.querySelector('#grid').addEventListener('input',function(e){
+  var t=e.target; var sid=t.getAttribute('data-s'), wid=t.getAttribute('data-w');
+  if(!sid||!wid||t.type!=='number')return;
+  setVal(sid,wid, t.value===''?'':Number(t.value));
+  renderFooter(); save();
+});
+
+/* ===== จัดการงาน ===== */
+function toggleMax(){ document.getElementById('maxWrap').style.display =
+  document.getElementById('newWorkType').value==='สอบ'?'':'none'; }
+document.getElementById('newWorkType').onchange=toggleMax;
+function renderWorks(){
+  var box=document.getElementById('workList'); box.innerHTML='';
+  if(!cur){box.innerHTML='<div class="muted">เปิดห้องก่อน</div>';return;}
+  if(!cur.works.length){box.innerHTML='<div class="muted">ยังไม่มีงาน</div>';return;}
+  cur.works.forEach(function(w,i){
+    var d=document.createElement('div'); d.className='work-row';
+    d.innerHTML='<span class="'+(w.type==='สอบ'?'tag-exam':'tag-send')+'">'+(w.type==='สอบ'?'สอบ':'งานส่ง')+'</span>'+
+      '<input value="'+escapeHtml(w.name)+'" data-i="'+i+'" data-f="name" style="flex:2;min-width:160px">'+
+      (w.type==='สอบ'?'<input type="number" min="0" value="'+(w.max||0)+'" data-i="'+i+'" data-f="max" title="คะแนนเต็ม" style="width:90px">':'')+
+      '<button class="ghost small" data-rptw2="'+escapeHtml(w.id)+'">📤 รายงาน/LINE</button>'+
+      '<button class="danger small" data-delw="'+i+'">✕</button>';
+    box.appendChild(d);
+  });
+}
+document.getElementById('workList').addEventListener('input',function(e){
+  var i=e.target.getAttribute('data-i'); if(i==null)return;
+  var f=e.target.getAttribute('data-f');
+  cur.works[Number(i)][f]= f==='max'?Number(e.target.value):e.target.value;
+  if(f==='name'||f==='max')renderGrid();
+  save();
+});
+document.getElementById('workList').addEventListener('click',function(e){
+  var r=e.target.getAttribute('data-rptw2'); if(r){openWorkReport(r);return;}
+  var d=e.target.getAttribute('data-delw'); if(d==null)return;
+  if(confirm('ลบงานนี้? (คะแนน/สถานะของงานนี้จะหายไป)')){
+    var w=cur.works[Number(d)];
+    Object.keys(cur.data).forEach(function(sid){ if(cur.data[sid]) delete cur.data[sid][w.id]; });
+    cur.works.splice(Number(d),1); renderWorks(); renderGrid(); updateLabel(); save();
+  }
+});
+document.getElementById('btnAddWork').onclick=function(){
+  if(!cur){alert('เปิดห้องก่อน');return;}
+  var name=document.getElementById('newWorkName').value.trim();
+  var type=document.getElementById('newWorkType').value;
+  var max=Number(document.getElementById('newWorkMax').value)||0;
+  if(!name){alert('ใส่ชื่องาน');return;}
+  var w={id:uid('w'),name:name,type:type}; if(type==='สอบ')w.max=max;
+  cur.works.push(w);
+  document.getElementById('newWorkName').value='';
+  renderWorks(); renderGrid(); updateLabel(); save();
+};
+
+/* ===== จัดการนักเรียน ===== */
+function renderStudents(){
+  var thead=document.querySelector('#stuTable thead'), tbody=document.querySelector('#stuTable tbody');
+  document.getElementById('stuCount').textContent=(cur?cur.students.length:0)+' คน';
+  // เติมเมนูคัดลอกรายชื่อจากชุดอื่นที่มีนักเรียน
+  var cf=document.getElementById('copyFrom');
+  if(cf){
+    var opts='<option value="">📥 คัดลอกรายชื่อจากห้อง/วิชาอื่น…</option>';
+    Object.keys(DB.sets).forEach(function(k){
+      var s=DB.sets[k]; if(k!==curKey && s.students.length)
+        opts+='<option value="'+escapeHtml(k)+'">'+escapeHtml(s.room+' · '+s.subject)+' ('+s.students.length+' คน)</option>';
+    });
+    cf.innerHTML=opts;
+  }
+  if(!cur||!cur.students.length){thead.innerHTML='';tbody.innerHTML='<tr><td class="muted" style="padding:14px">ยังไม่มีนักเรียน</td></tr>';return;}
+  thead.innerHTML='<tr><th style="width:60px">เลขที่</th><th style="text-align:left">ชื่อ-สกุล</th><th style="width:50px"></th></tr>';
+  tbody.innerHTML='';
+  cur.students.forEach(function(s,i){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td><input value="'+escapeHtml(s.no||'')+'" data-i="'+i+'" data-f="no" style="width:54px;text-align:center"></td>'+
+      '<td><input value="'+escapeHtml(s.name||'')+'" data-i="'+i+'" data-f="name" style="text-align:left"></td>'+
+      '<td><button class="danger small" data-dels="'+i+'">✕</button></td>';
+    tbody.appendChild(tr);
+  });
+}
+document.getElementById('stuTable').addEventListener('input',function(e){
+  var i=e.target.getAttribute('data-i'); if(i==null)return;
+  cur.students[Number(i)][e.target.getAttribute('data-f')]=e.target.value; save();
+});
+document.getElementById('stuTable').addEventListener('click',function(e){
+  var d=e.target.getAttribute('data-dels'); if(d==null)return;
+  if(confirm('ลบนักเรียนคนนี้?')){
+    var s=cur.students[Number(d)]; delete cur.data[s.id];
+    cur.students.splice(Number(d),1); renderStudents(); renderGrid(); updateLabel(); save();
+  }
+});
+document.getElementById('copyFrom').onchange=function(){
+  var k=this.value; this.value='';
+  if(!k||!cur||!DB.sets[k])return;
+  var src=DB.sets[k];
+  if(cur.students.length && !confirm('แทนรายชื่อเดิม '+cur.students.length+' คน ด้วยรายชื่อจาก '+src.room+' · '+src.subject+' ('+src.students.length+' คน)?'))return;
+  cur.students=src.students.map(function(s){return {id:uid('s'),no:s.no,name:s.name};});
+  renderStudents(); renderGrid(); updateLabel(); save();
+};
+document.getElementById('btnRoster').onclick=function(){
+  if(!cur){alert('เปิดห้องก่อน');return;}
+  var list=(ROSTER[cur.room]||[]).map(function(s){return {id:uid('s'),no:s.no,name:s.name};});
+  if(!list.length){alert('ไม่พบทะเบียนของห้อง '+cur.room+'\n(ห้องนี้ไม่มีในไฟล์รายชื่อ)');return;}
+  if(cur.students.length && !confirm('แทนรายชื่อเดิม '+cur.students.length+' คน ด้วยทะเบียนห้อง '+cur.room+' ('+list.length+' คน)?'))return;
+  cur.students=list; renderStudents(); renderGrid(); updateLabel(); save();
+};
+document.getElementById('btnAddStudent').onclick=function(){
+  if(!cur){alert('เปิดห้องก่อน');return;}
+  cur.students.push({id:uid('s'),no:cur.students.length+1,name:''}); renderStudents(); renderGrid(); updateLabel(); save();
+};
+
+/* ===== นำเข้ารายชื่อจากไฟล์ Excel/CSV ===== */
+function parseCSV(text){
+  text=text.replace(/^﻿/,''); var rows=[],row=[],cur='',q=false;
+  for(var i=0;i<text.length;i++){var c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else { if(c==='"')q=true; else if(c===','){row.push(cur);cur='';}
+      else if(c==='\n'){row.push(cur);rows.push(row);row=[];cur='';}
+      else if(c==='\r'){} else cur+=c; }
+  }
+  if(cur!==''||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
+function rowsToStudents(rows){
+  var out=[];
+  rows.forEach(function(r){
+    if(!r)return;
+    var cells=r.map(function(c){return (c==null?'':String(c)).trim();});
+    if(!cells.join('').length)return;
+    var joined=cells.join(' ');
+    // ข้ามแถวหัวตาราง (มีคำว่าหัวคอลัมน์ แต่ไม่ใช่ชื่อคน)
+    if(/(ชื่อ|เลขที่|ลำดับ|รายชื่อ|ที่|name)/i.test(joined) && !/(เด็ก|นาย|นางสาว|นาง|ด\.ช|ด\.ญ)/.test(joined)) return;
+    var no='',rest=[];
+    cells.forEach(function(c){ if(no===''&&/^\d{1,3}$/.test(c)) no=c; else if(c) rest.push(c); });
+    var name=rest.join(' ').replace(/\s+/g,' ').trim();
+    if(!name)return;
+    out.push({id:uid('s'),no:no||(out.length+1),name:name});
+  });
+  return out;
+}
+function applyImport(rows){
+  var studs=rowsToStudents(rows);
+  if(!studs.length){alert('อ่านรายชื่อจากไฟล์ไม่ได้ — ตรวจว่ามีคอลัมน์ชื่อ-สกุล');return;}
+  if(cur.students.length && !confirm('พบ '+studs.length+' คนในไฟล์ — แทนรายชื่อเดิม '+cur.students.length+' คน?'))return;
+  cur.students=studs; renderStudents(); renderGrid(); updateLabel(); save();
+  alert('นำเข้า '+studs.length+' คน สำเร็จ');
+}
+function loadXLSX(cb){ if(window.XLSX)return cb();
+  var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  s.onload=cb; s.onerror=function(){alert('โหลดตัวอ่าน Excel ไม่ได้ (ตรวจอินเทอร์เน็ต) — ลองบันทึกไฟล์เป็น .csv แล้วนำเข้าแทน');};
+  document.head.appendChild(s);
+}
+document.getElementById('btnFile').onclick=function(){ if(!cur){alert('เปิดห้องก่อน');return;} document.getElementById('rosterFile').click(); };
+document.getElementById('rosterFile').onchange=function(e){
+  var f=e.target.files[0]; if(!f)return; var nm=f.name.toLowerCase();
+  if(/\.(xlsx|xls)$/.test(nm)){
+    loadXLSX(function(){
+      var r=new FileReader();
+      r.onload=function(){
+        try{ var wb=XLSX.read(new Uint8Array(r.result),{type:'array'});
+          var ws=wb.Sheets[wb.SheetNames[0]];
+          applyImport(XLSX.utils.sheet_to_json(ws,{header:1,defval:''}));
+        }catch(err){alert('อ่านไฟล์ Excel ไม่สำเร็จ');}
+      };
+      r.readAsArrayBuffer(f);
+    });
+  } else {
+    var r=new FileReader(); r.onload=function(){ applyImport(parseCSV(r.result)); }; r.readAsText(f);
+  }
+  e.target.value='';
+};
+var importDlg=document.getElementById('importDlg');
+document.getElementById('btnImport').onclick=function(){ if(!cur){alert('เปิดห้องก่อน');return;} importDlg.showModal(); };
+document.getElementById('iCancel').onclick=function(){importDlg.close();};
+document.getElementById('iOk').onclick=function(){
+  var txt=document.getElementById('importText').value.trim();
+  if(txt){ txt.split('\n').forEach(function(line){
+    line=line.trim(); if(!line)return;
+    var parts=line.split(/[\t,]/); var no,name;
+    if(parts.length>=2){no=parts[0].trim();name=parts.slice(1).join(',').trim();}
+    else{no=cur.students.length+1;name=parts[0].trim();}
+    cur.students.push({id:uid('s'),no:no,name:name});
+  }); }
+  document.getElementById('importText').value=''; importDlg.close();
+  renderStudents(); renderGrid(); updateLabel(); save();
+};
+
+/* ===== สำรอง/กู้คืน ===== */
+document.getElementById('btnBackup').onclick=function(){
+  var blob=new Blob([JSON.stringify(DB)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='สำรองข้อมูลติดตามงาน_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+};
+document.getElementById('btnRestore').onclick=function(){document.getElementById('restoreFile').click();};
+document.getElementById('restoreFile').onchange=function(e){
+  var f=e.target.files[0]; if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{ var d=JSON.parse(r.result); if(!d.sets)throw 0;
+      if(!confirm('กู้คืนข้อมูลจากไฟล์? ข้อมูลปัจจุบันจะถูกทับ'))return;
+      DB=d; curKey=null; cur=null; save(); renderSetBar();
+      document.querySelector('#grid thead').innerHTML=''; document.querySelector('#grid tbody').innerHTML='';
+      document.getElementById('curLabel').textContent='— ยังไม่ได้เลือกห้อง —';
+      alert('กู้คืนสำเร็จ');
+    }catch(err){ alert('ไฟล์ไม่ถูกต้อง'); }
+  };
+  r.readAsText(f); e.target.value='';
+};
+
+/* ===== สรุป ===== */
+function renderSummary(){
+  document.getElementById('sumLabel').textContent=cur?('— '+cur.room+' · '+cur.subject):'';
+  var grid=document.getElementById('statGrid'),bars=document.getElementById('workBars'),miss=document.getElementById('missList');
+  if(!cur||!cur.students.length||!cur.works.length){
+    grid.innerHTML='<div class="muted">ยังไม่มีข้อมูล</div>';bars.innerHTML='';miss.innerHTML='';return;
+  }
+  var sendWorks=cur.works.filter(function(w){return w.type==='ส่ง';});
+  var examWorks=cur.works.filter(function(w){return w.type==='สอบ';});
+  var nStu=cur.students.length;
+  var cells=nStu*sendWorks.length, sent=0;
+  cur.students.forEach(function(s){sendWorks.forEach(function(w){if(isSent(s.id,w.id))sent++;});});
+  var rate=cells?Math.round(sent/cells*100):0;
+  grid.innerHTML=stat(nStu,'นักเรียน')+stat(sendWorks.length,'งานส่ง')+stat(examWorks.length,'ข้อสอบ')+
+    stat((cells?sent:0)+'/'+cells,'ส่งแล้ว')+stat(rate+'%','อัตราส่งรวม');
+  // bars งานส่ง
+  bars.innerHTML = sendWorks.length ? sendWorks.map(function(w){
+    var c=0; cur.students.forEach(function(s){if(isSent(s.id,w.id))c++;});
+    var pct=nStu?Math.round(c/nStu*100):0;
+    return '<div class="barline"><div class="nm">'+escapeHtml(w.name)+'</div><div class="barbg">'+
+      '<div class="barfill" style="width:'+pct+'%"></div></div><div style="width:96px;font-size:13px">'+c+'/'+nStu+' ('+pct+'%)</div></div>';
+  }).join('') : '<div class="muted">ไม่มีงานส่ง</div>';
+  // ค่าเฉลี่ยข้อสอบ
+  if(examWorks.length){
+    bars.innerHTML+='<div style="margin-top:14px;font-weight:700;color:var(--exam)">ค่าเฉลี่ยข้อสอบ</div>';
+    bars.innerHTML+=examWorks.map(function(w){
+      var sum=0,cnt=0; cur.students.forEach(function(s){var v=val(s.id,w.id); if(v!==''&&v!=null&&!isNaN(v)){sum+=Number(v);cnt++;}});
+      var avg=cnt?(sum/cnt):0;
+      return '<div class="barline"><div class="nm">'+escapeHtml(w.name)+'</div>'+
+        '<div style="flex:1;font-size:13px">เฉลี่ย '+(Math.round(avg*100)/100)+' / '+(w.max||0)+' (กรอกแล้ว '+cnt+'/'+nStu+' คน)</div></div>';
+    }).join('');
+  }
+  // ค้างส่ง
+  var rows=cur.students.map(function(s){
+    var pend=sendWorks.filter(function(w){return !isSent(s.id,w.id);});
+    return {s:s,pend:pend};
+  }).filter(function(x){return x.pend.length>0;}).sort(function(a,b){return b.pend.length-a.pend.length;});
+  miss.innerHTML = rows.length ? '<ul class="miss-list">'+rows.map(function(x){
+    return '<li><b>'+escapeHtml(x.s.no)+'. '+escapeHtml(x.s.name)+'</b> — ค้าง '+x.pend.length+' ชิ้น: '+
+      x.pend.map(function(w){return escapeHtml(w.name);}).join(', ')+'</li>';
+  }).join('')+'</ul>' : '<div class="ok" style="font-weight:600">🎉 ส่งงานครบทุกคน!</div>';
+}
+function stat(n,c){return '<div class="stat"><div class="num">'+n+'</div><div class="cap">'+c+'</div></div>';}
+
+/* ===== ส่งรูปสรุปเข้า LINE ===== */
+var TH_M=['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+function thaiDate(d){return d.getDate()+' '+TH_M[d.getMonth()+1]+' '+(d.getFullYear()+543);}
+var reportTitleEl=document.getElementById('reportTitle');
+reportTitleEl.value=localStorage.getItem('hwReportTitle_' + activeWorkspace)||'';
+reportTitleEl.addEventListener('input',function(){localStorage.setItem('hwReportTitle_' + activeWorkspace,reportTitleEl.value);});
+function statBox(num,cap,color){
+  return '<div style="flex:1;background:#fff;border:1px solid #e2e0d4;border-radius:11px;padding:12px 8px;text-align:center">'+
+    '<div style="font-size:25px;font-weight:800;color:'+color+'">'+num+'</div>'+
+    '<div style="font-size:12px;color:#6b7770;margin-top:2px">'+cap+'</div></div>';
+}
+function buildReportHtml(){
+  var sendWorks=cur.works.filter(function(w){return w.type==='ส่ง';});
+  var nStu=cur.students.length, cells=nStu*sendWorks.length, sent=0;
+  cur.students.forEach(function(s){sendWorks.forEach(function(w){if(isSent(s.id,w.id))sent++;});});
+  var rate=cells?Math.round(sent/cells*100):0;
+  var rc=rate>=80?'#1f6f3e':rate>=60?'#e0a800':'#c0392b';
+  var rows=cur.students.map(function(s){
+    var pend=sendWorks.filter(function(w){return !isSent(s.id,w.id);});return {s:s,pend:pend};
+  }).filter(function(x){return x.pend.length>0;}).sort(function(a,b){return b.pend.length-a.pend.length;});
+  var pendHtml=rows.length
+    ? '<table style="width:100%;border-collapse:collapse;font-size:15px"><tr style="background:#2c4a39;color:#f4f1e6">'+
+      '<th style="padding:8px;border:1px solid #cfd8d2">เลขที่</th><th style="padding:8px;text-align:left;border:1px solid #cfd8d2">ชื่อ-สกุล</th>'+
+      '<th style="padding:8px;border:1px solid #cfd8d2">ค้าง</th><th style="padding:8px;text-align:left;border:1px solid #cfd8d2">งานที่ค้าง</th></tr>'+
+      rows.map(function(x){return '<tr><td style="padding:7px;border:1px solid #e2e0d4;text-align:center">'+escapeHtml(x.s.no||'')+'</td>'+
+        '<td style="padding:7px;border:1px solid #e2e0d4">'+escapeHtml(x.s.name||'')+'</td>'+
+        '<td style="padding:7px;border:1px solid #e2e0d4;text-align:center;color:#c0392b;font-weight:700">'+x.pend.length+'</td>'+
+        '<td style="padding:7px;border:1px solid #e2e0d4;color:#555">'+x.pend.map(function(w){return escapeHtml(w.name);}).join(', ')+'</td></tr>';}).join('')+'</table>'
+    : '<div style="padding:18px;background:#e8f3ec;color:#1f6f3e;border-radius:10px;text-align:center;font-weight:700;font-size:18px">🎉 ส่งงานครบทุกคน!</div>';
+  var title=(reportTitleEl.value||'').trim();
+  return '<div style="width:720px;box-sizing:border-box;background:#fffdf7;font-family:Sarabun,sans-serif;color:#26302a;border-radius:14px;overflow:hidden">'+
+    '<div style="background:#2c4a39;color:#f4f1e6;padding:20px 26px"><div style="font-size:24px;font-weight:700">📦 รายงานการส่งงาน</div>'+
+    (title?'<div style="font-size:17px;margin-top:2px;opacity:.92">'+escapeHtml(title)+'</div>':'')+
+    '<div style="font-size:16px;margin-top:4px;opacity:.92">'+escapeHtml(cur.room)+' · '+escapeHtml(cur.subject)+'</div>'+
+    '<div style="font-size:14px;margin-top:2px;opacity:.8">ณ วันที่ '+thaiDate(new Date())+'</div></div>'+
+    '<div style="padding:18px 26px 22px"><div style="display:flex;gap:10px;margin-bottom:16px">'+
+      statBox(nStu,'นักเรียน','#2c4a39')+statBox(sendWorks.length,'งานส่ง','#2c4a39')+
+      statBox(sent+'/'+cells,'ส่งแล้ว','#1f6f3e')+statBox(rate+'%','อัตราส่งรวม',rc)+'</div>'+
+      '<div style="font-size:17px;font-weight:700;margin:6px 0 10px;color:#0f3d20">นักเรียนที่ค้างส่งงาน ('+rows.length+' คน)</div>'+pendHtml+
+      '<div style="margin-top:16px;font-size:12px;color:#8a948e;text-align:right">ระบบติดตามงาน • '+thaiDate(new Date())+'</div></div></div>';
+}
+function loadH2C(cb){ if(window.html2canvas)return cb();
+  var s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+  s.onload=cb; s.onerror=function(){alert('โหลด html2canvas ไม่ได้ (ตรวจอินเทอร์เน็ต)');}; document.head.appendChild(s);
+}
+document.getElementById('btnLine').onclick=function(){
+  if(!cur||!cur.students.length||!cur.works.length){alert('ยังไม่มีข้อมูล');return;}
+  loadH2C(function(){
+    var holder=document.createElement('div'); holder.style.cssText='position:fixed;left:-10000px;top:0';
+    holder.innerHTML=buildReportHtml(); document.body.appendChild(holder);
+    window.html2canvas(holder.firstChild,{scale:2,backgroundColor:'#fffdf7'}).then(function(canvas){
+      document.body.removeChild(holder);
+      canvas.toBlob(function(blob){
+        var fname=(cur.room+'_'+cur.subject+'_ส่งงาน.png').replace(/\s+/g,'');
+        var file=new File([blob],fname,{type:'image/png'});
+        if(navigator.canShare&&navigator.canShare({files:[file]})){
+          navigator.share({files:[file],title:'รายงานการส่งงาน'}).catch(function(){});
+        } else { var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click(); }
+      },'image/png');
+    }).catch(function(){ if(holder.parentNode)document.body.removeChild(holder); alert('สร้างรูปไม่สำเร็จ'); });
+  });
+};
+
+/* ===== สรุปรวมทุกห้อง ===== */
+// คำนวณสถิติของชุด (ห้อง/วิชา) ใด ๆ
+function setStats(s){
+  var data=s.data||{};
+  var sendWorks=(s.works||[]).filter(function(w){return w.type==='ส่ง';});
+  var examWorks=(s.works||[]).filter(function(w){return w.type==='สอบ';});
+  var nStu=(s.students||[]).length;
+  var cells=nStu*sendWorks.length, sent=0;
+  (s.students||[]).forEach(function(st){ sendWorks.forEach(function(w){
+    if(data[st.id] && data[st.id][w.id]===true) sent++; }); });
+  var rate=cells?Math.round(sent/cells*100):0;
+  return {sendWorks:sendWorks,examWorks:examWorks,nStu:nStu,cells:cells,sent:sent,rate:rate,data:data};
+}
+function renderAll(){
+  var keys=Object.keys(DB.sets);
+  var sg=document.getElementById('allStatGrid'),
+      rl=document.getElementById('allRoomList'),
+      ml=document.getElementById('allMissList');
+  if(!keys.length){ sg.innerHTML='<div class="muted">ยังไม่มีห้อง/วิชา</div>'; rl.innerHTML=''; ml.innerHTML=''; return; }
+  var totStu=0,totSend=0,totExam=0,totCells=0,totSent=0;
+  keys.forEach(function(k){ var st=setStats(DB.sets[k]);
+    totStu+=st.nStu; totSend+=st.sendWorks.length; totExam+=st.examWorks.length;
+    totCells+=st.cells; totSent+=st.sent; });
+  var rate=totCells?Math.round(totSent/totCells*100):0;
+  sg.innerHTML=stat(keys.length,'ห้อง/วิชา')+stat(totStu,'นักเรียนรวม')+stat(totSend,'งานส่ง')+
+    stat(totExam,'ข้อสอบ')+stat(totSent+'/'+totCells,'ส่งแล้ว')+stat(rate+'%','อัตราส่งรวม');
+  // รายห้อง
+  rl.innerHTML=keys.map(function(k){
+    var s=DB.sets[k], st=setStats(s);
+    var workChips=(s.works||[]).map(function(w){
+      if(w.type==='สอบ'){
+        var sum=0,cnt=0; (s.students||[]).forEach(function(stu){var v=st.data[stu.id]?st.data[stu.id][w.id]:undefined; if(v!==''&&v!=null&&!isNaN(v)){sum+=Number(v);cnt++;}});
+        var avg=cnt?Math.round(sum/cnt*100)/100:0;
+        return '<span class="chip" style="cursor:default"><span class="tag-exam">สอบ</span> '+escapeHtml(w.name)+' <small>เฉลี่ย '+avg+'/'+(w.max||0)+'</small></span>';
+      }
+      var c=0; (s.students||[]).forEach(function(stu){if(st.data[stu.id]&&st.data[stu.id][w.id]===true)c++;});
+      var pct=st.nStu?Math.round(c/st.nStu*100):0;
+      return '<span class="chip" style="cursor:default"><span class="tag-send">ส่ง</span> '+escapeHtml(w.name)+' <small>'+c+'/'+st.nStu+' ('+pct+'%)</small></span>';
+    }).join('');
+    var rc=st.rate>=80?'var(--green)':st.rate>=60?'#e0a800':'var(--miss)';
+    return '<div style="margin-bottom:16px;padding-bottom:12px;border-bottom:1px dashed var(--line)">'+
+      '<div style="font-weight:700;color:var(--green-d);font-size:16px;margin-bottom:6px">📚 '+escapeHtml(s.room)+' · '+escapeHtml(s.subject)+
+      ' <span class="muted" style="font-weight:400">— '+st.nStu+' คน · อัตราส่ง <b style="color:'+rc+'">'+st.rate+'%</b></span></div>'+
+      (workChips? '<div class="sets" style="gap:6px">'+workChips+'</div>' : '<div class="muted">ยังไม่มีงาน</div>')+'</div>';
+  }).join('');
+  // คนค้างส่งรวมทุกห้อง
+  var allRows=[];
+  keys.forEach(function(k){
+    var s=DB.sets[k], st=setStats(s);
+    (s.students||[]).forEach(function(stu){
+      var pend=st.sendWorks.filter(function(w){return !(st.data[stu.id]&&st.data[stu.id][w.id]===true);});
+      if(pend.length) allRows.push({room:s.room,subject:s.subject,stu:stu,pend:pend});
+    });
+  });
+  allRows.sort(function(a,b){return b.pend.length-a.pend.length;});
+  ml.innerHTML=allRows.length? '<ul class="miss-list">'+allRows.map(function(x){
+    return '<li><b>'+escapeHtml(x.stu.no)+'. '+escapeHtml(x.stu.name)+'</b> <span class="muted">['+escapeHtml(x.room)+' · '+escapeHtml(x.subject)+']</span> — ค้าง '+x.pend.length+' ชิ้น: '+
+      x.pend.map(function(w){return escapeHtml(w.name);}).join(', ')+'</li>';
+  }).join('')+'</ul>' : '<div class="ok" style="font-weight:600">🎉 ทุกห้องส่งงานครบ!</div>';
+}
+
+/* ===== Export Excel ทั้งหมด ===== */
+function sheetName(used,raw){
+  var nm=String(raw||'ห้อง').replace(/[:\\\/?*\[\]]/g,' ').trim().slice(0,28)||'ห้อง';
+  var base=nm,i=2; while(used[nm]){nm=base.slice(0,25)+' ('+i+')';i++;} used[nm]=1; return nm;
+}
+document.getElementById('btnExportXLSX').onclick=function(){
+  var keys=Object.keys(DB.sets);
+  if(!keys.length){alert('ยังไม่มีห้อง/วิชาให้ส่งออก');return;}
+  loadXLSX(function(){
+    try{
+      var wb=XLSX.utils.book_new(), used={};
+      // ชีตสรุปรวม
+      var sum=[['สรุปรวมทุกห้อง — ระบบติดตามงาน'],['วันที่',thaiDate(new Date())],[],
+        ['ห้อง','รายวิชา','นักเรียน','งานส่ง','ข้อสอบ','ส่งแล้ว','รวมช่อง','อัตราส่ง(%)']];
+      keys.forEach(function(k){var s=DB.sets[k],st=setStats(s);
+        sum.push([s.room,s.subject,st.nStu,st.sendWorks.length,st.examWorks.length,st.sent,st.cells,st.rate]);});
+      var wsSum=XLSX.utils.aoa_to_sheet(sum);
+      wsSum['!cols']=[{wch:12},{wch:20},{wch:9},{wch:8},{wch:8},{wch:9},{wch:9},{wch:11}];
+      XLSX.utils.book_append_sheet(wb,wsSum,'สรุปรวม');
+      // ชีตรายห้อง
+      keys.forEach(function(k){
+        var s=DB.sets[k], st=setStats(s), works=s.works||[];
+        var head=['เลขที่','ชื่อ-สกุล'];
+        works.forEach(function(w){head.push(w.name+(w.type==='สอบ'?' (สอบ/'+(w.max||0)+')':' (ส่ง)'));});
+        head.push('ค้างส่ง');
+        var aoa=[[s.room+' · '+s.subject],['อัตราส่งรวม '+st.rate+'%  ·  '+st.sent+'/'+st.cells+' ช่อง  ·  '+thaiDate(new Date())],[],head];
+        (s.students||[]).forEach(function(stu){
+          var row=[stu.no,stu.name], pend=0;
+          works.forEach(function(w){
+            var v=st.data[stu.id]?st.data[stu.id][w.id]:undefined;
+            if(w.type==='สอบ'){ row.push(v===''||v==null||isNaN(v)?'':Number(v)); }
+            else { var sent=(v===true); row.push(sent?'ส่ง':'ไม่ส่ง'); if(!sent)pend++; }
+          });
+          row.push(pend);
+          aoa.push(row);
+        });
+        // แถวสรุปท้าย
+        var foot=['','📊 สรุปรายงาน'];
+        works.forEach(function(w){
+          if(w.type==='สอบ'){var sm=0,cn=0;(s.students||[]).forEach(function(stu){var v=st.data[stu.id]?st.data[stu.id][w.id]:undefined;if(v!==''&&v!=null&&!isNaN(v)){sm+=Number(v);cn++;}});foot.push('เฉลี่ย '+(cn?Math.round(sm/cn*100)/100:0)+'/'+(w.max||0));}
+          else{var c=0;(s.students||[]).forEach(function(stu){if(st.data[stu.id]&&st.data[stu.id][w.id]===true)c++;});foot.push('ส่ง '+c+'/'+st.nStu);}
+        });
+        var totPend=0;(s.students||[]).forEach(function(stu){st.sendWorks.forEach(function(w){if(!(st.data[stu.id]&&st.data[stu.id][w.id]===true))totPend++;});});
+        foot.push(totPend);
+        aoa.push(foot);
+        var ws=XLSX.utils.aoa_to_sheet(aoa);
+        ws['!cols']=[{wch:7},{wch:24}].concat(works.map(function(){return {wch:14};})).concat([{wch:9}]);
+        XLSX.utils.book_append_sheet(wb,ws,sheetName(used,s.room+' '+s.subject));
+      });
+      XLSX.writeFile(wb,'ติดตามงานทั้งหมด_'+new Date().toISOString().slice(0,10)+'.xlsx');
+    }catch(err){alert('สร้างไฟล์ Excel ไม่สำเร็จ: '+err);}
+  });
+};
+
+/* ส่งรูปสรุปรวมเข้า LINE */
+document.getElementById('btnLineAll').onclick=function(){
+  var keys=Object.keys(DB.sets);
+  if(!keys.length){alert('ยังไม่มีข้อมูล');return;}
+  loadH2C(function(){
+    var holder=document.createElement('div'); holder.style.cssText='position:fixed;left:-10000px;top:0';
+    holder.innerHTML=buildAllReportHtml(); document.body.appendChild(holder);
+    window.html2canvas(holder.firstChild,{scale:2,backgroundColor:'#fffdf7'}).then(function(canvas){
+      document.body.removeChild(holder);
+      canvas.toBlob(function(blob){
+        var fname='สรุปรวมทุกห้อง_ส่งงาน.png';
+        var file=new File([blob],fname,{type:'image/png'});
+        if(navigator.canShare&&navigator.canShare({files:[file]})){
+          navigator.share({files:[file],title:'สรุปรวมการส่งงาน'}).catch(function(){});
+        } else { var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click(); }
+      },'image/png');
+    }).catch(function(){ if(holder.parentNode)document.body.removeChild(holder); alert('สร้างรูปไม่สำเร็จ'); });
+  });
+};
+function buildAllReportHtml(){
+  var keys=Object.keys(DB.sets);
+  var totStu=0,totCells=0,totSent=0;
+  var rowsHtml=keys.map(function(k){
+    var s=DB.sets[k],st=setStats(s); totStu+=st.nStu;totCells+=st.cells;totSent+=st.sent;
+    var rc=st.rate>=80?'#1f6f3e':st.rate>=60?'#e0a800':'#c0392b';
+    return '<tr><td style="padding:7px;border:1px solid #e2e0d4">'+escapeHtml(s.room)+'</td>'+
+      '<td style="padding:7px;border:1px solid #e2e0d4">'+escapeHtml(s.subject)+'</td>'+
+      '<td style="padding:7px;border:1px solid #e2e0d4;text-align:center">'+st.nStu+'</td>'+
+      '<td style="padding:7px;border:1px solid #e2e0d4;text-align:center">'+st.sent+'/'+st.cells+'</td>'+
+      '<td style="padding:7px;border:1px solid #e2e0d4;text-align:center;font-weight:700;color:'+rc+'">'+st.rate+'%</td></tr>';
+  }).join('');
+  var rate=totCells?Math.round(totSent/totCells*100):0;
+  var rc=rate>=80?'#1f6f3e':rate>=60?'#e0a800':'#c0392b';
+  var title=((document.getElementById('reportTitle')||{}).value||'').trim();
+  return '<div style="width:720px;box-sizing:border-box;background:#fffdf7;font-family:Sarabun,sans-serif;color:#26302a;border-radius:14px;overflow:hidden">'+
+    '<div style="background:#2c4a39;color:#f4f1e6;padding:20px 26px"><div style="font-size:24px;font-weight:700">🗂️ สรุปรวมการส่งงาน (ทุกห้อง)</div>'+
+    (title?'<div style="font-size:17px;margin-top:2px;opacity:.92">'+escapeHtml(title)+'</div>':'')+
+    '<div style="font-size:14px;margin-top:4px;opacity:.8">ณ วันที่ '+thaiDate(new Date())+'</div></div>'+
+    '<div style="padding:18px 26px 22px"><div style="display:flex;gap:10px;margin-bottom:16px">'+
+      statBox(keys.length,'ห้อง/วิชา','#2c4a39')+statBox(totStu,'นักเรียนรวม','#2c4a39')+
+      statBox(totSent+'/'+totCells,'ส่งแล้ว','#1f6f3e')+statBox(rate+'%','อัตราส่งรวม',rc)+'</div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:15px"><tr style="background:#2c4a39;color:#f4f1e6">'+
+      '<th style="padding:8px;border:1px solid #cfd8d2">ห้อง</th><th style="padding:8px;text-align:left;border:1px solid #cfd8d2">รายวิชา</th>'+
+      '<th style="padding:8px;border:1px solid #cfd8d2">นักเรียน</th><th style="padding:8px;border:1px solid #cfd8d2">ส่งแล้ว</th>'+
+      '<th style="padding:8px;border:1px solid #cfd8d2">อัตราส่ง</th></tr>'+rowsHtml+'</table>'+
+      '<div style="margin-top:16px;font-size:12px;color:#8a948e;text-align:right">ระบบติดตามงาน • '+thaiDate(new Date())+'</div></div></div>';
+}
+
+/* ===== รายงานรายชิ้นงาน (ตามงาน/ผลสอบ → รูปเข้า LINE) ===== */
+var workRptDlg=document.getElementById('workRptDlg');
+var curRptWork=null;
+function openWorkReport(wid){
+  if(!cur){return;}
+  var w=null; cur.works.forEach(function(x){if(x.id===wid)w=x;});
+  if(!w){return;}
+  if(!cur.students.length){alert('ยังไม่มีนักเรียนในห้องนี้');return;}
+  curRptWork=w;
+  document.getElementById('wrTitle').textContent=(w.type==='สอบ'?'📋 ผลสอบ: ':'📋 ตามงาน: ')+w.name;
+  document.getElementById('wrPreview').innerHTML=buildWorkReportHtml(w);
+  workRptDlg.showModal();
+}
+document.getElementById('wrClose').onclick=function(){workRptDlg.close();};
+document.getElementById('wrLine').onclick=function(){
+  if(!curRptWork)return;
+  var w=curRptWork;
+  loadH2C(function(){
+    var holder=document.createElement('div'); holder.style.cssText='position:fixed;left:-10000px;top:0';
+    holder.innerHTML=buildWorkReportHtml(w); document.body.appendChild(holder);
+    window.html2canvas(holder.firstChild,{scale:2,backgroundColor:'#fffdf7'}).then(function(canvas){
+      document.body.removeChild(holder);
+      canvas.toBlob(function(blob){
+        var fname=((w.type==='สอบ'?'ผลสอบ_':'ตามงาน_')+w.name+'_'+cur.room+'.png').replace(/\s+/g,'').replace(/[\/\\:*?"<>|]/g,'');
+        var file=new File([blob],fname,{type:'image/png'});
+        if(navigator.canShare&&navigator.canShare({files:[file]})){
+          navigator.share({files:[file],title:(w.type==='สอบ'?'ผลสอบ ':'ตามงาน ')+w.name}).catch(function(){});
+        } else { var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;a.click(); }
+      },'image/png');
+    }).catch(function(){ if(holder.parentNode)document.body.removeChild(holder); alert('สร้างรูปไม่สำเร็จ'); });
+  });
+};
+function buildWorkReportHtml(w){
+  var title=((reportTitleEl&&reportTitleEl.value)||'').trim();
+  var headLabel=w.type==='สอบ'?'📋 รายงานผลสอบ':'📋 รายงานการตามงาน';
+  var head='<div style="background:#2c4a39;color:#f4f1e6;padding:20px 26px">'+
+    '<div style="font-size:24px;font-weight:700">'+headLabel+'</div>'+
+    '<div style="font-size:18px;margin-top:3px;font-weight:600">'+escapeHtml(w.name)+(w.type==='สอบ'?' <span style="opacity:.85;font-size:15px">(เต็ม '+(w.max||0)+' คะแนน)</span>':'')+'</div>'+
+    (title?'<div style="font-size:15px;margin-top:2px;opacity:.92">'+escapeHtml(title)+'</div>':'')+
+    '<div style="font-size:15px;margin-top:2px;opacity:.92">'+escapeHtml(cur.room)+' · '+escapeHtml(cur.subject)+'</div>'+
+    '<div style="font-size:13px;margin-top:2px;opacity:.8">ณ วันที่ '+thaiDate(new Date())+'</div></div>';
+  var n=cur.students.length, body='';
+
+  if(w.type==='สอบ'){
+    var scored=[],absent=[];
+    cur.students.forEach(function(s){
+      var v=val(s.id,w.id);
+      if(v!==''&&v!=null&&!isNaN(v)) scored.push({s:s,score:Number(v)});
+      else absent.push(s);
+    });
+    var sum=0,max=null,min=null;
+    scored.forEach(function(o){sum+=o.score; if(max==null||o.score>max)max=o.score; if(min==null||o.score<min)min=o.score;});
+    var avg=scored.length?Math.round(sum/scored.length*100)/100:0;
+    var rows=cur.students.map(function(s){
+      var v=val(s.id,w.id); var has=(v!==''&&v!=null&&!isNaN(v));
+      return '<tr><td style="padding:7px;border:1px solid #e2e0d4;text-align:center">'+escapeHtml(s.no||'')+'</td>'+
+        '<td style="padding:7px;border:1px solid #e2e0d4">'+escapeHtml(s.name||'')+'</td>'+
+        (has
+          ? '<td style="padding:7px;border:1px solid #e2e0d4;text-align:center;font-weight:700">'+Number(v)+' <span style="color:#8a948e;font-weight:400">/ '+(w.max||0)+'</span></td>'
+          : '<td style="padding:7px;border:1px solid #e2e0d4;text-align:center;color:#c0392b;font-weight:700">ขาดสอบ</td>')+'</tr>';
+    }).join('');
+    body='<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">'+
+      statBox(avg+' / '+(w.max||0),'คะแนนเฉลี่ย','#2c4a39')+
+      statBox(scored.length?max:'-','สูงสุด','#1f6f3e')+
+      statBox(scored.length?min:'-','ต่ำสุด','#8a5a00')+
+      statBox(scored.length+'/'+n,'ทำข้อสอบ','#2c4a39')+
+      statBox(absent.length,'ขาดสอบ',absent.length?'#c0392b':'#1f6f3e')+'</div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:15px"><tr style="background:#2c4a39;color:#f4f1e6">'+
+      '<th style="padding:8px;border:1px solid #cfd8d2;width:60px">เลขที่</th><th style="padding:8px;text-align:left;border:1px solid #cfd8d2">ชื่อ-สกุล</th>'+
+      '<th style="padding:8px;border:1px solid #cfd8d2;width:120px">คะแนน</th></tr>'+rows+'</table>'+
+      (absent.length? '<div style="margin-top:14px;padding:12px 14px;background:#fceae8;border-radius:10px;font-size:15px">'+
+        '<b style="color:#c0392b">ขาดสอบ '+absent.length+' คน:</b> '+absent.map(function(s){return escapeHtml((s.no?s.no+'. ':'')+s.name);}).join(', ')+'</div>' : '');
+  } else {
+    var sentL=[],missL=[];
+    cur.students.forEach(function(s){ (isSent(s.id,w.id)?sentL:missL).push(s); });
+    var pct=n?Math.round(sentL.length/n*100):0;
+    var rc=pct>=80?'#1f6f3e':pct>=60?'#e0a800':'#c0392b';
+    var rows=cur.students.map(function(s){
+      var sent=isSent(s.id,w.id);
+      return '<tr><td style="padding:7px;border:1px solid #e2e0d4;text-align:center">'+escapeHtml(s.no||'')+'</td>'+
+        '<td style="padding:7px;border:1px solid #e2e0d4">'+escapeHtml(s.name||'')+'</td>'+
+        (sent
+          ? '<td style="padding:7px;border:1px solid #e2e0d4;text-align:center;color:#1f6f3e;font-weight:700">✓ ส่งแล้ว</td>'
+          : '<td style="padding:7px;border:1px solid #e2e0d4;text-align:center;color:#c0392b;font-weight:700">✗ ยังไม่ส่ง</td>')+'</tr>';
+    }).join('');
+    body='<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">'+
+      statBox(n,'นักเรียน','#2c4a39')+
+      statBox(sentL.length,'ส่งแล้ว','#1f6f3e')+
+      statBox(missL.length,'ยังไม่ส่ง',missL.length?'#c0392b':'#1f6f3e')+
+      statBox(pct+'%','อัตราการส่ง',rc)+'</div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:15px"><tr style="background:#2c4a39;color:#f4f1e6">'+
+      '<th style="padding:8px;border:1px solid #cfd8d2;width:60px">เลขที่</th><th style="padding:8px;text-align:left;border:1px solid #cfd8d2">ชื่อ-สกุล</th>'+
+      '<th style="padding:8px;border:1px solid #cfd8d2;width:120px">สถานะ</th></tr>'+rows+'</table>'+
+      (missL.length? '<div style="margin-top:14px;padding:12px 14px;background:#fceae8;border-radius:10px;font-size:15px">'+
+        '<b style="color:#c0392b">ยังไม่ส่ง '+missL.length+' คน:</b> '+missL.map(function(s){return escapeHtml((s.no?s.no+'. ':'')+s.name);}).join(', ')+'</div>'
+        : '<div style="margin-top:14px;padding:14px;background:#e8f3ec;color:#1f6f3e;border-radius:10px;text-align:center;font-weight:700;font-size:17px">🎉 ส่งครบทุกคน!</div>');
+  }
+  return '<div style="width:720px;box-sizing:border-box;background:#fffdf7;font-family:Sarabun,sans-serif;color:#26302a;border-radius:14px;overflow:hidden">'+
+    head+'<div style="padding:18px 26px 22px">'+body+
+    '<div style="margin-top:16px;font-size:12px;color:#8a948e;text-align:right">ระบบติดตามงาน • '+thaiDate(new Date())+'</div></div></div>';
+}
+
+/* ===== แท็บ ===== */
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active'); var name=t.getAttribute('data-tab');
+    ['grid','manage','summary','all'].forEach(function(s){document.getElementById('tab-'+s).classList.toggle('hide',s!==name);});
+    if(name==='grid')renderGrid();
+    if(name==='manage'){renderWorks();renderStudents();}
+    if(name==='summary')renderSummary();
+    if(name==='all')renderAll();
+  };
+});
+
+/* ===== ปุ่ม dialog ปลดล็อก / ตั้งค่าคลาวด์ ===== */
+document.getElementById('pwOk').onclick=function(){
+  var v=document.getElementById('pwInput').value.trim();
+  var isCorrect = false;
+  
+  if(activeWorkspace==='ครูนิวตรอน'){
+    if(v==='ครูนิวตรอน'||v==='2301') isCorrect=true;
+  } else {
+    var ws = workspaces.find(function(w){return w.name===activeWorkspace;});
+    if(ws && ws.password===v) isCorrect=true;
+  }
+  
+  if(isCorrect){
+    unlocked=true;
+    sessionStorage.setItem('hwUnlocked_' + activeWorkspace,'1');
+    sessionStorage.setItem('hwEnteredPassword_' + activeWorkspace,v);
+    document.getElementById('pwDlg').close(); updateLockUI();
+    setStatus('🔓 ปลดล็อกแล้ว — บันทึกได้','ok');
+    if(cloudUrl())pushNow();        // บันทึกการแก้ที่ค้างอยู่ขึ้นคลาวด์
+  } else { document.getElementById('pwMsg').textContent='รหัสผ่านไม่ถูกต้อง'; }
+};
+document.getElementById('pwInput').addEventListener('keydown',function(e){ if(e.key==='Enter')document.getElementById('pwOk').click(); });
+document.getElementById('pwCancel').onclick=function(){
+  document.getElementById('pwDlg').close();
+  refreshFromCloud();               // ทิ้งการแก้ที่ยังไม่ได้บันทึก ดึงของจริงกลับมา
+};
+document.getElementById('btnCfg').onclick=function(){
+  document.getElementById('cfgUrl').value=localStorage.getItem('hwCloudUrl_' + activeWorkspace)||CLOUD_URL||'';
+  document.getElementById('cfgMsg').textContent='';
+  document.getElementById('cfgDlg').showModal();
+};
+document.getElementById('cfgCancel').onclick=function(){document.getElementById('cfgDlg').close();};
+document.getElementById('cfgOk').onclick=function(){
+  var u=document.getElementById('cfgUrl').value.trim();
+  if(u && !/^https?:\/\/.+\/exec\/?$/.test(u)){ document.getElementById('cfgMsg').style.color='var(--miss)'; document.getElementById('cfgMsg').textContent='ลิงก์ควรลงท้ายด้วย /exec'; return; }
+  if(u)localStorage.setItem('hwCloudUrl_' + activeWorkspace,u); else localStorage.removeItem('hwCloudUrl_' + activeWorkspace);
+  document.getElementById('cfgDlg').close();
+  refreshFromCloud(function(){ setStatus(cloudUrl()?'☁️ เชื่อมคลาวด์แล้ว':'⚠️ ยังไม่ได้ตั้งลิงก์คลาวด์', cloudUrl()?'ok':''); });
+};
+document.getElementById('btnRefresh').onclick=function(){ refreshFromCloud(); };
+
+/* ===== ระบบจัดการห้องทำงานครู (Teacher Workspace Management) ===== */
+var selectedWsToLogin = '';
+
+function renderWorkspaceCards() {
+  var container = document.getElementById('wsCardsContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  workspaces.forEach(function(w) {
+    var item = document.createElement('div');
+    item.className = 'ws-card-item';
+    item.innerHTML = '<span class="ws-name">👤 ' + escapeHtml(w.name) + '</span><span class="ws-arrow">›</span>';
+    item.onclick = function() {
+      showWsLogin(w.name);
+    };
+    container.appendChild(item);
+  });
+}
+
+function showWsLogin(name) {
+  selectedWsToLogin = name;
+  document.getElementById('wsLoginTitle').textContent = '👤 ' + name;
+  document.getElementById('wsLoginPw').value = '';
+  document.getElementById('wsLoginMsg').textContent = '';
+  document.getElementById('wsLandingPageSelect').classList.add('hide');
+  document.getElementById('wsLandingPageLogin').classList.remove('hide');
+  setTimeout(function() {
+    document.getElementById('wsLoginPw').focus();
+  }, 60);
+}
+
+function hideWsLandingOverlay() {
+  document.getElementById('wsLandingScreen').classList.add('hide');
+}
+
+function showWsLandingOverlay() {
+  renderWorkspaceCards();
+  document.getElementById('wsLandingPageSelect').classList.remove('hide');
+  document.getElementById('wsLandingPageLogin').classList.add('hide');
+  document.getElementById('wsLandingScreen').classList.remove('hide');
+}
+
+function switchWorkspace(name) {
+  activeWorkspace = name;
+  localStorage.setItem(ACTIVE_WS_KEY, name);
+  
+  // โหลดสถานะการปลดล็อกเฉพาะเซสชันของห้องทำงานนี้
+  unlocked = (sessionStorage.getItem('hwUnlocked_' + activeWorkspace) === '1');
+  
+  // รีเซ็ตตัวแปรห้องเรียนปัจจุบัน
+  curKey = null;
+  cur = null;
+  
+  // โหลดข้อมูลห้องทำงาน
+  load();
+  
+  // อัปเดตชื่อผู้ใช้บน Header
+  var lbl = document.getElementById('lblActiveWs');
+  if (lbl) lbl.textContent = name;
+  
+  // อัปเดต UI ชื่องานรายงาน
+  if (reportTitleEl) {
+    reportTitleEl.value = localStorage.getItem('hwReportTitle_' + activeWorkspace) || '';
+  }
+  
+  updateLockUI();
+  afterDataReady();
+  
+  if (cloudUrl()) {
+    refreshFromCloud();
+  } else {
+    setStatus('⚠️ ยังไม่ตั้งค่าคลาวด์ — กด ⚙️ ตั้งค่าคลาวด์');
+  }
+}
+
+// ผูกเหตุการณ์ล็อกอินหน้าแรก
+document.getElementById('wsLoginUnlock').onclick = function() {
+  var pw = document.getElementById('wsLoginPw').value.trim();
+  var isCorrect = false;
+  
+  if (selectedWsToLogin === 'ครูนิวตรอน') {
+    if (pw === 'ครูนิวตรอน' || pw === '2301') isCorrect = true;
+  } else {
+    var ws = workspaces.find(function(w) { return w.name === selectedWsToLogin; });
+    if (ws && ws.password === pw) isCorrect = true;
+  }
+  
+  if (isCorrect) {
+    unlocked = true;
+    sessionStorage.setItem('hwUnlocked_' + selectedWsToLogin, '1');
+    sessionStorage.setItem('hwEnteredPassword_' + selectedWsToLogin, pw);
+    hideWsLandingOverlay();
+    switchWorkspace(selectedWsToLogin);
+    setStatus('🔓 ปลดล็อกและเข้าสู่ห้องทำงานแล้ว', 'ok');
+  } else {
+    document.getElementById('wsLoginMsg').textContent = '❌ รหัสผ่านไม่ถูกต้อง';
+  }
+};
+
+document.getElementById('wsLoginPw').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('wsLoginUnlock').click();
+});
+
+document.getElementById('wsLoginReadOnly').onclick = function() {
+  unlocked = false;
+  sessionStorage.removeItem('hwUnlocked_' + selectedWsToLogin);
+  sessionStorage.removeItem('hwEnteredPassword_' + selectedWsToLogin);
+  hideWsLandingOverlay();
+  switchWorkspace(selectedWsToLogin);
+  setStatus('👁️ เข้าดูอย่างเดียว (ไม่บันทึก)');
+};
+
+document.getElementById('wsLoginBack').onclick = function() {
+  document.getElementById('wsLandingPageSelect').classList.remove('hide');
+  document.getElementById('wsLandingPageLogin').classList.add('hide');
+};
+
+document.getElementById('btnLandingCreateWs').onclick = function() {
+  var dlg = document.getElementById('wsCreateDlg');
+  document.getElementById('wsNewName').value = '';
+  document.getElementById('wsNewPw').value = '';
+  document.getElementById('wsNewPwConfirm').value = '';
+  document.getElementById('wsCreateMsg').textContent = '';
+  dlg.showModal();
+};
+
+document.getElementById('btnSwitchWsHeader').onclick = function() {
+  showWsLandingOverlay();
+};
+
+// ยกเลิกสร้างห้องทำงานใหม่
+document.getElementById('wsCreateCancel').onclick = function() {
+  document.getElementById('wsCreateDlg').close();
+};
+
+// ยืนยันสร้างห้องทำงานใหม่
+document.getElementById('wsCreateOk').onclick = function() {
+  var nameInput = document.getElementById('wsNewName');
+  var pwInput = document.getElementById('wsNewPw');
+  var pwConfInput = document.getElementById('wsNewPwConfirm');
+  var msg = document.getElementById('wsCreateMsg');
+  
+  var name = nameInput.value.trim();
+  var pw = pwInput.value.trim();
+  var pwConf = pwConfInput.value.trim();
+  
+  if (!name) { msg.textContent = 'กรุณากรอกชื่อครู/ชื่อห้องทำงาน'; return; }
+  if (name === '__new__') { msg.textContent = 'ชื่อนี้ไม่สามารถใช้ได้'; return; }
+  
+  var exists = workspaces.some(function(w) { return w.name.toLowerCase() === name.toLowerCase(); });
+  if (exists) { msg.textContent = 'ชื่อห้องทำงานนี้มีอยู่แล้ว'; return; }
+  if (!pw) { msg.textContent = 'กรุณากรอกรหัสผ่าน'; return; }
+  if (pw !== pwConf) { msg.textContent = 'รหัสผ่านและยืนยันรหัสผ่านไม่ตรงกัน'; return; }
+  
+  workspaces.push({ name: name, password: pw });
+  localStorage.setItem(WS_LIST_KEY, JSON.stringify(workspaces));
+  
+  document.getElementById('wsCreateDlg').close();
+  nameInput.value = '';
+  pwInput.value = '';
+  pwConfInput.value = '';
+  msg.textContent = '';
+  
+  // ปลดล็อกให้ทันที
+  sessionStorage.setItem('hwUnlocked_' + name, '1');
+  sessionStorage.setItem('hwEnteredPassword_' + name, pw);
+  
+  hideWsLandingOverlay();
+  switchWorkspace(name);
+  setStatus('👤 สร้างและเปิดห้องทำงานใหม่แล้ว', 'ok');
+};
+
+// ลบห้องทำงานครูปัจจุบัน
+document.getElementById('btnDeleteWs').onclick = function() {
+  if (activeWorkspace === 'ครูนิวตรอน') {
+    alert('⚠️ ไม่สามารถลบห้องทำงานครูนิวตรอนได้');
+    return;
+  }
+  
+  var pw = prompt('🗑️ ยืนยันการลบห้องทำงาน "' + activeWorkspace + '"\n\nคำเตือน: ข้อมูลห้องเรียนทั้งหมดในห้องทำงานนี้จะถูกลบถาวรและไม่สามารถกู้คืนได้!\n\nกรุณาใส่รหัสผ่านของห้องทำงานนี้เพื่อยืนยัน:');
+  if (pw === null) return;
+  
+  var ws = workspaces.find(function(w) { return w.name === activeWorkspace; });
+  if (ws && ws.password === pw) {
+    if (confirm('⚠️ คุณแน่ใจจริงๆ หรือไม่ว่าต้องการลบห้องทำงานนี้?')) {
+      workspaces = workspaces.filter(function(w) { return w.name !== activeWorkspace; });
+      localStorage.setItem(WS_LIST_KEY, JSON.stringify(workspaces));
+      
+      localStorage.removeItem('hwTrackerApp_data_' + activeWorkspace);
+      localStorage.removeItem('hwCloudUrl_' + activeWorkspace);
+      localStorage.removeItem('hwReportTitle_' + activeWorkspace);
+      sessionStorage.removeItem('hwUnlocked_' + activeWorkspace);
+      sessionStorage.removeItem('hwEnteredPassword_' + activeWorkspace);
+      
+      switchWorkspace('ครูนิวตรอน');
+      showWsLandingOverlay();
+      alert('🗑️ ลบห้องทำงานเรียบร้อยแล้ว');
+    }
+  } else {
+    alert('❌ รหัสผ่านไม่ถูกต้อง การลบล้มเหลว');
+  }
+};
+
+/* ===== QR/Barcode Scanner ===== */
+var html5QrCode = null;
+var scanSessionHistory = [];
+var scanCooldown = false;
+
+function playScanBeep(success) {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.type = 'sine';
+    if (success) {
+      osc.frequency.setValueAtTime(950, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.18);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.18);
+    } else {
+      osc.frequency.setValueAtTime(180, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    }
+  } catch (e) {
+    console.error('Audio beep failed', e);
+  }
+}
+
+function openScannerModal() {
+  if (!cur) { alert('⚠️ กรุณาเลือกหรือสร้างห้อง/วิชาก่อน'); return; }
+  if (!unlocked) { promptUnlock(); return; }
+
+  var wSelect = document.getElementById('scanner-work-select');
+  wSelect.innerHTML = '';
+  if (!cur.works || !cur.works.length) {
+    alert('⚠️ กรุณาเพิ่มชิ้นงานที่แท็บ ⚙️ จัดการงาน ก่อนใช้งานสแกนเนอร์');
+    return;
+  }
+  cur.works.forEach(function(w) {
+    var option = document.createElement('option');
+    option.value = w.id;
+    option.textContent = w.name + (w.type === 'สอบ' ? ' (สอบ)' : ' (ส่งงาน)');
+    wSelect.appendChild(option);
+  });
+
+  wSelect.onchange = function() {
+    var w = cur.works.find(function(item) { return item.id === wSelect.value; });
+    var act = document.getElementById('scanner-action');
+    if (w && w.type === 'สอบ') {
+      act.value = 'score';
+      document.getElementById('scanner-score-value').max = w.max || 999;
+    } else {
+      if (act.value === 'score') act.value = 'sent';
+    }
+    toggleScannerScoreInput();
+  };
+
+  wSelect.onchange();
+
+  scanSessionHistory = [];
+  document.getElementById('scanner-history').innerHTML = '<div style="color: var(--muted); text-align: center; padding: 10px 0;">ยังไม่มีข้อมูลประวัติการสแกน</div>';
+  var logBox = document.getElementById('scanner-status-log');
+  logBox.style.background = 'var(--green-l)';
+  logBox.style.color = 'var(--green-d)';
+  logBox.textContent = 'พร้อมสแกน... นำการ์ดรหัสส่องกล้อง';
+
+  document.getElementById('scanDlg').showModal();
+
+  Html5Qrcode.getCameras().then(function(devices) {
+    var select = document.getElementById('scanner-camera-select');
+    select.innerHTML = '';
+    
+    if (devices && devices.length > 0) {
+      devices.forEach(function(device, index) {
+        var option = document.createElement('option');
+        option.value = device.id;
+        var label = device.label || 'กล้อง ' + (index + 1);
+        if (label.toLowerCase().indexOf('back') !== -1 || label.toLowerCase().indexOf('rear') !== -1) {
+          label = '📷 กล้องหลัง (' + label + ')';
+        } else if (label.toLowerCase().indexOf('front') !== -1) {
+          label = '🤳 กล้องหน้า (' + label + ')';
+        }
+        option.textContent = label;
+        select.appendChild(option);
+      });
+      
+      var rearCamera = devices.find(function(d) {
+        var l = d.label.toLowerCase();
+        return l.indexOf('back') !== -1 || l.indexOf('rear') !== -1 || l.indexOf('environment') !== -1;
+      });
+      if (rearCamera) {
+        select.value = rearCamera.id;
+      }
+      
+      select.onchange = function() {
+        startCamera(select.value);
+      };
+      
+      startCamera(select.value);
+    } else {
+      logBox.textContent = '❌ ไม่พบกล้องในอุปกรณ์นี้';
+      playScanBeep(false);
+    }
+  }).catch(function(e) {
+    console.error('Failed to get cameras', e);
+    logBox.textContent = '❌ ไม่ได้รับอนุญาตให้เข้าถึงกล้อง';
+    playScanBeep(false);
+  });
+}
+
+function startCamera(cameraId) {
+  if (html5QrCode) {
+    html5QrCode.stop().then(function() {
+      initCamera(cameraId);
+    }).catch(function(err) {
+      console.error('Stop camera failed', err);
+      initCamera(cameraId);
+    });
+  } else {
+    initCamera(cameraId);
+  }
+}
+
+function initCamera(cameraId) {
+  html5QrCode = new Html5Qrcode("scanner-view");
+  var config = { 
+    fps: 10, 
+    qrbox: function(width, height) {
+      var min = Math.min(width, height);
+      var boxSize = Math.floor(min * 0.75);
+      return { width: boxSize, height: boxSize };
+    }
+  };
+
+  html5QrCode.start(
+    cameraId,
+    config,
+    function(decodedText, decodedResult) {
+      handleScannedCode(decodedText.trim());
+    },
+    function(errorMessage) {
+      // verbose error
+    }
+  ).catch(function(err) {
+    console.error('Camera start error', err);
+    document.getElementById('scanner-status-log').textContent = '❌ เปิดกล้องไม่สำเร็จ: ' + err.message;
+  });
+}
+
+function toggleScannerScoreInput() {
+  var act = document.getElementById('scanner-action').value;
+  var wrap = document.getElementById('scanner-score-wrap');
+  if (act === 'score') {
+    wrap.style.display = 'block';
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+function handleScannedCode(code) {
+  if (scanCooldown) return;
+  scanCooldown = true;
+  setTimeout(function() { scanCooldown = false; }, 1800);
+
+  var rosterList = ROSTER[cur.room] || [];
+  var rosterStudent = rosterList.find(function(s) { return s.id && String(s.id).trim() === code; });
+  var foundStudent = null;
+
+  if (rosterStudent) {
+    foundStudent = cur.students.find(function(s) { return s.no === rosterStudent.no; });
+  }
+
+  if (!foundStudent && /^\d+$/.test(code)) {
+    var seatNo = parseInt(code, 10);
+    foundStudent = cur.students.find(function(s) { return s.no === seatNo; });
+  }
+
+  if (foundStudent) {
+    var wId = document.getElementById('scanner-work-select').value;
+    var work = cur.works.find(function(w) { return w.id === wId; });
+    var action = document.getElementById('scanner-action').value;
+    
+    if (!work) return;
+
+    var logBox = document.getElementById('scanner-status-log');
+    var actionText = '';
+    
+    if (work.type === 'สอบ') {
+      var scoreVal = document.getElementById('scanner-score-value').value;
+      var score = scoreVal === '' ? '' : Number(scoreVal);
+      setVal(foundStudent.id, work.id, score);
+      actionText = 'กรอกคะแนน ' + (score === '' ? 'ว่าง' : score) + ' คะแนน';
+    } else {
+      var valNow = isSent(foundStudent.id, work.id);
+      var newVal = true;
+      if (action === 'toggle') newVal = !valNow;
+      else if (action === 'miss') newVal = false;
+      
+      setVal(foundStudent.id, work.id, newVal);
+      actionText = newVal ? 'เช็คว่า ส่ง' : 'เช็คว่า ไม่ส่ง';
+    }
+
+    renderGrid();
+    save();
+
+    logBox.style.background = 'var(--green-l)';
+    logBox.style.color = 'var(--green-d)';
+    logBox.textContent = '✅ ' + foundStudent.name + ' (เลขที่ ' + foundStudent.no + ') -> ' + actionText;
+    
+    playScanBeep(true);
+    
+    var now = new Date();
+    var timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    scanSessionHistory.unshift({
+      time: timeStr,
+      no: foundStudent.no,
+      name: foundStudent.name,
+      actionText: actionText
+    });
+    
+    renderScanHistory();
+  } else {
+    var logBox = document.getElementById('scanner-status-log');
+    logBox.style.background = 'var(--miss-bg)';
+    logBox.style.color = 'var(--miss)';
+    logBox.textContent = '⚠️ ไม่พบข้อมูลนักเรียน: Code "' + code + '"';
+    
+    playScanBeep(false);
+  }
+}
+
+function renderScanHistory() {
+  var container = document.getElementById('scanner-history');
+  if (scanSessionHistory.length === 0) {
+    container.innerHTML = '<div style="color: var(--muted); text-align: center; padding: 10px 0;">ยังไม่มีข้อมูลประวัติการสแกน</div>';
+    return;
+  }
+  
+  var items = scanSessionHistory.slice(0, 5);
+  container.innerHTML = items.map(function(item) {
+    return '<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--line); padding: 4px 0;">' +
+      '<span>⏱️ <b>' + item.time + '</b> · เลขที่ ' + item.no + ' ' + item.name + '</span>' +
+      '<span style="font-weight: bold; color: var(--green);">' + item.actionText + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+function closeScannerModal() {
+  if (html5QrCode) {
+    html5QrCode.stop().then(function() {
+      html5QrCode = null;
+      document.getElementById('scanDlg').close();
+    }).catch(function(err) {
+      console.error('Stop camera failed on close', err);
+      html5QrCode = null;
+      document.getElementById('scanDlg').close();
+    });
+  } else {
+    document.getElementById('scanDlg').close();
+  }
+}
+
+/* ===== เริ่ม ===== */
+unlocked = (sessionStorage.getItem('hwUnlocked_' + activeWorkspace) === '1');
+showWsLandingOverlay();
+load(); toggleMax(); updateLockUI(); afterDataReady();   // แสดง cache ในเครื่องทันที
+if(cloudUrl()){ refreshFromCloud(); }                    // แล้วดึงของล่าสุดจากคลาวด์มาทับ
+else { setStatus('⚠️ ยังไม่ตั้งค่าคลาวด์ — กด ⚙️ ตั้งค่าคลาวด์'); }
+</script>
+</body>
+</html>

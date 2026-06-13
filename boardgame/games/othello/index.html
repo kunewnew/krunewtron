@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โอเทลโล่ (Othello) - บอร์ดเกมครูนิวตรอน</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-glow"></div>
+    
+    <div class="game-container-wrapper">
+        <!-- Sidebar controls -->
+        <div class="game-sidebar">
+            <a href="../../index.html" class="back-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                กลับหน้าหลัก
+            </a>
+
+            <div class="game-info-panel">
+                <h2>โอเทลโล่ (Othello)</h2>
+                <p class="game-description-short">วางหมากล้อมหมากของคู่ต่อสู้เพื่อพลิกหมากเป็นสีของคุณ ครองกระดานให้ได้มากที่สุดจนจบเกม!</p>
+            </div>
+
+            <!-- Game Status Display -->
+            <div class="game-status-card">
+                <div class="status-label">สถานะการเล่น</div>
+                <div id="gameTurnIndicator" class="turn-indicator">
+                    <span class="turn-dot"></span>
+                    <span class="turn-text">ตาของ ผู้เล่น 1 (หมากดำ)</span>
+                </div>
+                <div class="game-score-display" id="gameScoreContainer">
+                    <div class="score-row">
+                        <span>ผู้เล่น 1 (ดำ):</span>
+                        <span class="score-value" id="scoreBlack">2</span>
+                    </div>
+                    <div class="score-row">
+                        <span id="scoreWhiteLabel">ผู้เล่น 2 (ขาว):</span>
+                        <span class="score-value" id="scoreWhite">2</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom Game Options -->
+            <div class="game-config-card" id="gameConfigCard">
+                <div class="config-label">ตั้งค่าการเล่น</div>
+                <div class="config-group" id="playerModeConfig">
+                    <label>โหมดผู้เล่น:</label>
+                    <div class="toggle-group">
+                        <button id="btnPvP" class="toggle-option active">ผู้เล่น VS ผู้เล่น</button>
+                        <button id="btnPvE" class="toggle-option">ผู้เล่น VS AI</button>
+                    </div>
+                </div>
+                <div class="config-group hidden" id="aiDifficultyConfig">
+                    <label for="aiDiffSelect">ระดับความยากของ AI:</label>
+                    <select id="aiDiffSelect" class="styled-select">
+                        <option value="easy">ง่าย (สุ่มเดิน)</option>
+                        <option value="medium" selected>ปานกลาง</option>
+                        <option value="hard">ท้าทาย (AI ฉลาด)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="game-actions">
+                <button id="resetGameBtn" class="reset-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                    </svg>
+                    เริ่มใหม่
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Viewport -->
+        <div class="game-viewport">
+            <div id="gameBoardContainer" class="board-container"></div>
+        </div>
+    </div>
+
+    <!-- Win/Loss/Draw Overlay Modal -->
+    <div id="resultModal" class="result-modal hidden">
+        <div class="result-modal-content">
+            <div class="result-effect-bg"></div>
+            <div class="result-icon-wrapper" id="resultIcon"></div>
+            <h2 id="resultTitle">ผู้ชนะ!</h2>
+            <p id="resultText">คำอธิบายผลลัพธ์</p>
+            <div class="result-actions">
+                <button id="resultResetBtn" class="primary-btn">เล่นอีกครั้ง</button>
+                <a href="../../index.html" class="secondary-btn">กลับสู่หน้าหลัก</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="game.js"></script>
+</body>
+</html>

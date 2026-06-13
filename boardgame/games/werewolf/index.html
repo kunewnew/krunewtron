@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Werewolf Agent - คืนล่าหมาป่า (No Host)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="stars-bg"></div>
+    <div class="ambient-glow"></div>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="game-header">
+            <div class="logo">
+                <span class="wolf-logo-icon">🐺</span>
+                <h1 class="glitch-text" data-text="WEREWOLF AGENT">WEREWOLF AGENT</h1>
+            </div>
+            <p class="subtitle">คืนล่าหมาป่าระทึกขวัญ (Multiplayer & ไร้โฮสต์ด้วยเสียงพากย์อัตโนมัติ)</p>
+        </header>
+
+        <!-- WELCOME SCREEN -->
+        <section id="screen-welcome" class="screen active">
+            <div class="card welcome-card">
+                <h2 style="text-align: center; margin-bottom: 20px;">เข้าร่วมทีมล่าหมาป่า</h2>
+                
+                <div class="input-group">
+                    <label for="input-player-name">ชื่อของคุณ (Name)</label>
+                    <input type="text" id="input-player-name" placeholder="ระบุชื่อของคุณ (เช่น นิวตรอน)" maxlength="15" autocomplete="off">
+                </div>
+
+                <hr class="divider">
+
+                <!-- JOIN GAME -->
+                <div class="input-group">
+                    <label for="input-room-code">รหัสห้อง (Room Code)</label>
+                    <input type="text" id="input-room-code" placeholder="กรอกรหัส 4 หลัก" maxlength="4" autocomplete="off" style="text-transform: uppercase; text-align: center; font-size: 1.4rem; letter-spacing: 4px; font-weight: 600; color: var(--color-primary);">
+                </div>
+                <button id="btn-join-room" class="btn btn-primary">เข้าร่วมห้องเล่นเกม</button>
+                
+                <div style="text-align: center; margin: 12px 0; color: var(--text-muted); font-size: 0.85rem;">หรือ</div>
+
+                <!-- CREATE GAME -->
+                <button id="btn-create-room" class="btn btn-accent">สร้างห้องเล่นใหม่ (เป็นโฮสต์)</button>
+                <a href="../../index.html" class="btn btn-secondary" style="margin-top: 10px; display: block; text-align: center; text-decoration: none;">กลับหน้าหลักคลับ</a>
+            </div>
+
+            <!-- Rules dossiers -->
+            <div class="card welcome-card rules-card" style="max-width: 600px;">
+                <div class="rules-header">
+                    <h3>📘 กติกาการเล่นอย่างละเอียด (สำหรับมือใหม่)</h3>
+                </div>
+                <div class="rules-body" style="font-size: 0.85rem; line-height: 1.6; color: var(--color-slate-300);">
+                    <p style="margin-bottom: 12px;">เกมนี้จำลองสถานการณ์ใน <strong>"คืนเดียวและเช้าวันรุ่งขึ้นทันที"</strong> ทุกคนจะได้เล่นจนจบไม่มีใครตกรอบก่อน! แบ่งทีมหลักเป็น <strong>ฝ่ายชาวบ้าน</strong> และ <strong>ฝ่ายหมาป่า</strong></p>
+                    
+                    <h4 style="color: var(--color-secondary); margin: 12px 0 6px 0; font-size: 0.95rem;">🎬 ขั้นตอนการเล่น 3 เฟส:</h4>
+                    <ol style="margin-left: 18px; margin-bottom: 12px;">
+                        <li><strong>1. ช่วงค่ำคืน (Night Phase):</strong> ทุกคนต้อง <strong>หลับตาลง</strong> และฟังเสียงบรรยายอัตโนมัติจากโฮสต์ล่วงหน้า ระบบจะประกาศให้แต่ละบทบาทลื่นไหลสลับกันลืมตาขึ้นมาทำภารกิจลับของตนเอง (เช่น สลับการ์ดเพื่อน, ตรวจการ์ดตนเอง) เมื่อหมดเวลาของบทบาทตนเองให้หลับตาลงตามเดิม โดยที่หน้าจอของผู้อื่นจะเป็นสีดำมืดสนิทเพื่อป้องกันการโกง</li>
+                        <li><strong>2. ช่วงเช้าวันรุ่งขึ้น (Discussion):</strong> เมื่อถึงรุ่งเช้า ทุกคนลืมตาขึ้นมาและมีเวลาพูดคุยตามตั้งค่า เพื่อสืบสวนหาตัวคนร้าย บลัฟ หรือสวมรอยโกหกปั่นป่วนเพื่อจับผิดพิรุธเพื่อนๆ (ห้ามจับหรือเปิดดูการ์ดของตนเองและผู้อื่นเด็ดขาด จนกว่าเกมจะเฉลย)</li>
+                        <li><strong>3. การลงมติโหวต (Voting):</strong> เมื่อหมดเวลากลางวัน ทุกคนชี้โหวตคนที่น่าสงสัยที่สุดพร้อมกัน ผู้ที่ได้คะแนนโหวตสูงสุดจะถูกนำไปประหารชีวิต</li>
+                    </ol>
+
+                    <h4 style="color: var(--color-accent); margin: 12px 0 6px 0; font-size: 0.95rem;">📱 ระบบการทำงานของโทรศัพท์ (กันโกงเป๊ะ):</h4>
+                    <ul style="margin-left: 18px; margin-bottom: 12px; list-style-type: circle;">
+                        <li><strong>การสแกนนิ้วมือดูบทบาท:</strong> เมื่อกดเริ่มเกม ให้ใช้นิ้วมือ <strong>แตะค้างไว้</strong> บนปุ่มสแกนนิ้วเป็นเวลา 1.5 วินาที ระบบจะเล่นเสียงปี๊บและแสดงบทบาทลับของคุณ (แนะนำให้เอามือป้องไว้เพื่อไม่ให้เพื่อนข้างๆ แอบเห็น)</li>
+                        <li><strong>หน้าจอดับเองอัตโนมัติ (Blackout):</strong> ในตอนกลางคืน หน้าจอโทรศัพท์ของคุณจะ <strong>ดับมืดสนิทลงเอง</strong> เพื่อไม่ให้แสงจากจอสะท้อนส่องหน้าคุณ (ซึ่งจะบอกให้คนอื่นรู้ว่าคุณลืมตา)ไม่ต้องตกใจ! โทรศัพท์ไม่ได้ดับและเกมไม่ได้ค้าง</li>
+                        <li><strong>หน้าจอสว่างขึ้นเมื่อถึงตาคุณ:</strong> เมื่อเสียงผู้บรรยายประกาศเรียกชื่อบทบาทของคุณ หน้าจอโทรศัพท์ของคุณจะ <strong>สว่างขึ้นอัตโนมัติ</strong> เพื่อแสดงปุ่มให้คุณแอบทำการ์ดสลับหรือส่องดูอย่างเงียบๆ และจะดับมืดลงอีกครั้งทันทีที่หมดเวลาของคุณ</li>
+                        <li><strong>การควบคุมเสียงบรรยาย (Mute):</strong> สำหรับการเล่นในห้องเดียวกัน แนะนำให้คนที่เป็นโฮสต์เปิดเสียงบรรยายออกลำโพง ส่วนผู้เล่นคนอื่นให้กดปุ่ม <strong>🔇 ปิดเสียง</strong> ที่มุมขวาบนของจอ เพื่อไม่ให้เสียงประกาศซ้อนกันสับสน</li>
+                    </ul>
+
+                    <h4 style="color: var(--color-secondary); margin: 12px 0 6px 0; font-size: 0.95rem;">🏆 เงื่อนไขชัยชนะ:</h4>
+                    <ul style="margin-left: 18px; margin-bottom: 12px; list-style-type: square;">
+                        <li><strong>ฝ่ายชาวบ้านชนะ</strong> เมื่อ: มีหมาป่าหรือสมุนหมาป่าอย่างน้อย 1 ตัวถูกแขวนคอ (หรือหากไม่มีหมาป่าในเกมเลย และไม่มีใครถูกแขวนคอ)</li>
+                        <li><strong>ฝ่ายหมาป่าชนะ</strong> เมื่อ: ฝ่ายชาวบ้านถูกแขวนคอกันเอง โดยที่หมาป่าทั้งหมดรอดชีวิต</li>
+                        <li><strong>ตัวตลก (Tanner) ชนะคนเดียว</strong> เมื่อ: หลอกล่อปั่นหัวให้ทุกคนรุมโหวตประหาร "ตัวเขาเอง" ได้สำเร็จ (ฝ่ายอื่นพ่ายแพ้ทั้งหมด)</li>
+                    </ul>
+
+                    <h4 style="color: var(--color-secondary); margin: 12px 0 6px 0; font-size: 0.95rem;">🎭 สรุปบทบาทลับและความสามารถ:</h4>
+                    <ul style="margin-left: 18px; list-style-type: none; padding-left: 0;">
+                        <li style="margin-bottom: 6px;">🐺 <strong>หมาป่า (Werewolf):</strong> ลืมตามาตรวจสอบพวกเดียวกัน หากมีตัวเดียวสามารถดูการ์ดกองกลางได้ 1 ใบ</li>
+                        <li style="margin-bottom: 6px;">😈 <strong>สมุนหมาป่า (Minion):</strong> ลืมตาดูว่าใครเป็นหมาป่าเพื่อช่วยปกป้องทีมหมาป่า (หมาป่าจะไม่รู้ว่าคุณคือใคร)</li>
+                        <li style="margin-bottom: 6px;">💀 <strong>ตัวตลก (Tanner):</strong> ไม่มีพรรคพวก ต้องการโดนแขวนคอเพื่อชนะเกม</li>
+                        <li style="margin-bottom: 6px;">👁️‍🗨️ <strong>ผู้หยั่งรู้ (Seer):</strong> แอบดูการ์ดเพื่อน 1 คน หรือแอบดูการ์ดคว่ำกองกลาง 2 ใบ</li>
+                        <li style="margin-bottom: 6px;">🎭 <strong>จอมขโมย (Robber):</strong> สลับการ์ดของตนกับเพื่อน 1 คน และเปิดดูบทบาทใหม่ที่ได้มา</li>
+                        <li style="margin-bottom: 6px;">⚡ <strong>ตัวป่วน (Troublemaker):</strong> สลับการ์ดของเพื่อน 2 คนโดยไม่ได้แอบดูการ์ดใบนั้น</li>
+                        <li style="margin-bottom: 6px;">🍺 <strong>คนเมา (Drunk):</strong> บังคับสลับการ์ดตนเองกับการ์ดกองกลาง 1 ใบ โดยไม่ได้ดูการ์ดใหม่</li>
+                        <li style="margin-bottom: 6px;">☕ <strong>คนนอนไม่หลับ (Insomniac):</strong> ตื่นมาคนสุดท้ายเพื่อเช็คว่าการ์ดตนเองโดนแอบสลับไปหรือไม่</li>
+                        <li style="margin-bottom: 6px;">👨‍🌾 <strong>ชาวบ้าน (Villager):</strong> ไม่มีพลังพิเศษใดๆ ใช้เพียงพลังโหวตและพลังสมองในการหาความจริง</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOBBY SCREEN -->
+        <section id="screen-lobby" class="screen">
+            <div class="host-layout">
+                <!-- Left panel: Code and player list -->
+                <div class="host-main-panel">
+                    <div class="card info-card">
+                        <div class="room-code-display">
+                            <span class="label">รหัสห้อง (Room Code)</span>
+                            <div class="code" id="lobby-code">----</div>
+                        </div>
+
+                        <div class="connection-info" id="lobby-owner-info" style="display:none;">
+                            <p>บอกรหัสห้องด้านบนให้เพื่อนของคุณเพื่อพิมพ์เข้าร่วม!</p>
+                            <span class="badge badge-owner">คุณคือผู้ควบคุมห้อง (Host)</span>
+                        </div>
+                        
+                        <div class="connection-info" id="lobby-player-info" style="display:none;">
+                            <div class="radar-pulse"></div>
+                            <p class="pulse-text">กำลังรอโฮสต์กดสุ่มบทบาทล่าท้าทาย...</p>
+                            <span class="badge badge-player" id="lobby-my-name-badge">ผู้เล่น: ...</span>
+                        </div>
+                    </div>
+
+                    <div class="card players-card">
+                        <h3>ผู้เล่นที่เข้าร่วมแล้ว (<span id="lobby-players-count">0</span> คน)</h3>
+                        <div class="player-list-scroll">
+                            <ul id="lobby-players-list" class="player-grid"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right panel: Settings & start -->
+                <div class="host-side-panel">
+                    <div class="card settings-card">
+                        <h2>ตั้งค่าบอร์ดหมาป่า</h2>
+                        
+                        <div class="setting-item">
+                            <label for="select-spies">จำนวนหมาป่า (Werewolves)</label>
+                            <select id="select-wolves">
+                                <option value="1">1 ตัว</option>
+                                <option value="2" selected>2 ตัว (แนะนำ)</option>
+                                <option value="3">3 ตัว</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label>บทบาทพิเศษที่จะใช้ในเกม</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" id="check-seer" checked> ผู้หยั่งรู้ (Seer)</label>
+                                <label><input type="checkbox" id="check-robber" checked> จอมขโมย (Robber)</label>
+                                <label><input type="checkbox" id="check-troublemaker" checked> ตัวป่วน (Troublemaker)</label>
+                                <label><input type="checkbox" id="check-minion"> สมุนหมาป่า (Minion)</label>
+                                <label><input type="checkbox" id="check-tanner"> ตัวตลก (Tanner)</label>
+                                <label><input type="checkbox" id="check-drunk"> คนเมา (Drunk)</label>
+                                <label><input type="checkbox" id="check-insomniac"> คนนอนไม่หลับ (Insomniac)</label>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <label>เวลาสำหรับพูดคุยปรึกษา (นาที)</label>
+                            <div class="range-display">
+                                <input type="range" id="range-duration" min="1" max="10" value="5" step="1">
+                                <span id="lbl-duration" class="badge">5 นาที</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item" id="lobby-recommendation-box" style="background: rgba(192, 132, 252, 0.08); border: 1.5px dashed rgba(192, 132, 252, 0.25); padding: 0.75rem; border-radius: 12px; font-size: 0.8rem; margin-top: 15px; color: #e9d5ff; line-height: 1.4;">
+                            <strong>💡 แนะนำจัดบทบาท:</strong> รอผู้เล่นเข้าร่วมอย่างน้อย 3 คน...
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="btn-start-game" class="btn btn-primary btn-block btn-lg" style="display:none;">เริ่มเกมแจกบทบาทลึกลับ</button>
+                            <button id="btn-leave-lobby" class="btn btn-secondary btn-block">ออกจากห้อง</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GAME SCREEN -->
+        <section id="screen-game" class="screen">
+            <!-- Phase display banner -->
+            <div class="phase-banner" id="game-phase-banner">
+                <span id="game-phase-text">ช่วงเวลากลางคืน...</span>
+            </div>
+
+            <!-- NIGHT PHASE VIEW -->
+            <div class="card night-view-card" id="view-night">
+                <div class="night-backdrop-black">
+                    <!-- Timer ring -->
+                    <div class="timer-box">
+                        <div class="radar-pulse-night"></div>
+                        <div id="night-instruction-text" class="night-instruction">กรุณาหลับตาและตั้งใจฟังเสียงพากย์คุมเกม... 🤫</div>
+                    </div>
+
+                    <!-- FINGERPRINT SCANNER TO DECRYPT ROLE -->
+                    <div class="secret-scanner-container" id="scanner-container">
+                        <p class="scan-tip">แตะค้างที่นิ้วมือด้านล่างเพื่อสแกนและดูบทบาทลับของคุณ</p>
+                        <div class="fingerprint-scan-btn" id="fingerprint-btn">
+                            <svg viewBox="0 0 100 100" class="fingerprint-svg">
+                                <path d="M50,15 A35,35 0 0,1 85,50 A35,35 0 0,1 50,85 A35,35 0 0,1 15,50 A35,35 0 0,1 50,15" fill="none" stroke="var(--color-secondary)" stroke-width="2.5" stroke-dasharray="6 6" class="rotating-ring"/>
+                                <path d="M50,25 C36.2,25 25,36.2 25,50 C25,56.9 27.8,63.1 32.3,67.7 M38.6,73.4 C42.1,75 46,75.8 50,75.8 C63.8,75.8 75,64.6 75,50.8 M34,42 C38,34 46,30 50,30 C58,30 65,37 65,45 M40,55 C43,58 47,60 50,60 C53,60 57,58 60,55 M45,48 C47,46 49,45 50,45 C51,45 53,46 55,48" fill="none" stroke="var(--color-secondary)" stroke-width="2.5" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- ROLE DISPLAYS (DYNAMICALLY INJECTED) -->
+                    <div class="decrypted-role-panel hidden" id="role-panel">
+                        <div class="decrypted-card">
+                            <div class="role-avatar" id="decrypted-role-icon">👤</div>
+                            <h3 id="decrypted-role-title">บทบาทเริ่มต้นของคุณ</h3>
+                            <h2 id="decrypted-role-name" class="role-highlight">ชาวบ้าน</h2>
+                            <p id="decrypted-role-desc" class="role-desc">คุณไม่มีความสามารถพิเศษในตอนกลางคืน หลับตาและฟังคำสั่งโฮสต์</p>
+                        </div>
+                    </div>
+
+                    <!-- ACTIVE NIGHT ACTIONS (FOR SPECIAL ROLES WHEN ACTIVE) -->
+                    <div class="active-night-action-panel hidden" id="active-action-panel">
+                        <h3 id="action-panel-title">ความสามารถของคุณ</h3>
+                        <div class="action-options-grid" id="action-options-grid"></div>
+                        <button id="btn-submit-action" class="btn btn-primary" style="margin-top: 15px; width: 100%;">ยืนยันการกระทำ</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAY PHASE / DISCUSSION VIEW -->
+            <div class="card day-view-card hidden" id="view-day">
+                <div class="day-layout">
+                    <!-- Left: Timer and list -->
+                    <div class="day-main">
+                        <div class="discussion-timer-box">
+                            <span class="timer-label">เหลือเวลาพูดคุยสืบสวน</span>
+                            <div class="timer-value" id="day-timer">00:00</div>
+                        </div>
+
+                        <div class="voting-section">
+                            <h3>ลงคะแนนเลือกแขวนคอหมาป่า (โหวตได้คนละ 1 ครั้ง)</h3>
+                            <div class="player-vote-grid" id="vote-players-grid"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="day-side">
+                        <div class="card rules-side-card">
+                            <h4>คำแนะนำยามเช้า ☀️</h4>
+                            <p>หมาป่าอาจโดนตัวป่วนหรือจอมขโมยสับเปลี่ยนการ์ดไปแล้วในตอนกลางคืน! โกหก ปั้นน้ำเป็นตัว และพยายามจับผิดพิรุธเพื่อนๆ ทุกคน</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- END GAME REVEAL VIEW -->
+            <div class="card reveal-view-card hidden" id="view-reveal">
+                <h2 id="reveal-winner-title" class="winner-title">ชาวบ้านชนะ! 🎉</h2>
+                <p id="reveal-winner-desc" class="winner-desc">หมาป่าสมชายโดนจับโหวตแขวนคอสำเร็จ!</p>
+                
+                <div class="reveal-boards-grid">
+                    <div class="reveal-board-section">
+                        <h3>เฉลยบทบาทของทุกคน</h3>
+                        <table class="reveal-table">
+                            <thead>
+                                <tr>
+                                    <th>ผู้เล่น</th>
+                                    <th>บทบาทตอนเริ่ม</th>
+                                    <th>บทบาทตอนจบ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reveal-players-table-body"></tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="reveal-board-section">
+                        <h3>การ์ดเหลือกลางกระดาน</h3>
+                        <div class="center-cards-grid" id="reveal-center-cards"></div>
+                    </div>
+                </div>
+
+                <div class="action-buttons" style="margin-top: 30px;">
+                    <button id="btn-restart-game" class="btn btn-primary btn-block" style="display: none;">เล่นอีกรอบ (โฮสต์คุม)</button>
+                    <button id="btn-leave-game" class="btn btn-secondary btn-block">ออกจากห้อง</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="game-footer">
+            <p>ออกแบบและพัฒนาบอร์ดเกมคณิตคิดคำนวณโดย <span class="highlight-text">ครูนิวตรอน</span></p>
+        </footer>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alert-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <h3 id="alert-title">ระบบแจ้งเตือน</h3>
+            <p id="alert-message">ข้อความแจ้งเตือนบางประการ...</p>
+            <button class="btn btn-primary btn-sm" onclick="closeAlert()">ตกลง</button>
+        </div>
+    </div>
+
+    <!-- Paho MQTT client from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+    <script type="module" src="game.js"></script>
+</body>
+</html>

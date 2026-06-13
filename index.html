@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🏠 ครูนิวตรอน.com - ศูนย์รวมระบบจัดการเรียนการสอน</title>
+  <meta name="description" content="พอร์ตทัลรวมเครื่องมือช่วยสอน ระบบเช็คชื่อ เช็คภาระงาน บันทึกคะแนน และกิจกรรมสันทนาการบอร์ดเกมพรีเมียม">
+  
+  <!-- Google Fonts - Kanit, Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Outfit:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            kanit: ['Kanit', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+            inter: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            darkbg: '#0C0C0C',
+            textlight: '#D7E2EA',
+            accentpurple: '#8b5cf6',
+            accentblue: '#3b82f6',
+            accentpink: '#ec4899',
+            accentemerald: '#10b981',
+            accentamber: '#f59e0b',
+            accentred: '#f43f5e',
+            accentteal: '#2dd4bf',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- React & ReactDOM CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  
+  <!-- Babel Standalone CDN for in-browser JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Custom CSS for specialized styling -->
+  <style>
+    /* Global Resets and Base Styles */
+    html, body, #root {
+      background-color: #0C0C0C;
+      color: #D7E2EA;
+      font-family: 'Kanit', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Hide scrollbars but keep functionality */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0C0C0C;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2A2A2A;
+      border-radius: 99px;
+    }
+
+    /* Hero Heading Gradient Text Class */
+    .hero-heading {
+      background: linear-gradient(180deg, #646973 0%, #BBCCD7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Prevent text selection on decorations */
+    .no-select {
+      user-select: none;
+    }
+
+    /* Glassmorphism style cards */
+    .glass-card {
+      background: rgba(17, 24, 39, 0.45);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Mascot breathing/floating float keyframes */
+    @keyframes float-breath {
+      0%, 100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+      }
+      50% {
+        transform: translateY(-8px) scale(1.02) rotate(0.8deg);
+      }
+    }
+    .animate-float-breath {
+      animation: float-breath 6s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-darkbg text-textlight select-none">
+  
+  <div id="root"></div>
+
+  <!-- React code with Babel compiler -->
+  <script type="text/babel">
+    const { useState, useEffect, useRef } = React;
+
+    // ==========================================
+    //  REUSABLE COMPONENT: FadeIn
+    // ==========================================
+    const FadeIn = ({ children, delay = 0, duration = 0.7, x = 0, y = 20, className = "" }) => {
+      const [isVisible, setIsVisible] = useState(false);
+      const domRef = useRef();
+
+      useEffect(() => {
+        setIsVisible(true);
+      }, []);
+
+      const style = {
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible 
+          ? 'translate3d(0,0,0)' 
+          : `translate3d(${x}px, ${y}px, 0)`,
+        transition: `opacity ${duration}s cubic-bezier(0.25, 0.1, 0.25, 1) ${delay}s, transform ${duration}s cubic-bezier(0.25, 0.1, 0.25, 1) ${delay}s`
+      };
+
+      return (
+        <div ref={domRef} style={style} className={className}>
+          {children}
+        </div>
+      );
+    };
+
+    // ==========================================
+    //  REUSABLE COMPONENT: Magnet
+    // ==========================================
+    const Magnet = ({ children, padding = 150, strength = 3, className = "" }) => {
+      const magnetRef = useRef();
+      const [transform, setTransform] = useState("translate3d(0px, 0px, 0px)");
+      const [transition, setTransition] = useState("transform 0.6s ease-in-out");
+
+      const handleMouseMove = (e) => {
+        if (!magnetRef.current) return;
+        const rect = magnetRef.current.getBoundingClientRect();
+        
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        const distanceX = e.clientX - centerX;
+        const distanceY = e.clientY - centerY;
+        
+        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        
+        if (distance < padding) {
+          setTransition("transform 0.3s ease-out");
+          const targetX = distanceX / strength;
+          const targetY = distanceY / strength;
+          setTransform(`translate3d(${targetX}px, ${targetY}px, 0) scale(1.05)`);
+        } else {
+          resetPosition();
+        }
+      };
+
+      const resetPosition = () => {
+        setTransition("transform 0.6s ease-in-out");
+        setTransform("translate3d(0px, 0px, 0px) scale(1)");
+      };
+
+      useEffect(() => {
+        window.addEventListener("mousemove", handleMouseMove);
+        return () => window.removeEventListener("mousemove", handleMouseMove);
+      }, [padding, strength]);
+
+      return (
+        <div 
+          ref={magnetRef} 
+          style={{ transform, transition, willChange: 'transform' }} 
+          className={`cursor-pointer ${className}`}
+          onMouseLeave={resetPosition}
+        >
+          {children}
+        </div>
+      );
+    };
+
+    // ==========================================
+    //  REUSABLE COMPONENT: Starfield Background
+    // ==========================================
+    const Starfield = () => {
+      const canvasRef = useRef(null);
+
+      useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        let animationFrameId;
+        
+        const resizeCanvas = () => {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        };
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Create stars
+        const stars = [];
+        const numStars = 120;
+        for (let i = 0; i < numStars; i++) {
+          stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 1.5 + 0.4,
+            speed: Math.random() * 0.05 + 0.015,
+            alpha: Math.random(),
+            fade: Math.random() > 0.5 ? 1 : -1
+          });
+        }
+        
+        // Render loop
+        const render = () => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          
+          stars.forEach(star => {
+            // Draw star
+            ctx.fillStyle = `rgba(215, 226, 234, ${star.alpha})`;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Move star (drift slowly upwards)
+            star.y -= star.speed;
+            if (star.y < 0) {
+              star.y = canvas.height;
+              star.x = Math.random() * canvas.width;
+            }
+            
+            // Twinkle
+            star.alpha += 0.008 * star.fade;
+            if (star.alpha > 1) {
+              star.alpha = 1;
+              star.fade = -1;
+            } else if (star.alpha < 0.1) {
+              star.alpha = 0.1;
+              star.fade = 1;
+            }
+          });
+          
+          animationFrameId = requestAnimationFrame(render);
+        };
+        render();
+        
+        return () => {
+          window.removeEventListener('resize', resizeCanvas);
+          cancelAnimationFrame(animationFrameId);
+        };
+      }, []);
+
+      return (
+        <canvas 
+          ref={canvasRef} 
+          className="fixed inset-0 w-full h-full pointer-events-none z-0"
+        />
+      );
+    };
+
+    // ==========================================
+    //  REUSABLE COMPONENT: TransparentImage (CSS Screen Blending)
+    // ==========================================
+    const TransparentImage = ({ src, alt, className, style = {} }) => {
+      return (
+        <img 
+          src={src} 
+          alt={alt} 
+          className={className} 
+          style={{ ...style, mixBlendMode: 'screen' }} 
+        />
+      );
+    };
+
+    // ==========================================
+    //  MAIN APPLICATION: Split-Screen Dashboard
+    // ==========================================
+    const App = () => {
+      const [timeStr, setTimeStr] = useState("00:00:00");
+      const [dateStr, setDateStr] = useState("วันเสาร์ที่ 13 มิถุนายน 2569");
+      const [greeting, setGreeting] = useState("สวัสดีครับคุณครู 🧑‍🏫");
+      
+      const MEMO_STORAGE_KEY = 'teacher_neutron_portal_memo';
+      const [memo, setMemo] = useState("");
+      const [savedLabel, setSavedLabel] = useState("บันทึกอัตโนมัติแล้ว");
+      const [labelColor, setLabelColor] = useState("text-accentemerald");
+      const saveTimerRef = useRef(null);
+
+      // Load saved notes
+      useEffect(() => {
+        const saved = localStorage.getItem(MEMO_STORAGE_KEY);
+        if (saved !== null) {
+          setMemo(saved);
+        }
+      }, []);
+
+      const handleMemoChange = (e) => {
+        const val = e.target.value;
+        setMemo(val);
+        localStorage.setItem(MEMO_STORAGE_KEY, val);
+        
+        setSavedLabel("กำลังพิมพ์...");
+        setLabelColor("text-accentamber");
+        
+        if (saveTimerRef.current) {
+          clearTimeout(saveTimerRef.current);
+        }
+        
+        saveTimerRef.current = setTimeout(() => {
+          setSavedLabel("บันทึกอัตโนมัติแล้ว");
+          setLabelColor("text-accentemerald");
+        }, 500);
+      };
+
+      useEffect(() => {
+        const updateClock = () => {
+          const daysThai = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
+          const monthsThai = [
+            'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 
+            'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+          ];
+          
+          const now = new Date();
+          
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+          setTimeStr(`${hours}:${minutes}:${seconds}`);
+          
+          const dayName = daysThai[now.getDay()];
+          const dateNum = now.getDate();
+          const monthName = monthsThai[now.getMonth()];
+          const yearTH = now.getFullYear() + 543;
+          setDateStr(`${dayName}ที่ ${dateNum} ${monthName} ${yearTH}`);
+          
+          const hr = now.getHours();
+          if (hr >= 5 && hr < 12) {
+            setGreeting("อรุณสวัสดิ์ครับคุณครู 🌅");
+          } else if (hr >= 12 && hr < 17) {
+            setGreeting("สวัสดีตอนบ่ายครับคุณครู ☀️");
+          } else if (hr >= 17 && hr < 21) {
+            setGreeting("สวัสดีตอนเย็นครับคุณครู 🌆");
+          } else {
+            setGreeting("สวัสดีตอนค่ำครับคุณครู 🌌");
+          }
+        };
+
+        updateClock();
+        const interval = setInterval(updateClock, 1000);
+        return () => clearInterval(interval);
+      }, []);
+
+      const appCards = [
+        {
+          title: "ระบบเช็คชื่อเข้าเรียนรายวิชา",
+          desc: "บันทึกเวลาเรียน ขาด ลา มาสาย รายคาบและรายห้องเรียนอย่างเป็นระเบียบ",
+          url: "เช็คชื่อรายวิชา/index.html",
+          image: "images/grad-cap.png",
+          badge: "เช็คผ่านกล้อง 📷",
+          colorClass: "hover:border-accentblue hover:shadow-[0_0_20px_rgba(59,130,246,0.15)]",
+          badgeStyle: { color: '#60a5fa', borderColor: '#60a5fa', background: 'rgba(59, 130, 246, 0.08)' }
+        },
+        {
+          title: "เช็คชื่อ ม.4-ม.6 เตรียมวิศวะ",
+          desc: "ระบบบันทึกการเข้าเรียนออนไลน์ ห้องเรียนพิเศษเตรียมวิศวกรรมศาสตร์ 3 ห้องเรียน",
+          url: "เช็คชื่อ-เตรียมวิศวะ.html",
+          image: "images/gear.png",
+          badge: "ม.4 - ม.6 🚀",
+          colorClass: "hover:border-accentred hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]",
+          badgeStyle: { color: '#f43f5e', borderColor: '#f43f5e', background: 'rgba(244, 63, 94, 0.08)' }
+        },
+        {
+          title: "ระบบติดตามส่งงาน/ข้อสอบ",
+          desc: "บันทึกความก้าวหน้าการส่งการบ้านและข้อสอบอย่างรวดเร็ว รองรับสแกนคิวอาร์การ์ดเด็ก",
+          url: "ส่งงาน/index-ส่งงาน.html",
+          image: "images/beaker.png",
+          badge: "สแกนสปีด 📝",
+          colorClass: "hover:border-accentpurple hover:shadow-[0_0_20px_rgba(139,92,246,0.15)]",
+          badgeStyle: { color: '#a78bfa', borderColor: '#a78bfa', background: 'rgba(139, 92, 246, 0.08)' }
+        },
+        {
+          title: "สุ่มเลขที่เป็ดแข่งวิ่ง 3D",
+          desc: "สร้างความสนุกด้วยการวิ่งแข่งสุ่มเลขที่ของเด็กนักเรียนผ่านโมเดลเป็ดสามมิติสุดเร้าใจ",
+          url: "สุ่มเลขที่/index.html",
+          image: "images/dice.png",
+          badge: "มินิเกมกิจกรรม 🦆",
+          colorClass: "hover:border-accentamber hover:shadow-[0_0_20px_rgba(245,158,11,0.15)]",
+          badgeStyle: { color: '#fbbf24', borderColor: '#fbbf24', background: 'rgba(245, 158, 11, 0.08)' }
+        },
+        {
+          title: "บอร์ดเกมคลับพัฒนาทักษะ",
+          desc: "คลังบอร์ดเกมเล่นง่ายพัฒนาตรรกะและความคิดสร้างสรรค์ เช่น Werewolf, Connect4, Othello",
+          url: "boardgame/index.html",
+          image: "images/dice.png",
+          badge: "สันทนาการ 🧩",
+          colorClass: "hover:border-accentpink hover:shadow-[0_0_20px_rgba(236,72,153,0.15)]",
+          badgeStyle: { color: '#f472b6', borderColor: '#f472b6', background: 'rgba(236, 72, 153, 0.08)' }
+        }
+      ];
+
+      return (
+        <div className="w-full min-h-screen bg-darkbg flex flex-col lg:flex-row relative">
+          
+          {/* Animated Twinkling Starfield Background */}
+          <Starfield />
+
+          {/* Ambient Background Glows */}
+          <div className="absolute top-[20%] left-[5%] w-[30vw] h-[30vw] rounded-full bg-accentpurple/5 blur-[120px] pointer-events-none z-0" />
+          <div className="absolute bottom-[20%] right-[5%] w-[25vw] h-[25vw] rounded-full bg-accentblue/5 blur-[120px] pointer-events-none z-0" />
+
+          {/* ========================================================
+               LEFT COLUMN: BRANDING, CLOCK, MASCOT (Desktop Fixed)
+             ======================================================== */}
+          <div className="w-full lg:w-[35%] xl:w-[32%] lg:h-screen lg:sticky lg:top-0 p-8 sm:p-12 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/5 bg-black/25 z-10">
+            
+            {/* Top Logo */}
+            <FadeIn delay={0} y={-15}>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-accentpurple to-accentblue flex items-center justify-center shadow-md shadow-accentpurple/15">
+                  <svg viewBox="0 0 24 24" className="w-5.5 h-5.5 fill-none stroke-white stroke-[2.5]">
+                    <path d="M12 2L1 7L12 12L23 7L12 2Z" />
+                    <path d="M21 12.5V17.5L12 22L3 17.5V12.5" />
+                    <path d="M12 12V22" />
+                  </svg>
+                </div>
+                <div className="font-bold tracking-wider text-base sm:text-lg text-white font-kanit uppercase">
+                  KRUNEWTRON<span className="text-accentpurple">.COM</span>
+                </div>
+              </div>
+            </FadeIn>
+
+            {/* Middle: Title & 3D Cat Mascot */}
+            <div className="my-8 sm:my-10 lg:my-0 flex flex-col items-center lg:items-start text-center lg:text-left gap-6">
+              
+              {/* 3D Magnet Mascot (Cat Teacher) with breathing floating animation */}
+              <div className="w-[170px] sm:w-[200px] md:w-[220px] lg:w-[230px] xl:w-[245px]">
+                <Magnet padding={150} strength={3.5}>
+                  <img 
+                    src="images/mascot_animated.webp" 
+                    alt="Kru Neutron Mascot" 
+                    className="w-full h-auto object-contain pointer-events-none drop-shadow-[0_15px_40px_rgba(251,146,60,0.22)] animate-float-breath"
+                  />
+                </Magnet>
+              </div>
+
+              <div>
+                <h1 className="hero-heading font-black tracking-tight leading-none text-4xl sm:text-5xl lg:text-[2.85rem] xl:text-[3.25rem] whitespace-nowrap uppercase select-none no-select mb-2">
+                  ครูนิวตรอน.com
+                </h1>
+                <p className="text-textlight/70 font-light text-xs sm:text-sm max-w-[320px] leading-relaxed">
+                  พอร์ตทัลอัจฉริยะรวบรวมระบบจัดการชั้นเรียน เช็คชื่อรายวิชา ส่งการบ้าน วัดประเมินเกรด และกิจกรรมสันทนาการบอร์ดเกม
+                </p>
+              </div>
+
+            </div>
+
+            {/* Bottom: Thai Clock Widget */}
+            <FadeIn delay={0.25} y={15}>
+              <div className="glass-card rounded-2xl px-5 py-3.5 border border-white/5 flex flex-col items-center lg:items-start justify-center shadow-lg shadow-black/30">
+                <div className="text-[10px] sm:text-xs font-semibold text-accentpurple tracking-widest uppercase mb-0.5">{greeting}</div>
+                <div className="font-outfit text-xl sm:text-2xl font-bold tracking-widest text-accentemerald drop-shadow-[0_0_10px_rgba(16,185,129,0.18)]">
+                  {timeStr}
+                </div>
+                <div className="text-[9px] sm:text-[10px] text-textlight/50 font-light mt-0.5">
+                  {dateStr}
+                </div>
+              </div>
+            </FadeIn>
+
+          </div>
+
+          {/* ========================================================
+               RIGHT COLUMN: MAIN APP CARDS GRID & TEXTAREA NOTE PAD
+             ======================================================== */}
+          <div className="w-full lg:w-[65%] xl:w-[68%] p-6 sm:p-10 lg:p-12 overflow-y-auto z-10 flex flex-col justify-between">
+            
+            <div>
+              {/* Heading Label */}
+              <div className="mb-6 flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <span className="inline-block w-2.5 h-2.5 rounded-full bg-accentpurple animate-pulse" />
+                  <h2 className="text-xs sm:text-sm uppercase tracking-widest font-semibold text-white">
+                    คลังเครื่องมือจัดการเรียนการสอน
+                  </h2>
+                </div>
+                <span className="text-[10px] sm:text-xs font-light text-textlight/40">
+                  เลือกหัวข้อเพื่อเริ่มเข้าใช้งานระบบ
+                </span>
+              </div>
+
+              {/* Sub-Apps Cards Grid (6 apps) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {appCards.map((app, idx) => (
+                  <a 
+                    key={idx}
+                    href={app.url}
+                    className={`glass-card p-5 rounded-2xl flex flex-col justify-between min-h-[160px] cursor-pointer group ${app.colorClass}`}
+                  >
+                    <div>
+                      {/* Top row icon & badge */}
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
+                          <TransparentImage 
+                            src={app.image} 
+                            alt={app.title} 
+                            className="w-8 h-8 object-contain pointer-events-none group-hover:scale-110 transition-transform duration-300"
+                          />
+                        </div>
+                        <span 
+                          className="text-[9px] font-bold px-2.5 py-0.5 rounded-full border" 
+                          style={app.badgeStyle}
+                        >
+                          {app.badge}
+                        </span>
+                      </div>
+                      
+                      <h3 className="font-bold text-sm sm:text-base text-white tracking-wide group-hover:text-white transition-colors">
+                        {app.title}
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-textlight/55 font-light mt-1.5 leading-relaxed">
+                        {app.desc}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 text-xs font-semibold text-accentemerald tracking-wider mt-4">
+                      เปิดใช้งาน
+                      <svg className="w-3.5 h-3.5 fill-none stroke-current stroke-[2.5] transition-transform duration-200 group-hover:translate-x-1" viewBox="0 0 24 24">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </div>
+                  </a>
+                ))}
+
+                {/* Card 7: QR Code Management Tools (Dual Link) */}
+                <div className="glass-card p-5 rounded-2xl flex flex-col justify-between min-h-[160px] hover:border-accentteal hover:shadow-[0_0_20px_rgba(45,212,191,0.15)]">
+                  <div>
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/5 flex items-center justify-center">
+                        <svg viewBox="0 0 24 24" className="w-6 h-6 fill-none stroke-accentteal stroke-[2.5]">
+                          <path d="M12 4H4v8h8V4zM20 4h-8v8h8V4zM12 12H4v8h8v-8zM20 16h-4v4h4v-4z" />
+                          <path d="M20 12h-2v2h2v-2zM16 12h-2v2h2v-2zM14 20h2v-2h-2v2z" />
+                        </svg>
+                      </div>
+                      <span className="text-[9px] font-bold px-2.5 py-0.5 rounded-full border" style={{ color: '#2dd4bf', borderColor: '#2dd4bf', background: 'rgba(45,212,191,0.08)' }}>
+                        QR UTILS 🖨️
+                      </span>
+                    </div>
+                    
+                    <h3 className="font-bold text-sm sm:text-base text-white tracking-wide">
+                      ชุดจัดการ QR Code เช็คชื่อเด็ก
+                    </h3>
+                    <p className="text-[11px] sm:text-xs text-textlight/55 font-light mt-1.5 leading-relaxed">
+                      จัดพิมพ์การ์ดเช็คชื่อรายบุคคลของนักเรียนตามทะเบียนห้อง หรือสร้างคิวอาร์โค้ดปรับแต่งอเนกประสงค์
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    <a href="ส่งงาน/qr-card.html" className="text-center bg-white/[0.03] hover:bg-accentteal/15 hover:text-accentteal border border-white/5 hover:border-accentteal rounded-lg py-2 text-xs font-semibold transition-all duration-300">
+                      🖨️ พิมพ์การ์ดสแกน
+                    </a>
+                    <a href="ส่งงาน/qr-generator.html" className="text-center bg-white/[0.03] hover:bg-accentteal/15 hover:text-accentteal border border-white/5 hover:border-accentteal rounded-lg py-2 text-xs font-semibold transition-all duration-300">
+                      ✨ เจน QR Code
+                    </a>
+                  </div>
+                </div>
+
+                {/* Card 8: Quick Notepad */}
+                <div className="glass-card p-5 rounded-2xl flex flex-col justify-between min-h-[160px] hover:border-accentpurple/40 hover:shadow-[0_0_20px_rgba(139,92,246,0.15)]">
+                  <div className="w-full">
+                    <div className="flex justify-between items-center mb-2.5 text-xs font-semibold text-textlight/60">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block w-2.5 h-2.5 rounded-full bg-accentpurple animate-pulse" />
+                        โน้ตเตือนความจำ 📌
+                      </div>
+                      <span className={`transition-colors duration-300 font-medium text-[10px] ${labelColor}`}>
+                        {savedLabel}
+                      </span>
+                    </div>
+                    
+                    <textarea 
+                      value={memo}
+                      onChange={handleMemoChange}
+                      className="w-full h-[75px] bg-black/30 border border-white/5 rounded-xl p-2.5 text-xs text-textlight font-normal leading-relaxed outline-none focus:border-accentpurple/40 transition-colors duration-300 resize-none font-kanit"
+                      placeholder="เขียนข้อความเตือนความจำ โน้ตชั่วคราวในคาบเรียน..."
+                    />
+                  </div>
+
+                  <div className="flex justify-between items-center mt-2 text-[9px] text-textlight/40 font-light pr-1">
+                    <span>* จัดเก็บเฉพาะในเครื่องคอมนี้</span>
+                    <span>{memo.length} ตัวอักษร</span>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Footer */}
+            <footer className="w-full border-t border-white/5 pt-6 mt-12 flex flex-col sm:flex-row justify-between items-center text-[10px] sm:text-xs text-textlight/30 gap-4">
+              <div className="flex items-center gap-3">
+                <p>© 2026 ครูนิวตรอน.com. All rights reserved.</p>
+                <span>•</span>
+                <a href="https://github.com/kunewnew/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">
+                  GitHub: kunewnew
+                </a>
+              </div>
+              <p>Designed with Scientific & Educational 3D Clay Models ⚛️</p>
+            </footer>
+
+          </div>
+
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

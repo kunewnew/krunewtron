@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>📊 ระบบจัดการคะแนน/ตัดเกรด</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Itim&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#1f6f3e; --green-d:#0f3d20; --green-l:#e8f3ec;
+    --card:#fffdf7; --line:#e2e0d4; --text:#26302a;
+    --muted:#6b7770; --warn:#c0392b; --gold:#b8860b;
+    --board:#2c4a39; --board-d:#21392c; --chalk:#f4f1e6; --chalk-dim:rgba(244,241,230,.78);
+    --chalk-line:rgba(244,241,230,.45);
+    --font:"Sarabun","Noto Sans Thai",-apple-system,"Segoe UI",sans-serif;
+    --font-chalk:"Itim",var(--font);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--font);font-size:15px;line-height:1.55;color:var(--text);
+    background:
+      radial-gradient(120% 90% at 50% -10%, rgba(255,255,255,.07), transparent 60%),
+      radial-gradient(80% 60% at 80% 110%, rgba(0,0,0,.18), transparent 60%),
+      repeating-linear-gradient(115deg, rgba(255,255,255,.012) 0 3px, transparent 3px 7px),
+      linear-gradient(160deg, var(--board) 0%, var(--board-d) 100%);
+    background-attachment:fixed; min-height:100vh}
+  header{background:rgba(15,30,22,.35);color:var(--chalk);padding:16px 18px;display:flex;
+    align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20;
+    border-bottom:2px solid var(--chalk-line);
+    box-shadow:0 4px 18px rgba(0,0,0,.28);backdrop-filter:blur(4px)}
+  header h1{font-family:var(--font-chalk);font-size:24px;margin:0;flex:1;min-width:200px;
+    letter-spacing:.3px;text-shadow:0 1px 0 rgba(0,0,0,.25),0 0 8px rgba(244,241,230,.18)}
+  #status{font-size:13px;color:var(--chalk-dim)}
+  .wrap{max-width:1100px;margin:0 auto;padding:18px 16px 40px}
+  .tabs{display:flex;gap:8px;margin:0 0 16px;flex-wrap:wrap}
+  .tab{background:transparent;border:1.5px dashed var(--chalk-line);border-radius:12px;
+    padding:9px 18px;cursor:pointer;font-family:var(--font-chalk);font-size:16px;
+    color:var(--chalk-dim);transition:.15s}
+  .tab:hover{border-color:var(--chalk);color:var(--chalk)}
+  .tab.active{background:var(--chalk);color:var(--green-d);border:1.5px solid var(--chalk);
+    box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:18px;margin-bottom:16px;box-shadow:0 8px 24px rgba(0,0,0,.22)}
+  .card h2{font-family:var(--font-chalk);font-size:20px;margin:0 0 12px;color:var(--green-d);
+    display:inline-block;border-bottom:2px dashed #cdd8d0;padding-bottom:3px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px;font-weight:600}
+  input,select,textarea{font-family:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);
+    border-radius:9px;background:#fff;color:var(--text);width:100%}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--green-l);border-color:var(--green)}
+  .field{flex:1;min-width:140px}
+  button{font-family:var(--font-chalk);font-size:16px;font-weight:600;border:none;border-radius:10px;
+    padding:9px 18px;cursor:pointer;background:var(--green);color:#fff;
+    box-shadow:0 2px 6px rgba(31,111,62,.3)}
+  button:hover{background:var(--green-d)}
+  button.ghost{background:#fff;color:var(--green-d);border:1.5px solid var(--green);box-shadow:none}
+  button.danger{background:#fff;color:var(--warn);border:1.5px solid var(--warn);box-shadow:none}
+  button.small{padding:5px 12px;font-size:14px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+  th{background:var(--green-l);color:var(--green-d);position:sticky;top:0}
+  td.name,th.name{text-align:left}
+  td input{padding:5px 6px;text-align:center;border-radius:6px}
+  td input.score{width:64px}
+  .tbl-scroll{overflow-x:auto;max-height:62vh;border-radius:10px;border:1px solid var(--line)}
+  .grade{font-weight:800;border-radius:6px;padding:2px 8px;display:inline-block;min-width:34px}
+  .g4{background:#1f6f3e;color:#fff}.g35{background:#2e8b57;color:#fff}
+  .g3{background:#3cb371;color:#fff}.g25{background:#9acd32;color:#173}
+  .g2{background:#ffd54a;color:#5a4500}.g15{background:#ffb74d;color:#5a3500}
+  .g1{background:#ff8a65;color:#3a1200}.g0{background:#c0392b;color:#fff}
+  .muted{color:var(--muted);font-size:13px}
+  .pill{background:var(--green-l);color:var(--green-d);border-radius:20px;padding:3px 12px;
+    font-size:13px;font-weight:600;display:inline-block}
+  .err{color:var(--warn);font-weight:600}
+  .ok{color:var(--green)}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .comp-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .comp-row input.cname{flex:1}
+  .comp-row select.ctype{width:120px;flex:none}
+  .comp-row input.cmax{width:90px;flex:none}
+  .col-k{background:#eef6f0}.col-s{background:#fff6e6}
+  th.col-k{background:#dcefe2}th.col-s{background:#fdeccb}
+  .tag-k,.tag-s{font-size:11px;font-weight:700;border-radius:4px;padding:1px 6px;display:inline-block}
+  .tag-k{background:#cfe9d8;color:#155029}
+  .tag-s{background:#fbe2b0;color:#7a5200}
+  td.subK,td.subS{font-weight:700}
+  .bar-wrap{display:flex;align-items:flex-end;gap:10px;height:200px;padding:10px 0;
+    border-bottom:2px solid var(--line)}
+  .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+  .bar{width:70%;background:var(--green);border-radius:6px 6px 0 0;min-height:2px;
+    display:flex;align-items:flex-start;justify-content:center;color:#fff;font-size:12px;
+    font-weight:700;padding-top:3px}
+  .bar-label{margin-top:6px;font-weight:700;font-size:13px}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+  .stat{background:var(--green-l);border-radius:12px;padding:12px;text-align:center}
+  .stat .num{font-size:26px;font-weight:800;color:var(--green-d)}
+  .stat .cap{font-size:12px;color:var(--muted)}
+  dialog{border:none;border-radius:14px;padding:0;max-width:460px;width:92%}
+  dialog::backdrop{background:rgba(0,0,0,.4)}
+  .dlg-body{padding:18px}
+  .hide{display:none!important}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px}
+</style>
+</head>
+<body>
+<header style="position: relative;">
+  <a href="../index.html" style="position: absolute; top: 16px; right: 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 10px; padding: 8px 16px; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; z-index: 10; backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.15)';" onmouseout="this.style.background='rgba(255, 255, 255, 0.08)';">
+    🏠 กลับหน้าหลัก
+  </a>
+  <h1>📊 ระบบจัดการคะแนน / ตัดเกรด</h1>
+  <span id="status">⏳ กำลังเชื่อมต่อ…</span>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-tab="entry">📝 กรอกคะแนน</div>
+    <div class="tab" data-tab="summary">📈 สรุปผล/สถิติ</div>
+    <div class="tab" data-tab="setup">⚙️ ตั้งค่าองค์ประกอบ</div>
+  </div>
+
+  <!-- เลือกห้อง/วิชา -->
+  <div class="card">
+    <div class="row">
+      <div class="field">
+        <label>ห้อง / ระดับชั้น</label>
+        <input id="room" list="roomList" placeholder="เช่น ม.6/1">
+        <datalist id="roomList"></datalist>
+      </div>
+      <div class="field">
+        <label>รายวิชา</label>
+        <input id="subject" list="subjList" placeholder="เช่น คณิตศาสตร์เพิ่มเติม 5">
+        <datalist id="subjList"></datalist>
+      </div>
+      <div>
+        <button id="btnLoad" class="ghost">📂 เปิด/สร้าง</button>
+      </div>
+      <div>
+        <button id="btnDelete" class="danger small">🗑️ ลบชุดนี้</button>
+      </div>
+    </div>
+    <div class="hint">เปิดชุดที่บันทึกไว้แล้ว หรือพิมพ์ชื่อใหม่เพื่อสร้างชุดคะแนนใหม่</div>
+  </div>
+
+  <!-- TAB: กรอกคะแนน -->
+  <section id="tab-entry">
+    <div class="card" id="entryCard">
+      <div class="toolbar">
+        <span class="pill" id="curLabel">— ยังไม่ได้เลือกชุด —</span>
+        <button id="btnAddStudent" class="ghost small">➕ เพิ่มนักเรียน</button>
+        <button id="btnImport" class="ghost small">📋 วางรายชื่อ (เลขที่,ชื่อ)</button>
+        <button id="btnSave">💾 บันทึกลง Google Sheet</button>
+      </div>
+      <div class="tbl-scroll">
+        <table id="scoreTable">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="hint">คะแนนรวมคิดจากผลรวมทุกองค์ประกอบ (เต็ม 100) แล้วตัดเกรดอัตโนมัติ • แก้น้ำหนัก/องค์ประกอบได้ที่แท็บ ⚙️</div>
+    </div>
+  </section>
+
+  <!-- TAB: สรุปผล -->
+  <section id="tab-summary" class="hide">
+    <div class="card">
+      <h2>สรุปผลการเรียน <span id="sumLabel" class="muted"></span></h2>
+      <div class="stat-grid" id="statGrid"></div>
+    </div>
+    <div class="card">
+      <h2>การกระจายเกรด</h2>
+      <div class="bar-wrap" id="barWrap"></div>
+    </div>
+    <div class="card">
+      <h2>ตารางผลการเรียน</h2>
+      <div class="toolbar">
+        <button id="btnCsv" class="ghost small">⬇️ ดาวน์โหลด CSV</button>
+      </div>
+      <div class="tbl-scroll">
+        <table id="resultTable"><thead></thead><tbody></tbody></table>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: ตั้งค่า -->
+  <section id="tab-setup" class="hide">
+    <div class="card">
+      <h2>องค์ประกอบคะแนน (รวมต้องเท่ากับ 100)</h2>
+      <div id="compList"></div>
+      <div class="row" style="margin-top:8px">
+        <button id="btnAddComp" class="ghost small">➕ เพิ่มองค์ประกอบ</button>
+        <span id="compSum" class="pill">รวม: 0 / 100</span>
+        <button id="btnSaveComp">💾 ใช้ค่านี้</button>
+      </div>
+      <div class="hint">ตัวอย่าง: ก่อนกลางภาค 25 · กลางภาค 20 · หลังกลางภาค 25 · ปลายภาค 30</div>
+    </div>
+    <div class="card">
+      <h2>เกณฑ์ตัดเกรด (8 ระดับ — มาตรฐานไทย)</h2>
+      <table style="max-width:420px">
+        <thead><tr><th>คะแนนรวม</th><th>เกรด</th></tr></thead>
+        <tbody>
+          <tr><td>80 – 100</td><td><span class="grade g4">4</span></td></tr>
+          <tr><td>75 – 79</td><td><span class="grade g35">3.5</span></td></tr>
+          <tr><td>70 – 74</td><td><span class="grade g3">3</span></td></tr>
+          <tr><td>65 – 69</td><td><span class="grade g25">2.5</span></td></tr>
+          <tr><td>60 – 64</td><td><span class="grade g2">2</span></td></tr>
+          <tr><td>55 – 59</td><td><span class="grade g15">1.5</span></td></tr>
+          <tr><td>50 – 54</td><td><span class="grade g1">1</span></td></tr>
+          <tr><td>0 – 49</td><td><span class="grade g0">0</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- dialog: import -->
+<dialog id="importDlg">
+  <div class="dlg-body">
+    <h2 style="margin-top:0">วางรายชื่อนักเรียน</h2>
+    <p class="muted">หนึ่งคนต่อบรรทัด รูปแบบ: <b>เลขที่ , ชื่อ-สกุล</b> (เว้นด้วยจุลภาค หรือ Tab)<br>
+       เช่น &nbsp; <code>1, เด็กชายสมชาย ใจดี</code></p>
+    <textarea id="importText" rows="10" placeholder="1, สมชาย ใจดี&#10;2, สมหญิง รักเรียน"></textarea>
+    <div class="row" style="margin-top:12px;justify-content:flex-end">
+      <button class="ghost" onclick="document.getElementById('importDlg').close()">ยกเลิก</button>
+      <button id="btnDoImport">นำเข้า</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+/* ====== ตั้งค่า URL ของ Apps Script ======
+   เมื่อหน้านี้ถูก serve โดย Apps Script เอง ตัวแปร scriptUrl จะถูกแทนค่าให้
+   ถ้าเปิดจาก GitHub Pages ให้กรอก URL ครั้งแรก (จำไว้ใน localStorage) */
+var SCRIPT_URL = "<?= scriptUrl ?>";
+if (!SCRIPT_URL || SCRIPT_URL.indexOf("script.google") === -1) {
+  SCRIPT_URL = localStorage.getItem('gradeScriptUrl') || '';
+  if (!SCRIPT_URL) {
+    SCRIPT_URL = prompt('วาง Web App URL ของ Google Apps Script:') || '';
+    if (SCRIPT_URL) localStorage.setItem('gradeScriptUrl', SCRIPT_URL);
+  }
+}
+
+/* ====== สถานะ ====== */
+var DB = {};            // ทุกชุด { key: data }
+var curKey = null;      // ชุดที่กำลังแก้
+var cur = null;         // data ของชุดปัจจุบัน
+var DEFAULT_COMPS = [
+  {id:'c1', name:'คะแนนเก็บก่อนกลางภาค', max:25, type:'เก็บ'},
+  {id:'c2', name:'สอบกลางภาค', max:20, type:'สอบ'},
+  {id:'c3', name:'คะแนนเก็บหลังกลางภาค', max:25, type:'เก็บ'},
+  {id:'c4', name:'สอบปลายภาค', max:30, type:'สอบ'}
+];
+// เติมประเภทให้ข้อมูลเก่าที่ยังไม่มี type (เดาจากชื่อ: มีคำว่า "สอบ" = สอบ, อื่น ๆ = เก็บ)
+function ensureTypes(comps){
+  (comps||[]).forEach(function(c){
+    if(!c.type) c.type = /สอบ/.test(c.name||'') ? 'สอบ' : 'เก็บ';
+  });
+  return comps;
+}
+function sumMaxByType(comps,type){var m=0;comps.forEach(function(c){if(c.type===type)m+=Number(c.max)||0;});return Math.round(m*100)/100;}
+function studentSubtotal(s,comps,type){
+  var t=0; comps.forEach(function(c){ if(c.type===type){var v=Number(s.scores&&s.scores[c.id]); if(!isNaN(v))t+=v;} });
+  return Math.round(t*100)/100;
+}
+
+/* ====== ตัดเกรด 8 ระดับ ====== */
+function calcGrade(total){
+  var t = Number(total)||0;
+  if(t>=80)return 4; if(t>=75)return 3.5; if(t>=70)return 3; if(t>=65)return 2.5;
+  if(t>=60)return 2; if(t>=55)return 1.5; if(t>=50)return 1; return 0;
+}
+function gradeClass(g){
+  return {4:'g4','3.5':'g35',3:'g3','2.5':'g25',2:'g2','1.5':'g15',1:'g1',0:'g0'}[g]||'g0';
+}
+function studentTotal(s,comps){
+  var t=0; comps.forEach(function(c){ var v=Number(s.scores&&s.scores[c.id]); if(!isNaN(v))t+=v; });
+  return Math.round(t*100)/100;
+}
+
+/* ====== เรียก API ====== */
+function api(params){
+  var url = SCRIPT_URL + '?' + Object.keys(params).map(function(k){
+    return k+'='+encodeURIComponent(params[k]);
+  }).join('&');
+  return fetch(url).then(function(r){return r.json();});
+}
+function setStatus(msg,cls){
+  var el=document.getElementById('status'); el.textContent=msg;
+  el.className = cls||'';
+}
+
+/* ====== โหลดข้อมูลทั้งหมด ====== */
+function loadAll(){
+  if(!SCRIPT_URL){ setStatus('⚠️ ยังไม่ได้ตั้งค่า URL'); return; }
+  setStatus('⏳ กำลังโหลด…');
+  api({action:'getAll'}).then(function(res){
+    if(res.success){
+      DB = res.data||{};
+      setStatus('✅ เชื่อมต่อแล้ว ('+Object.keys(DB).length+' ชุด)','ok');
+      refreshLists();
+    } else { setStatus('❌ '+res.error,'err'); }
+  }).catch(function(e){ setStatus('❌ เชื่อมต่อไม่ได้','err'); });
+}
+
+function refreshLists(){
+  var rooms={},subs={};
+  Object.keys(DB).forEach(function(k){
+    var d=DB[k]; if(d.room)rooms[d.room]=1; if(d.subject)subs[d.subject]=1;
+  });
+  document.getElementById('roomList').innerHTML =
+    Object.keys(rooms).map(function(r){return '<option value="'+r+'">';}).join('');
+  document.getElementById('subjList').innerHTML =
+    Object.keys(subs).map(function(s){return '<option value="'+s+'">';}).join('');
+}
+
+/* ====== เปิด/สร้างชุด ====== */
+function openSet(){
+  var room=document.getElementById('room').value.trim();
+  var subject=document.getElementById('subject').value.trim();
+  if(!room||!subject){ alert('กรุณากรอกห้องและรายวิชา'); return; }
+  curKey = room+'|'+subject;
+  if(DB[curKey]){
+    cur = DB[curKey];
+    if(!cur.components||!cur.components.length) cur.components=JSON.parse(JSON.stringify(DEFAULT_COMPS));
+    ensureTypes(cur.components);
+    if(!cur.students) cur.students=[];
+  } else {
+    cur = {room:room, subject:subject,
+      components:JSON.parse(JSON.stringify(DEFAULT_COMPS)), students:[]};
+    DB[curKey]=cur;
+  }
+  cur.room=room; cur.subject=subject;
+  document.getElementById('curLabel').textContent = room+' · '+subject+' ('+cur.students.length+' คน)';
+  renderTable(); renderComps();
+}
+
+/* ====== ตารางกรอกคะแนน ====== */
+function renderTable(){
+  if(!cur){return;}
+  var comps=cur.components;
+  var thead=document.querySelector('#scoreTable thead');
+  var tbody=document.querySelector('#scoreTable tbody');
+  var maxK=sumMaxByType(comps,'เก็บ'), maxS=sumMaxByType(comps,'สอบ');
+  var h='<tr><th>เลขที่</th><th class="name">ชื่อ-สกุล</th>';
+  comps.forEach(function(c){
+    var tag = c.type==='สอบ'?'<span class="tag-s">สอบ</span>':'<span class="tag-k">เก็บ</span>';
+    h+='<th class="'+(c.type==='สอบ'?'col-s':'col-k')+'">'+c.name+'<br>'+tag+'<span class="muted"> ('+c.max+')</span></th>';
+  });
+  h+='<th class="col-k">รวมเก็บ<br><span class="muted">('+maxK+')</span></th>'+
+     '<th class="col-s">รวมสอบ<br><span class="muted">('+maxS+')</span></th>'+
+     '<th>รวม</th><th>เกรด</th><th></th></tr>';
+  thead.innerHTML=h;
+
+  tbody.innerHTML='';
+  cur.students.forEach(function(s,i){
+    if(!s.scores)s.scores={};
+    var tr=document.createElement('tr');
+    var html='<td><input value="'+(s.no||'')+'" style="width:48px" data-i="'+i+'" data-f="no"></td>'+
+      '<td class="name"><input value="'+escapeHtml(s.name||'')+'" data-i="'+i+'" data-f="name"></td>';
+    comps.forEach(function(c){
+      var v=(s.scores[c.id]==null)?'':s.scores[c.id];
+      html+='<td class="'+(c.type==='สอบ'?'col-s':'col-k')+'"><input class="score" type="number" min="0" max="'+c.max+'" value="'+v+'" data-i="'+i+'" data-c="'+c.id+'"></td>';
+    });
+    var subK=studentSubtotal(s,comps,'เก็บ'), subS=studentSubtotal(s,comps,'สอบ');
+    var tot=studentTotal(s,comps); var g=calcGrade(tot);
+    html+='<td class="subK col-k">'+subK+'</td><td class="subS col-s">'+subS+'</td>'+
+      '<td class="total">'+tot+'</td><td><span class="grade '+gradeClass(g)+'">'+g+'</span></td>'+
+      '<td><button class="danger small" data-del="'+i+'">✕</button></td>';
+    tr.innerHTML=html; tbody.appendChild(tr);
+  });
+}
+function escapeHtml(s){return String(s).replace(/[&<>"]/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+
+/* อัปเดตค่าเมื่อพิมพ์ */
+document.querySelector('#scoreTable').addEventListener('input',function(e){
+  var t=e.target; var i=t.getAttribute('data-i'); if(i==null)return;
+  i=Number(i); var s=cur.students[i];
+  if(t.getAttribute('data-c')){
+    var c=t.getAttribute('data-c'); var max=getCompMax(c);
+    var v=t.value===''?'':Math.min(Number(t.value),max);
+    if(v!==''&&Number(t.value)>max)t.value=max;
+    s.scores[c]= t.value===''?'':Number(t.value);
+    // อัปเดตรวม+เกรดในแถวนั้น
+    var tr=t.closest('tr');
+    var tot=studentTotal(s,cur.components); var g=calcGrade(tot);
+    tr.querySelector('.subK').textContent=studentSubtotal(s,cur.components,'เก็บ');
+    tr.querySelector('.subS').textContent=studentSubtotal(s,cur.components,'สอบ');
+    tr.querySelector('.total').textContent=tot;
+    var ge=tr.querySelector('.grade'); ge.textContent=g; ge.className='grade '+gradeClass(g);
+  } else {
+    s[t.getAttribute('data-f')]=t.value;
+  }
+});
+document.querySelector('#scoreTable').addEventListener('click',function(e){
+  var d=e.target.getAttribute('data-del'); if(d==null)return;
+  if(confirm('ลบนักเรียนคนนี้?')){ cur.students.splice(Number(d),1); renderTable(); updateLabel(); }
+});
+function getCompMax(cid){var m=0;cur.components.forEach(function(c){if(c.id===cid)m=c.max;});return m;}
+function updateLabel(){
+  if(cur)document.getElementById('curLabel').textContent=cur.room+' · '+cur.subject+' ('+cur.students.length+' คน)';
+}
+
+/* ====== เพิ่ม / นำเข้า นักเรียน ====== */
+document.getElementById('btnAddStudent').onclick=function(){
+  if(!cur){alert('เปิดชุดคะแนนก่อน');return;}
+  cur.students.push({no:cur.students.length+1,name:'',scores:{}});
+  renderTable(); updateLabel();
+};
+document.getElementById('btnImport').onclick=function(){
+  if(!cur){alert('เปิดชุดคะแนนก่อน');return;}
+  document.getElementById('importDlg').showModal();
+};
+document.getElementById('btnDoImport').onclick=function(){
+  var txt=document.getElementById('importText').value.trim();
+  if(!txt){document.getElementById('importDlg').close();return;}
+  txt.split('\n').forEach(function(line){
+    line=line.trim(); if(!line)return;
+    var parts=line.split(/[\t,]/);
+    var no,name;
+    if(parts.length>=2){ no=parts[0].trim(); name=parts.slice(1).join(',').trim(); }
+    else { no=cur.students.length+1; name=parts[0].trim(); }
+    cur.students.push({no:no,name:name,scores:{}});
+  });
+  document.getElementById('importText').value='';
+  document.getElementById('importDlg').close();
+  renderTable(); updateLabel();
+};
+
+/* ====== บันทึก ====== */
+document.getElementById('btnSave').onclick=function(){
+  if(!cur){alert('เปิดชุดคะแนนก่อน');return;}
+  setStatus('⏳ กำลังบันทึก…');
+  api({action:'save',key:curKey,data:JSON.stringify(cur)}).then(function(res){
+    if(res.success){ setStatus('✅ บันทึกแล้ว','ok'); DB[curKey]=cur; refreshLists(); }
+    else setStatus('❌ '+res.error,'err');
+  }).catch(function(){ setStatus('❌ บันทึกไม่สำเร็จ','err'); });
+};
+
+/* ====== ลบชุด ====== */
+document.getElementById('btnDelete').onclick=function(){
+  if(!curKey||!DB[curKey]){alert('ยังไม่ได้เปิดชุด');return;}
+  if(!confirm('ลบชุด "'+curKey+'" ทั้งหมด?'))return;
+  api({action:'delete',key:curKey}).then(function(res){
+    if(res.success){ delete DB[curKey]; cur=null; curKey=null;
+      document.querySelector('#scoreTable thead').innerHTML='';
+      document.querySelector('#scoreTable tbody').innerHTML='';
+      document.getElementById('curLabel').textContent='— ยังไม่ได้เลือกชุด —';
+      setStatus('🗑️ ลบแล้ว','ok'); refreshLists();
+    } else setStatus('❌ '+res.error,'err');
+  });
+};
+
+/* ====== องค์ประกอบ (setup) ====== */
+function renderComps(){
+  var box=document.getElementById('compList'); box.innerHTML='';
+  var comps = cur?cur.components:DEFAULT_COMPS;
+  comps.forEach(function(c,i){
+    var t=c.type||'เก็บ';
+    var div=document.createElement('div'); div.className='comp-row';
+    div.innerHTML='<input class="cname" value="'+escapeHtml(c.name)+'" data-i="'+i+'" data-f="name">'+
+      '<select class="ctype" data-i="'+i+'" data-f="type">'+
+        '<option value="เก็บ"'+(t==='เก็บ'?' selected':'')+'>เก็บคะแนน</option>'+
+        '<option value="สอบ"'+(t==='สอบ'?' selected':'')+'>สอบ</option>'+
+      '</select>'+
+      '<input class="cmax" type="number" min="0" value="'+c.max+'" data-i="'+i+'" data-f="max">'+
+      '<button class="danger small" data-delc="'+i+'">✕</button>';
+    box.appendChild(div);
+  });
+  sumComps();
+}
+function sumComps(){
+  var comps=cur?cur.components:DEFAULT_COMPS;
+  var s=0; comps.forEach(function(c){s+=Number(c.max)||0;});
+  var mk=sumMaxByType(comps,'เก็บ'), ms=sumMaxByType(comps,'สอบ');
+  var el=document.getElementById('compSum');
+  el.textContent='รวม: '+s+' / 100  (เก็บ '+mk+' : สอบ '+ms+')';
+  el.style.background = s===100?'var(--green-l)':'#ffe3e0';
+  el.style.color = s===100?'var(--green-d)':'var(--warn)';
+  return s;
+}
+function compEdit(e){
+  var i=e.target.getAttribute('data-i'); if(i==null)return;
+  var comps=cur?cur.components:DEFAULT_COMPS;
+  var f=e.target.getAttribute('data-f');
+  comps[Number(i)][f]= f==='max'?Number(e.target.value):e.target.value;
+  sumComps();
+}
+document.getElementById('compList').addEventListener('input',compEdit);
+document.getElementById('compList').addEventListener('change',compEdit);
+document.getElementById('compList').addEventListener('click',function(e){
+  var d=e.target.getAttribute('data-delc'); if(d==null)return;
+  var comps=cur?cur.components:DEFAULT_COMPS;
+  comps.splice(Number(d),1); renderComps();
+});
+document.getElementById('btnAddComp').onclick=function(){
+  var comps=cur?cur.components:DEFAULT_COMPS;
+  comps.push({id:'c'+Date.now(),name:'องค์ประกอบใหม่',max:0}); renderComps();
+};
+document.getElementById('btnSaveComp').onclick=function(){
+  var s=sumComps();
+  if(s!==100){ if(!confirm('ผลรวม = '+s+' (ไม่เท่ากับ 100) ต้องการใช้ต่อหรือไม่?'))return; }
+  if(cur){ renderTable(); alert('อัปเดตองค์ประกอบแล้ว — อย่าลืมกดบันทึก'); }
+};
+
+/* ====== สรุปผล ====== */
+function renderSummary(){
+  var grid=document.getElementById('statGrid');
+  var bar=document.getElementById('barWrap');
+  var rt_h=document.querySelector('#resultTable thead');
+  var rt_b=document.querySelector('#resultTable tbody');
+  document.getElementById('sumLabel').textContent = cur?('— '+cur.room+' · '+cur.subject):'';
+  if(!cur||!cur.students.length){
+    grid.innerHTML='<div class="muted">ยังไม่มีข้อมูล เปิดชุดคะแนนและกรอกก่อน</div>';
+    bar.innerHTML=''; rt_h.innerHTML=''; rt_b.innerHTML=''; return;
+  }
+  var comps=cur.components;
+  var grades=[4,3.5,3,2.5,2,1.5,1,0];
+  var dist={}; grades.forEach(function(g){dist[g]=0;});
+  var sumG=0,n=0,pass=0,sumK=0,sumS=0;
+  cur.students.forEach(function(s){
+    var tot=studentTotal(s,comps); var g=calcGrade(tot);
+    dist[g]++; sumG+=g; n++; if(g>=1)pass++;
+    sumK+=studentSubtotal(s,comps,'เก็บ'); sumS+=studentSubtotal(s,comps,'สอบ');
+  });
+  var gpa=n?(sumG/n):0;
+  var maxK=sumMaxByType(comps,'เก็บ'), maxS=sumMaxByType(comps,'สอบ');
+  grid.innerHTML=
+    stat(n,'นักเรียน')+stat(gpa.toFixed(2),'เกรดเฉลี่ย (GPA)')+
+    stat(pass,'ผ่าน (เกรด ≥1)')+stat(n-pass,'ติด 0')+
+    stat((n?(sumK/n):0).toFixed(1)+' / '+maxK,'เฉลี่ยคะแนนเก็บ')+
+    stat((n?(sumS/n):0).toFixed(1)+' / '+maxS,'เฉลี่ยคะแนนสอบ')+
+    stat(dist[4],'ได้เกรด 4');
+  // bar
+  var max=Math.max.apply(null,grades.map(function(g){return dist[g];}))||1;
+  bar.innerHTML=grades.map(function(g){
+    var h=Math.round(dist[g]/max*160);
+    return '<div class="bar-col"><div class="bar '+gradeClass(g)+'" style="height:'+(h+2)+'px">'+
+      (dist[g]||'')+'</div><div class="bar-label">'+g+'</div></div>';
+  }).join('');
+  // table
+  var h='<tr><th>เลขที่</th><th class="name">ชื่อ-สกุล</th>';
+  comps.forEach(function(c){h+='<th class="'+(c.type==='สอบ'?'col-s':'col-k')+'">'+c.name+'</th>';});
+  h+='<th class="col-k">รวมเก็บ</th><th class="col-s">รวมสอบ</th><th>รวม</th><th>เกรด</th></tr>'; rt_h.innerHTML=h;
+  rt_b.innerHTML=cur.students.map(function(s){
+    var tot=studentTotal(s,comps); var g=calcGrade(tot);
+    var r='<tr><td>'+(s.no||'')+'</td><td class="name">'+escapeHtml(s.name||'')+'</td>';
+    comps.forEach(function(c){r+='<td class="'+(c.type==='สอบ'?'col-s':'col-k')+'">'+(s.scores[c.id]==null?'':s.scores[c.id])+'</td>';});
+    r+='<td class="col-k">'+studentSubtotal(s,comps,'เก็บ')+'</td><td class="col-s">'+studentSubtotal(s,comps,'สอบ')+'</td>'+
+       '<td>'+tot+'</td><td><span class="grade '+gradeClass(g)+'">'+g+'</span></td></tr>';
+    return r;
+  }).join('');
+}
+function stat(num,cap){return '<div class="stat"><div class="num">'+num+'</div><div class="cap">'+cap+'</div></div>';}
+
+/* CSV */
+document.getElementById('btnCsv').onclick=function(){
+  if(!cur||!cur.students.length){alert('ไม่มีข้อมูล');return;}
+  var comps=cur.components;
+  var rows=[['เลขที่','ชื่อ-สกุล'].concat(comps.map(function(c){return c.name+' ('+c.type+')';})).concat(['รวมเก็บ','รวมสอบ','รวม','เกรด'])];
+  cur.students.forEach(function(s){
+    var tot=studentTotal(s,comps);
+    rows.push([s.no||'',s.name||''].concat(comps.map(function(c){return s.scores[c.id]==null?'':s.scores[c.id];}))
+      .concat([studentSubtotal(s,comps,'เก็บ'),studentSubtotal(s,comps,'สอบ'),tot,calcGrade(tot)]));
+  });
+  var csv='﻿'+rows.map(function(r){return r.map(function(x){return '"'+String(x).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+  var blob=new Blob([csv],{type:'text/csv'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=(cur.room+'_'+cur.subject+'.csv'); a.click();
+};
+
+/* ====== แท็บ ====== */
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+    t.classList.add('active');
+    var name=t.getAttribute('data-tab');
+    ['entry','summary','setup'].forEach(function(s){
+      document.getElementById('tab-'+s).classList.toggle('hide',s!==name);
+    });
+    if(name==='summary')renderSummary();
+    if(name==='setup')renderComps();
+  };
+});
+
+document.getElementById('btnLoad').onclick=openSet;
+
+/* เริ่ม */
+loadAll();
+renderComps();
+</script>
+</body>
+</html>

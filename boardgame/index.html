@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ครูนิวตรอน บอร์ดเกม คลับ - แหล่งรวมบอร์ดเกมพัฒนาสมอง</title>
+    <meta name="description" content="แหล่งรวบรวมบอร์ดเกมพัฒนาสมองสุดสร้างสรรค์โดยครูนิวตรอน เล่นสนุก ลับสมอง พัฒนากระบวนการคิดอย่างเป็นระบบ">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="games/forbidden-word/style.css">
+</head>
+<body>
+    <!-- Background Elements for Premium Vibe -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    <div class="bg-glow bg-glow-3"></div>
+
+    <!-- Main Container -->
+    <div class="app-container" id="main-hub-layout">
+        
+        <!-- Header Section -->
+        <header class="main-header" style="position: relative;">
+            <a href="../index.html" style="position: absolute; top: 16px; right: 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; padding: 8px 16px; color: #fff; font-family: 'Sarabun', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; z-index: 10; backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255,255,255,0.12)'; this.style.borderColor='rgba(255,255,255,0.25)';" onmouseout="this.style.background='rgba(255,255,255,0.06)'; this.style.borderColor='rgba(255,255,255,0.12)';">
+                🏠 กลับหน้าหลัก
+            </a>
+            <div class="header-logo">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="2" y="2" width="20" height="20" rx="6" stroke="url(#logoGrad)" stroke-width="2.5" fill="rgba(15, 23, 42, 0.6)"/>
+                    <path d="M12 7V17M7 12H17" stroke="url(#logoGrad)" stroke-width="2.5" stroke-linecap="round"/>
+                    <circle cx="7" cy="7" r="1.5" fill="var(--color-primary)"/>
+                    <circle cx="17" cy="17" r="1.5" fill="var(--color-secondary)"/>
+                    <circle cx="17" cy="7" r="1.5" fill="var(--color-accent)"/>
+                    <circle cx="7" cy="17" r="1.5" fill="var(--color-emerald)"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="var(--color-primary)"/>
+                            <stop offset="50%" stop-color="var(--color-secondary)"/>
+                            <stop offset="100%" stop-color="var(--color-accent)"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="logo-text">
+                    <h1>ครูนิวตรอน.com</h1>
+                    <span>BOARD GAME HUB</span>
+                </div>
+            </div>
+            
+            <div class="header-tagline">
+                <h2>แหล่งรวมบอร์ดเกมพัฒนาสมอง ครูนิวตรอน</h2>
+                <p>สนุกสนาน ลับสมอง และเรียนรู้ทักษะการคิดอย่างเป็นระบบผ่านบอร์ดเกมคุณภาพ</p>
+            </div>
+        </header>
+
+        <!-- Stats Bar -->
+        <section class="stats-bar">
+            <div class="stat-card">
+                <span class="stat-value" id="statGamesCount">7</span>
+                <span class="stat-label">เกมทั้งหมด</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statTotalPlays">0</span>
+                <span class="stat-label">จำนวนการเล่น</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value" id="statAvgRating">4.9</span>
+                <span class="stat-label">คะแนนความพึงพอใจ</span>
+            </div>
+        </section>
+
+        <!-- Games Grid Section -->
+        <main class="games-section">
+            <h3 class="section-title">เลือกบอร์ดเกมที่ต้องการเล่น</h3>
+            
+            <div class="games-grid">
+                <!-- Spy Agent Card -->
+                <a href="games/spy/index.html" class="game-card">
+                    <div class="game-card-bg"></div>
+                    <div class="game-badge difficulty-medium" style="border-color:var(--color-accent); color:var(--color-accent); background:rgba(244,63,94,0.15)">มัลติเพลเยอร์</div>
+                    <div class="game-icon">
+                        <!-- Spy Custom SVG Icon -->
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="64" height="64" rx="16" fill="rgba(15, 23, 42, 0.8)"/>
+                            <!-- Hat -->
+                            <path d="M14 38C14 34 19 34 22 34C22 30 26 26 32 26C38 26 42 30 42 34C45 34 50 34 50 38" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Glasses -->
+                            <circle cx="25" cy="44" r="5" stroke="var(--color-accent)" stroke-width="2.5"/>
+                            <circle cx="39" cy="44" r="5" stroke="var(--color-accent)" stroke-width="2.5"/>
+                            <line x1="30" y1="44" x2="34" y2="44" stroke="var(--color-accent)" stroke-width="2.5"/>
+                            <!-- Magnifying Glass -->
+                            <circle cx="44" cy="20" r="7" stroke="var(--color-secondary)" stroke-width="2.5"/>
+                            <line x1="49" y1="25" x2="54" y2="30" stroke="var(--color-secondary)" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h4>Spy Agent (สายลับจับผิด)</h4>
+                    <p>บอร์ดเกมเล่นออนไลน์ร่วมกันเรียลไทม์! สืบหาผู้แฝงตัวผ่านเบาะแสสถานที่ลับ 100 แห่ง ปลอดภัยด้วยระบบสแกนนิ้วมือถอดรหัสลับประจำเครื่อง</p>
+                    <div class="game-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            3-30 ผู้เล่น
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            3-15 นาที
+                        </span>
+                    </div>
+                    <button class="play-btn">เล่นเกมนี้</button>
+                </a>
+
+                <!-- Werewolf Agent Card -->
+                <a href="games/werewolf/index.html" class="game-card">
+                    <div class="game-card-bg"></div>
+                    <div class="game-badge difficulty-medium" style="border-color:var(--color-accent); color:var(--color-accent); background:rgba(244,63,94,0.15)">มัลติเพลเยอร์</div>
+                    <div class="game-icon">
+                        <!-- Werewolf Custom SVG Icon -->
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="64" height="64" rx="16" fill="rgba(15, 23, 42, 0.8)"/>
+                            <!-- Moon -->
+                            <circle cx="44" cy="20" r="8" fill="#fbbf24" filter="drop-shadow(0 0 8px rgba(251,191,36,0.6))"/>
+                            <!-- Werewolf silhouette -->
+                            <path d="M16 48C16 42 22 36 28 36C31 36 34 38 36 40C37 38 39 36 42 36C48 36 54 42 54 48" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Ears/Fangs -->
+                            <path d="M22 30L26 36M42 30L38 36" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round"/>
+                            <!-- Glowing eyes -->
+                            <circle cx="28" cy="42" r="1.5" fill="var(--color-accent)" filter="drop-shadow(0 0 2px var(--color-accent))"/>
+                            <circle cx="36" cy="42" r="1.5" fill="var(--color-accent)" filter="drop-shadow(0 0 2px var(--color-accent))"/>
+                        </svg>
+                    </div>
+                    <h4>Werewolf Agent (คืนล่าหมาป่า)</h4>
+                    <p>บอร์ดเกมบลัฟล่าหมาป่าเรียลไทม์! ค้นหาผู้แฝงตัวไร้ผู้ดำเนินเกม (No Host) ด้วยโฮสต์เสียงไทยอัตโนมัติและจอล็อกมืดกันโกงเป๊ะทุกเครื่อง</p>
+                    <div class="game-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            3-10 ผู้เล่น
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            5-10 นาที
+                        </span>
+                    </div>
+                    <button class="play-btn">เล่นเกมนี้</button>
+                </a>
+
+                <!-- Forbidden Word Card -->
+                <a href="javascript:void(0)" onclick="openForbiddenWordGame()" class="game-card">
+                    <div class="game-card-bg"></div>
+                    <div class="game-badge difficulty-medium" style="border-color:var(--color-accent); color:var(--color-accent); background:rgba(244,63,94,0.15)">มัลติเพลเยอร์</div>
+                    <div class="game-icon">
+                        <!-- Forbidden Word Custom SVG Icon -->
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="64" height="64" rx="16" fill="rgba(15, 23, 42, 0.8)"/>
+                            <!-- Speech bubble -->
+                            <path d="M18 40V46L26 40H44C47.3 40 50 37.3 50 34V22C50 18.7 47.3 16 44 16H20C16.7 16 14 18.7 14 22V34C14 37.3 16.7 40 20 40H18Z" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <!-- Red Cross over bubble -->
+                            <path d="M26 24L38 32M38 24L26 32" stroke="#ef4444" stroke-width="3" stroke-linecap="round" filter="drop-shadow(0 0 4px #ef4444)"/>
+                        </svg>
+                    </div>
+                    <h4>Forbidden Word (เกมคำต้องห้าม)</h4>
+                    <p>บอร์ดเกมปาร์ตี้สุดฮาเรียลไทม์! ใบ้คำ หลอกล่อ และแกล้งเพื่อนให้พูดคำต้องห้ามประจำตัวโดยที่ตนเองไม่รู้ตัว เล่นสนุกได้ตั้งแต่ 2 คนขึ้นไป</p>
+                    <div class="game-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            2-10 ผู้เล่น
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            3-10 นาที
+                        </span>
+                    </div>
+                    <button class="play-btn">เล่นเกมนี้</button>
+                </a>
+
+                <!-- Reversi / Othello Card -->
+                <a href="games/othello/index.html" class="game-card">
+                    <div class="game-card-bg"></div>
+                    <div class="game-badge difficulty-medium">ระดับ: กลาง</div>
+                    <div class="game-icon">
+                        <!-- Othello Custom SVG Icon -->
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="64" height="64" rx="16" fill="rgba(15, 23, 42, 0.8)"/>
+                            <rect x="8" y="8" width="48" height="48" rx="8" stroke="var(--color-primary)" stroke-width="1.5" stroke-dasharray="4 2"/>
+                            <circle cx="24" cy="24" r="10" fill="#FFFFFF" filter="drop-shadow(0 0 8px rgba(255,255,255,0.4))"/>
+                            <circle cx="40" cy="40" r="10" fill="#1E293B" stroke="#64748B" stroke-width="2" filter="drop-shadow(0 0 8px rgba(0,0,0,0.6))"/>
+                            <circle cx="40" cy="24" r="10" fill="#FFFFFF" fill-opacity="0.3" stroke="#FFFFFF" stroke-width="1.5" stroke-dasharray="2 2"/>
+                            <circle cx="24" cy="40" r="10" fill="#1E293B" stroke="var(--color-primary)" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h4>โอเทลโล่ (Othello)</h4>
+                    <p>เกมกระดานสุดคลาสสิก วางหมากล้อมและพลิกหมากของคู่ต่อสู้เพื่อครองกระดาน คิดล่วงหน้าและวางกลยุทธ์!</p>
+                    <div class="game-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            1-2 ผู้เล่น
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            10-15 นาที
+                        </span>
+                    </div>
+                    <button class="play-btn">เล่นเกมนี้</button>
+                </a>
+
+                <!-- Connect Four Card -->
+                <a href="games/connect4/index.html" class="game-card">
+                    <div class="game-card-bg"></div>
+                    <div class="game-badge difficulty-easy">ระดับ: ง่าย</div>
+                    <div class="game-icon">
+                        <!-- Connect Four Custom SVG Icon -->
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="64" height="64" rx="16" fill="rgba(15, 23, 42, 0.8)"/>
+                            <rect x="10" y="14" width="44" height="36" rx="4" fill="#1E293B" stroke="var(--color-secondary)" stroke-width="2"/>
+                            <circle cx="20" cy="23" r="4" fill="var(--color-secondary)" />
+                            <circle cx="32" cy="23" r="4" fill="rgba(255,255,255,0.1)" />
+                            <circle cx="44" cy="23" r="4" fill="rgba(255,255,255,0.1)" />
+                            <circle cx="20" cy="32" r="4" fill="var(--color-accent)" />
+                            <circle cx="32" cy="32" r="4" fill="var(--color-secondary)" />
+                            <circle cx="44" cy="32" r="4" fill="rgba(255,255,255,0.1)" />
+                            <circle cx="20" cy="41" r="4" fill="var(--color-accent)" />
+                            <circle cx="32" cy="41" r="4" fill="var(--color-accent)" />
+                            <circle cx="44" cy="41" r="4" fill="var(--color-secondary)" />
+                            <!-- Drop arrow -->
+                            <path d="M32 4V10M32 10L28 7M32 10L36 7" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h4>ต่อสี่ชี้ชะตา (Connect 4)</h4>
+                    <p>หยอดเหรียญสีของคุณลงในกระดานแนวตั้ง แข่งขันเรียงเหรียญของตัวเองให้ครบ 4 เหรียญในแนวตั้ง แนวนอน หรือแนวทแยง</p>
+                    <div class="game-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            1-2 ผู้เล่น
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            5-10 นาที
+                        </span>
+                    </div>
+                    <button class="play-btn">เล่นเกมนี้</button>
+                </a>
+
+                <!-- Tic-Tac-Toe Card -->
+                <a href="games/tictactoe/index.html" class="game-card">
+                    <div class="game-card-bg"></div>
+                    <div class="game-badge difficulty-easy">ระดับ: ง่ายมาก</div>
+                    <div class="game-icon">
+                        <!-- Tic Tac Toe Custom SVG Icon -->
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="64" height="64" rx="16" fill="rgba(15, 23, 42, 0.8)"/>
+                            <line x1="24" y1="12" x2="24" y2="52" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="40" y1="12" x2="40" y2="52" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="12" y1="24" x2="52" y2="24" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="12" y1="40" x2="52" y2="40" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+                            <!-- X -->
+                            <line x1="15" y1="15" x2="21" y2="21" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round"/>
+                            <line x1="21" y1="15" x2="15" y2="21" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round"/>
+                            <!-- O -->
+                            <circle cx="32" cy="32" r="4.5" stroke="var(--color-accent)" stroke-width="2.5"/>
+                            <!-- X 2 -->
+                            <line x1="43" y1="43" x2="49" y2="49" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round"/>
+                            <line x1="49" y1="43" x2="43" y2="49" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h4>โอ-เอ็กซ์ (Tic-Tac-Toe)</h4>
+                    <p>เกมเรียง 3 คลาสสิกยอดนิยมสำหรับผู้เริ่มต้นประลองไหวพริบอย่างรวดเร็ว สามารถประลองกับ AI สุดฉลาดได้</p>
+                    <div class="game-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            1-2 ผู้เล่น
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            1-3 นาที
+                        </span>
+                    </div>
+                    <button class="play-btn">เล่นเกมนี้</button>
+                </a>
+
+                <!-- Memory Card Match Card -->
+                <a href="games/memory/index.html" class="game-card">
+                    <div class="game-card-bg"></div>
+                    <div class="game-badge difficulty-medium">ระดับ: กลาง</div>
+                    <div class="game-icon">
+                        <!-- Memory Card Custom SVG Icon -->
+                        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="64" height="64" rx="16" fill="rgba(15, 23, 42, 0.8)"/>
+                            <!-- Card 1 -->
+                            <rect x="14" y="16" width="16" height="24" rx="3" fill="var(--color-emerald)" stroke="#FFFFFF" stroke-width="1.5" transform="rotate(-8 22 28)"/>
+                            <!-- Card 2 -->
+                            <rect x="36" y="20" width="16" height="24" rx="3" fill="var(--color-accent)" stroke="#FFFFFF" stroke-width="1.5" transform="rotate(12 44 32)"/>
+                            <!-- Question mark or match symbol on card -->
+                            <circle cx="44" cy="30" r="3" fill="#FFFFFF"/>
+                        </svg>
+                    </div>
+                    <h4>เกมการ์ดจับคู่ (Memory Match)</h4>
+                    <p>ฝึกฝนความจำและสมาธิไปกับการจับคู่ภาพบอร์ดเกมและการศึกษา แข่งขันกับเวลาและทำคะแนนให้ดีที่สุด</p>
+                    <div class="game-meta">
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            1 ผู้เล่น
+                        </span>
+                        <span class="meta-item">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            3-5 นาที
+                        </span>
+                    </div>
+                    <button class="play-btn">เล่นเกมนี้</button>
+                </a>
+            </div>
+        </main>
+
+        <!-- Footer Section -->
+        <footer class="main-footer">
+            <p>ออกแบบและพัฒนาด้วยความใส่ใจ เพื่อการเรียนรู้ของทุกคน</p>
+            <p class="copyright">&copy; 2026 ครูนิวตรอน บอร์ดเกม คลับ. สงวนลิขสิทธิ์ทั้งหมด.</p>
+        </footer>
+    </div>
+
+    <!-- Forbidden Word Game Layout -->
+    <div id="forbidden-game-layout" style="display: none;">
+        <div class="stars-bg"></div>
+        <div class="ambient-glow"></div>
+
+        <div class="app-container">
+            <!-- HEADER -->
+            <header class="game-header">
+                <div class="logo">
+                    <span class="game-logo-icon">🤫</span>
+                    <h1 class="glitch-text" data-text="FORBIDDEN WORD">FORBIDDEN WORD</h1>
+                </div>
+                <p class="subtitle">เกมสุ่มคำต้องห้ามแบบผู้เล่นหลายคน (Serverless)</p>
+            </header>
+
+            <!-- PROTOCOL WARNING FOR FILE:// -->
+            <div id="protocol-warning" class="card warning-card-alert" style="display: none; margin-bottom: 24px; position: relative; border-left: 4px solid var(--warning-color) !important;">
+                <button onclick="document.getElementById('protocol-warning').style.display='none'" style="position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: color 0.2s;" onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='var(--text-muted)'">✕</button>
+                <h3 style="color: var(--warning-color); margin-bottom: 8px; padding-right: 20px;">💡 คำแนะนำสำหรับการเล่นแบบ Local</h3>
+                <p style="font-size: 0.9rem; color: var(--text-main); line-height: 1.5; margin-bottom: 8px;">
+                    คุณเปิดไฟล์ HTML โดยตรงในเครื่อง ซึ่งสามารถเชื่อมต่อระบบเล่นร่วมกันและทดสอบได้ตามปกติ แต่อาจไม่สะดวกในการแชร์ QR Code เพื่อชวนเพื่อนเล่นผ่านโทรศัพท์มือถือ
+                </p>
+                <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                    <strong>วิธีเล่นกับเพื่อน:</strong> ให้ผู้เล่นเปิดหน้าเว็บนี้แล้วนำ <strong>รหัสห้อง 4 หลัก</strong> ไปกรอกเข้าร่วมเล่นเกม หรือจำลองเซิร์ฟเวอร์เพื่อความสะดวก
+                </p>
+            </div>
+
+            <!-- WELCOME SCREEN -->
+            <section id="screen-welcome" class="screen active">
+                <div class="card welcome-card">
+                    <h2 style="text-align: center; margin-bottom: 20px; font-weight: 600;">เข้าเล่นเกมคำต้องห้าม</h2>
+                    
+                    <div class="input-group">
+                        <label for="input-player-name">ชื่อผู้เล่น (Name)</label>
+                        <input type="text" id="input-player-name" placeholder="กรอกชื่อของคุณ (เช่น นิวตรอน)" maxlength="12" autocomplete="off">
+                    </div>
+
+                    <hr class="divider" style="margin: 20px 0;">
+
+                    <!-- JOIN GAME -->
+                    <div class="input-group">
+                        <label for="input-room-code">รหัสห้อง (Room Code)</label>
+                        <input type="text" id="input-room-code" placeholder="กรอกรหัส 4 หลัก (เช่น ABCD)" maxlength="4" autocomplete="off" style="text-transform: uppercase; text-align: center; font-size: 1.4rem; letter-spacing: 4px; font-weight: 600; color: var(--primary-color);">
+                    </div>
+                    <button id="btn-join-room" class="btn btn-primary" onclick="joinRoom()" style="margin-bottom: 12px;">เข้าร่วมห้อง</button>
+                    
+                    <div style="text-align: center; margin: 10px 0; color: var(--text-muted); font-size: 0.85rem;">หรือ</div>
+
+                    <!-- CREATE GAME -->
+                    <button id="btn-create-room" class="btn btn-accent" onclick="createRoom()">สร้างห้องใหม่</button>
+                    
+                    <!-- BACK TO MENU BUTTON -->
+                    <button class="btn btn-secondary btn-block" onclick="exitToHub()" style="margin-top: 12px;">🔙 กลับสู่หน้าแรกบอร์ดเกม</button>
+                </div>
+
+                <!-- RULES DOSSIER CARD -->
+                <div class="card welcome-card" style="margin-top: 20px; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;" onclick="toggleWelcomeRules()">
+                        <h3 style="font-size: 1.05rem; font-weight: 600; color: var(--accent-color); margin: 0;">📘 กติกาและวิธีการเล่น (คลิกแสดง)</h3>
+                        <span id="rules-toggle-icon" style="color: var(--accent-color); font-weight: bold; font-size: 1rem;">▼</span>
+                    </div>
+                    <div id="rules-content" style="display: none; margin-top: 16px; font-size: 0.85rem; line-height: 1.6; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 16px;">
+                        <h4 style="color: var(--text-main); margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">🎯 เป้าหมายของเกม:</h4>
+                        <p style="margin-bottom: 12px;">หลอกล่อให้เพื่อนพูด <strong>"คำต้องห้าม"</strong> ประจำตัวของเขาออกมาให้สำเร็จ โดยที่ตัวเราและทุกคนจะรู้คำต้องห้ามของเพื่อนทั้งหมด แต่จะไม่รู้คำของตัวเอง!</p>
+                        
+                        <h4 style="color: var(--text-main); margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">🕹️ โหมดการแสดงผล (สลับได้ตลอดเวลา):</h4>
+                        <ul style="margin-left: 16px; margin-bottom: 12px; list-style-type: disc; padding-left: 4px;">
+                            <li><strong>โหมดปกติ (ดูคำเพื่อน)</strong>: มองหน้าจอของตัวเอง จะแสดงคำต้องห้ามของเพื่อนทุกคน โดยคำของเราจะถูกซ่อนไว้</li>
+                            <li><strong>โmovedแปะหน้าผาก (แสดงคำตัวเอง)</strong>: กดสุ่มคำแล้วหันโทรศัพท์แปะหน้าผากตัวเองให้เพื่อนดู หน้าจอจะแสดงคำของเราขนาดใหญ่</li>
+                        </ul>
+
+                        <h4 style="color: var(--text-main); margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">🏁 กติกาแพ้ชนะ (ตามโหมด):</h4>
+                        <ul style="margin-left: 16px; list-style-type: disc; padding-left: 4px;">
+                            <li><strong>โหมดเอาชีวิตรอด</strong>: ถ้าคุณเผลอพูดคำต้องห้ามของตัวเอง แล้วเพื่อนจับได้ (โดยกดปุ่ม "จับได้แล้ว!" บนหน้าจอ) คุณจะตกรอบทันที ใครอยู่รอดคนสุดท้ายชนะ!</li>
+                            <li><strong>โหมดเก็บคะแนน</strong>: เมื่อพูดคำต้องห้ามจะถูกหัก 1 คะแนน และระบบจะสุ่มคำต้องห้ามใหม่ให้คุณทันทีเพื่อเล่นต่อ เมื่อเวลาหมดใครคะแนนสูงสุดชนะ!</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LOBBY SCREEN -->
+            <section id="screen-lobby" class="screen">
+                <div class="lobby-layout">
+                    <!-- Left Column: Room Code & Players -->
+                    <div class="host-main-panel" style="display: flex; flex-direction: column; gap: 20px;">
+                        <div class="card info-card">
+                            <div class="room-code-display">
+                                <span class="label">รหัสห้อง (Room Code)</span>
+                                <div class="code" id="lobby-code">----</div>
+                            </div>
+
+                            <!-- Host Specific Help -->
+                            <div class="connection-info" id="lobby-owner-info" style="display:none; width: 100%;">
+                                <p style="margin-bottom: 12px;">แชร์รหัสห้องด้านบนหรือสแกน QR Code เพื่อให้เพื่อนเข้าร่วม!</p>
+                                <div class="qr-container" id="lobby-qr-code" style="margin: 0 auto 16px auto;"></div>
+                                <span class="badge badge-owner">คุณคือผู้ควบคุมห้อง (Owner)</span>
+                            </div>
+                            
+                            <!-- Member Specific Waiting Screen -->
+                            <div class="connection-info" id="lobby-player-info" style="display:none;">
+                                <div class="radar-pulse"></div>
+                                <p class="pulse-text">กำลังรอเจ้าของห้องเริ่มสุ่มคำ...</p>
+                                <span class="badge badge-player" id="lobby-my-name-badge" style="margin-top: 8px;">ผู้เล่น: ...</span>
+                            </div>
+                        </div>
+
+                        <div class="card players-card">
+                            <h3>รายชื่อผู้เล่นในห้อง (<span id="lobby-players-count">0</span> คน)</h3>
+                            <div class="player-list-scroll">
+                                <ul id="lobby-players-list" class="player-grid">
+                                    <!-- Dynamic Player list -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Settings & Game controls -->
+                    <div class="host-side-panel">
+                        <div class="card settings-card">
+                            <h2>ตั้งค่าห้องเล่นเกม</h2>
+                            
+                            <!-- Game Mode Option -->
+                            <div class="setting-item">
+                                <label for="select-game-mode">โหมดการเล่น</label>
+                                <select id="select-game-mode" onchange="onSettingChanged()">
+                                    <option value="survival" selected>💀 เอาชีวิตรอด (พูดแล้วตกรอบ)</option>
+                                    <option value="score">🏆 เก็บคะแนน (พูดแล้วหักคะแนน/สุ่มใหม่)</option>
+                                </select>
+                            </div>
+
+                            <!-- Duration Option -->
+                            <div class="setting-item">
+                                <label>เวลาในการเล่น</label>
+                                <div class="range-display">
+                                    <input type="range" id="range-duration" min="2" max="15" value="5" step="1" oninput="updateDurationLabel(this.value)" onchange="onSettingChanged()">
+                                    <span id="lbl-duration" class="badge badge-mode">5 นาที</span>
+                                </div>
+                            </div>
+
+                            <!-- Word Categories Selection Grid -->
+                            <div class="setting-item">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 4px;">
+                                    <label>หมวดหมู่คำที่จะสุ่ม</label>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                        <span id="selected-categories-count">0</span> เลือกอยู่
+                                    </div>
+                                </div>
+                                <div class="categories-checkbox-grid" id="lobby-categories-list">
+                                    <!-- Generated Dynamically from words.js -->
+                                </div>
+                            </div>
+
+                            <div class="action-buttons" style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
+                                <button id="btn-start-game" class="btn btn-primary btn-block btn-lg" onclick="startGame()" style="display:none;">เริ่มสุ่มคำต้องห้าม 🚀</button>
+                                <button class="btn btn-secondary btn-block" onclick="leaveRoom()">ออกจากห้อง</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GAME SCREEN -->
+            <section id="screen-game" class="screen">
+                <div class="card game-card">
+                    <!-- Status bar with Timer and Info -->
+                    <div class="game-status-bar">
+                        <div class="game-timer-container">
+                            <svg class="timer-ring" width="50" height="50">
+                                <circle class="timer-ring__circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="3" fill="transparent" r="21" cx="25" cy="25"/>
+                                <circle class="timer-ring__circle" stroke="#f43f5e" stroke-width="3" fill="transparent" r="21" cx="25" cy="25"/>
+                            </svg>
+                            <span id="game-timer" class="timer-text">00:00</span>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="badge badge-mode" id="game-mode-indicator">โหมด: เอาชีวิตรอด</span>
+                            <span class="badge badge-player" id="game-player-name">ผู้เล่น: ...</span>
+                        </div>
+                    </div>
+
+                    <!-- MAIN WORKSPACE -->
+                    <div class="active-game-grid">
+                        <!-- Left: Word Card Grid -->
+                        <div class="words-panel">
+                            <h3 id="panel-game-instruction">คำต้องห้ามของเพื่อน (หลอกล่อให้เพื่อนพูดคำเหล่านี้):</h3>
+                            
+                            <div class="words-grid" id="game-words-grid">
+                                <!-- Dynamically generated word cards for players -->
+                            </div>
+                        </div>
+
+                        <!-- Right: Feed Log, Controls, End actions -->
+                        <div class="game-controls-panel">
+                            <!-- Switch Mode Button (Forehead vs Screen) -->
+                            <div class="card" style="padding: 16px; background: rgba(0,0,0,0.25); text-align: center;">
+                                <h4 style="font-size: 0.9rem; margin-bottom: 8px; color: var(--text-main);">📸 ต้องการแปะหน้าผากเล่น?</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">เปลี่ยนให้หน้าจอแสดงเฉพาะคำของคุณขนาดใหญ่เพื่อให้เพื่อนดู</p>
+                                <button class="btn btn-accent" onclick="toggleForeheadMode(true)" style="padding: 10px 16px; font-size: 0.9rem;">
+                                    📱 เข้าสู่โหมดแปะหน้าผาก
+                                </button>
+                            </div>
+
+                            <!-- Event Logs -->
+                            <div class="card" style="padding: 16px; background: rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 10px;">
+                                <h4 style="font-size: 0.9rem; color: var(--text-main); border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">📢 บันทึกสถานการณ์</h4>
+                                <div class="game-events-feed" id="game-events-feed">
+                                    <div class="event-item event-system">เริ่มการประลองคำต้องห้าม!</div>
+                                </div>
+                            </div>
+
+                            <!-- Host End game button -->
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <button id="btn-owner-stop-game" class="btn btn-primary" onclick="requestStopGame()" style="display:none;">จบเกมเฉลยคะแนน 🏁</button>
+                                <button id="btn-player-leave-game" class="btn btn-secondary" onclick="leaveRoom()">ออกจากห้อง</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- POST-GAME SCOREBOARD -->
+                    <div class="card" id="post-game-reveal-panel" style="display: none; border-color: var(--success-color); background: rgba(16, 185, 129, 0.04); margin-top: 10px;">
+                        <h3 style="color: var(--success-color); margin-bottom: 4px; text-align: center; font-size: 1.3rem;">🏁 สรุปอันดับการแข่งขัน</h3>
+                        <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;" id="reveal-mode-label">โหมด: เอาชีวิตรอด</p>
+                        
+                        <div class="post-reveal-grid" id="reveal-scoreboard-list">
+                            <!-- Score lists generated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOREHEAD MODE OVERLAY -->
+            <div class="forehead-mode-overlay" id="forehead-mode-overlay">
+                <div class="forehead-instructions">
+                    🤫 แปะหน้าผากของคุณแล้วหันหน้าจอให้เพื่อนดู! 🤫
+                </div>
+
+                <div class="forehead-word-box">
+                    <div class="forehead-player-name" id="forehead-my-name">นิวตรอน</div>
+                    <div class="forehead-word" id="forehead-my-word">---</div>
+                </div>
+
+                <div style="width: 100%; max-width: 320px;">
+                    <button class="btn btn-secondary" onclick="toggleForeheadMode(false)">
+                        🔙 กลับสู่โหมดหน้าจอปกติ
+                    </button>
+                </div>
+            </div>
+
+            <!-- FOOTER CREDIT -->
+            <footer class="game-footer" style="margin-top: 32px; padding: 16px 0; text-align: center; font-size: 0.8rem; color: var(--text-muted); border-top: 1px solid var(--border-color); width: 100%;">
+                <p>ออกแบบและพัฒนาด้วยความใส่ใจโดย <span class="highlight-text" style="color: var(--accent-color); font-weight: 600;">ครูนิวตรอน</span></p>
+            </footer>
+        </div>
+
+        <!-- Alert Modal / Popup -->
+        <div id="alert-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-box">
+                <h3 id="alert-title">แจ้งเตือน</h3>
+                <p id="alert-message">มีบางอย่างเกิดขึ้น</p>
+                <button class="btn btn-primary" onclick="closeAlert()" style="padding: 10px 16px; font-size: 0.9rem;">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paho MQTT client, QRCode generator, and scripts for Forbidden Word Game -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+    <script src="games/spy/qrcode.min.js"></script>
+    <script src="games/forbidden-word/words.js"></script>
+    <script src="games/forbidden-word/app.js"></script>
+
+    <script>
+        function openForbiddenWordGame() {
+            document.getElementById('main-hub-layout').style.display = 'none';
+            document.getElementById('forbidden-game-layout').style.display = 'block';
+            showScreen('screen-welcome');
+            
+            // Add a plays count trigger
+            let count = parseInt(localStorage.getItem('neutron_hub_total_plays') || 0);
+            localStorage.setItem('neutron_hub_total_plays', count + 1);
+            document.getElementById('statTotalPlays').textContent = count + 1;
+        }
+
+        function exitToHub() {
+            document.getElementById('forbidden-game-layout').style.display = 'none';
+            document.getElementById('main-hub-layout').style.display = 'flex';
+            leaveRoom();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load plays count from localStorage
+            const plays = localStorage.getItem('neutron_hub_total_plays') || 0;
+            document.getElementById('statTotalPlays').textContent = plays;
+
+            // Simple increment click handler for plays count
+            const cards = document.querySelectorAll('.game-card');
+            cards.forEach(card => {
+                // Only bind to elements that are NOT the forbidden word trigger to avoid double counting
+                if (!card.onclick && card.getAttribute('href') !== 'javascript:void(0)') {
+                    card.addEventListener('click', () => {
+                        let count = parseInt(localStorage.getItem('neutron_hub_total_plays') || 0);
+                        localStorage.setItem('neutron_hub_total_plays', count + 1);
+                        document.getElementById('statTotalPlays').textContent = count + 1;
+                    });
+                }
+            });
+
+            // Check query params for auto-joining
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomParam = urlParams.get('room');
+            if (roomParam && roomParam.length === 4) {
+                openForbiddenWordGame();
+            }
+        });
+    </script>
+</body>
+</html>

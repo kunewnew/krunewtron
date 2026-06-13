@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spy Agent - เกมสายลับจับผิด (Serverless)</title>
+    <!-- Google Fonts for Modern Styling (Outfit for English/Numbers, Mitr for Modern Thai) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="stars-bg"></div>
+    <div class="ambient-glow"></div>
+
+    <div class="app-container">
+        <!-- HEADER -->
+        <header class="game-header">
+            <div class="logo">
+                <span class="spy-icon">🕵️‍♂️</span>
+                <h1 class="glitch-text" data-text="SPY AGENT">SPY AGENT</h1>
+            </div>
+            <p class="subtitle">เกมสืบสวนและสุ่มสายลับจับผิด (Serverless)</p>
+        </header>
+
+        <!-- PROTOCOL WARNING FOR FILE:// -->
+        <div id="protocol-warning" class="card warning-card-alert" style="display: none; margin-bottom: 24px; border-color: var(--spy-color);">
+            <h3 style="color: var(--spy-color); margin-bottom: 8px;">⚠️ ตรวจพบข้อผิดพลาดในการเข้าใช้งาน</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">
+                คุณเปิดไฟล์ HTML โดยตรงในเครื่อง ทำให้ตัวเกมไม่สามารถเชื่อมต่อระบบหลังบ้านเพื่อสร้างห้องหรือเข้าร่วมเล่นเกมได้
+            </p>
+            <p style="font-size: 0.95rem; margin-top: 10px; font-weight: bold; margin-bottom: 8px;">
+                วิธีแก้ไข: กรุณาเปิดเว็บเบราว์เซอร์ (Chrome / Safari) แล้วพิมพ์ลิงก์นี้ในช่องที่อยู่เว็บเพื่อเข้าใช้งาน:
+            </p>
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-family: monospace; font-size: 1.25rem; text-align: center; color: var(--primary-color); font-weight: 600; text-shadow: 0 0 8px var(--primary-glow);">
+                http://localhost:8000
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- WELCOME SCREEN -->
+        <!-- ============================================== -->
+        <section id="screen-welcome" class="screen active">
+            <div class="card welcome-card">
+                <h2 style="text-align: center; margin-bottom: 20px; font-weight: 600;">เข้าเล่นเกมสืบสวน</h2>
+                
+                <div class="input-group">
+                    <label for="input-player-name">ชื่อของคุณ (Name)</label>
+                    <input type="text" id="input-player-name" placeholder="ระบุชื่อของคุณ (เช่น สมชาย)" maxlength="15" autocomplete="off">
+                </div>
+
+                <hr class="divider" style="margin: 24px 0;">
+
+                <!-- JOIN GAME -->
+                <div class="input-group">
+                    <label for="input-room-code">รหัสห้อง (Room Code)</label>
+                    <input type="text" id="input-room-code" placeholder="กรอกรหัส 4 หลัก (เช่น ABCD)" maxlength="4" autocomplete="off" style="text-transform: uppercase; text-align: center; font-size: 1.4rem; letter-spacing: 4px; font-weight: 600; color: var(--primary-color);">
+                </div>
+                <button id="btn-join-room" class="btn btn-primary" onclick="joinRoom()" style="margin-bottom: 12px;">เข้าร่วมห้องเล่นเกม</button>
+                
+                <div style="text-align: center; margin: 12px 0; color: var(--text-muted); font-size: 0.85rem;">หรือ</div>
+
+                <!-- CREATE GAME -->
+                <button id="btn-create-room" class="btn btn-accent" onclick="createRoom()">สร้างห้องเล่นใหม่</button>
+            </div>
+
+            <!-- RULES DOSSIER CARD -->
+            <div class="card welcome-card" style="margin-top: 20px; max-width: 480px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none;" onclick="toggleWelcomeRules()">
+                    <h3 style="font-size: 1.05rem; font-weight: 600; color: var(--primary-color); margin: 0;">📘 กติกาและวิธีการเล่น (คลิกเพื่อแสดง)</h3>
+                    <span id="rules-toggle-icon" style="color: var(--primary-color); font-weight: bold; font-size: 1rem;">▼</span>
+                </div>
+                <div id="rules-content" style="display: none; margin-top: 16px; font-size: 0.85rem; line-height: 1.6; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 16px;">
+                    <h4 style="color: var(--text-main); margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">🎯 เป้าหมายของเกม:</h4>
+                    <ul style="margin-left: 16px; margin-bottom: 12px; list-style-type: disc; padding-left: 4px;">
+                        <li><strong style="color: var(--success-color);">ฝ่ายผู้เล่นปกติ:</strong> ต้องหาว่าใครคือสายลับ (SPY) และปกป้องไม่ให้สายลับรู้สถานที่ลับประจำรอบ</li>
+                        <li><strong style="color: var(--spy-color);">ฝ่ายสายลับ (SPY):</strong> ต้องเนียนทำตัวกลมกลืน และสังเกตคำถาม/คำตอบเพื่อสืบหาว่าสถานที่ลับรอบนี้คืออะไร</li>
+                    </ul>
+                    
+                    <h4 style="color: var(--text-main); margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">🕹️ วิธีการเล่น:</h4>
+                    <ol style="margin-left: 16px; margin-bottom: 12px; list-style-type: decimal; padding-left: 4px;">
+                        <li>เมื่อเริ่มเกม ทุกคน **แตะมือถือค้างไว้** เพื่อดูบทบาทและสถานที่ลับของตนเองแบบส่วนตัว</li>
+                        <li>ผู้เล่นคนแรกถามคำถามเพื่อน 1 คน เช่น <em>"ที่นี่มีของกินอร่อยไหม?"</em> หรือ <em>"คุณเพิ่งทำความสะอาดที่นี่หรือเปล่า?"</em> (เลี่ยงคำถามเจาะจงเกินไป)</li>
+                        <li>คนตอบเสร็จ มีสิทธิ์เลือกถามคนอื่นถัดไป (ห้ามถามย้อนกลับคนเดิมทันที)</li>
+                    </ol>
+
+                    <h4 style="color: var(--text-main); margin-bottom: 6px; font-weight: 600; font-size: 0.9rem;">🏁 การตัดสินแพ้ชนะ:</h4>
+                    <ul style="margin-left: 16px; list-style-type: disc; padding-left: 4px;">
+                        <li><strong>ผู้เล่นปกติชนะ:</strong> เมื่อโหวตจับสายลับได้ถูกต้อง และสายลับเดาสถานที่ลับไม่ถูก</li>
+                        <li><strong>สายลับชนะ:</strong> เมื่อโหวตผิดตัว หรือเมื่อสายลับสามารถเดาสถานที่ลับได้ถูกต้องระหว่างเกม</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- LOBBY SCREEN (Combined Host & Player Views) -->
+        <!-- ============================================== -->
+        <section id="screen-lobby" class="screen">
+            <div class="host-layout">
+                <!-- Left Column: Room Code & Players -->
+                <div class="host-main-panel">
+                    <div class="card info-card">
+                        <div class="room-code-display">
+                            <span class="label">รหัสห้อง (Room Code)</span>
+                            <div class="code" id="lobby-code">----</div>
+                        </div>
+
+                        <div class="connection-info" id="lobby-owner-info" style="display:none;">
+                            <p>แชร์รหัสห้องด้านบนให้เพื่อนของคุณพิมพ์เข้าร่วมได้เลย!</p>
+                            <p class="badge badge-player" style="margin-top: 8px;">คุณคือผู้ควบคุมห้อง (Room Owner)</p>
+                        </div>
+                        
+                        <div class="connection-info" id="lobby-player-info" style="display:none;">
+                            <div class="radar-pulse" style="margin: 10px 0;"></div>
+                            <p class="pulse-text">กำลังรอเจ้าของห้องเริ่มสุ่มบทบาท...</p>
+                            <p class="badge" id="lobby-my-name-badge" style="margin-top: 8px;">ผู้เล่น: ...</p>
+                        </div>
+                    </div>
+
+                    <div class="card players-card">
+                        <h3>รายชื่อผู้เล่นที่เข้าร่วมแล้ว (<span id="lobby-players-count">0</span> คน)</h3>
+                        <div class="player-list-scroll">
+                            <ul id="lobby-players-list" class="player-grid">
+                                <!-- Dynamic Player list -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Settings & Game controls -->
+                <div class="host-side-panel">
+                    <div class="card settings-card">
+                        <h2>ตั้งค่าห้องเล่นเกม</h2>
+                        
+                        <div class="setting-item">
+                            <label for="select-spies">จำนวนสายลับ (Spy)</label>
+                            <select id="select-spies" onchange="onSettingChanged()">
+                                <option value="1" selected>1 คน (แนะนำ)</option>
+                                <option value="2">2 คน</option>
+                                <option value="3">3 คน</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label>เวลาต่อเกม (นาที)</label>
+                            <div class="range-display">
+                                <input type="range" id="range-duration" min="1" max="15" value="8" step="1" oninput="updateDurationLabel(this.value)" onchange="onSettingChanged()">
+                                <span id="lbl-duration" class="badge">8 นาที</span>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="locations-header">
+                                <label>สถานที่ในเกม (<span id="selected-locs-count">0</span>/100)</label>
+                                <div class="locs-buttons" id="locs-select-controls">
+                                    <button class="btn-text" onclick="toggleAllLocations(true)">เลือกทั้งหมด</button> | 
+                                    <button class="btn-text" onclick="toggleAllLocations(false)">ไม่เลือกเลย</button>
+                                </div>
+                            </div>
+                            <div class="locations-checkbox-list" id="lobby-locations-list">
+                                <!-- Generated Dynamically -->
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="btn-start-game" class="btn btn-primary btn-block btn-lg" onclick="startGame()" style="display:none;">เริ่มเกมสุ่มบทบาท</button>
+                            <button class="btn btn-secondary btn-block" onclick="leaveRoom()">ออกจากห้อง</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- GAME SCREEN -->
+        <!-- ============================================== -->
+        <section id="screen-game" class="screen">
+            <div class="card game-card">
+                <!-- Game Header with Timer -->
+                <div class="game-meta">
+                    <div class="game-timer">
+                        <svg class="timer-ring" width="60" height="60">
+                            <circle class="timer-ring__circle-bg" stroke="rgba(255,255,255,0.05)" stroke-width="4" fill="transparent" r="26" cx="30" cy="30"/>
+                            <circle class="timer-ring__circle" stroke="#06b6d4" stroke-width="4" fill="transparent" r="26" cx="30" cy="30"/>
+                        </svg>
+                        <span id="game-timer" class="timer-text">00:00</span>
+                    </div>
+                    <div class="badge badge-player" id="game-player-name">ผู้เล่น: ...</div>
+                </div>
+
+                <!-- SECRET CARD AREA -->
+                <div class="secret-card-container">
+                    <p class="card-instruction">แตะหน้าจอค้างไว้เพื่อถอดรหัสบทบาทลับของคุณ 🔒</p>
+                    
+                    <div class="secret-card" id="role-card" onmousedown="revealRole()" onmouseup="hideRole()" onmouseleave="hideRole()" ontouchstart="revealRole(event)" ontouchend="hideRole(event)">
+                        <!-- Card Face (Hidden State) -->
+                        <div class="card-face card-hidden">
+                            <div class="scanner-effect"></div>
+                            <div class="fingerprint-btn">
+                                <svg viewBox="0 0 100 100" class="fingerprint-svg">
+                                    <path d="M50,15 A35,35 0 0,1 85,50 A35,35 0 0,1 50,85 A35,35 0 0,1 15,50 A35,35 0 0,1 50,15" fill="none" stroke="#06b6d4" stroke-width="3" stroke-dasharray="8 8" class="rotating-ring"/>
+                                    <path d="M50,25 C36.2,25 25,36.2 25,50 C25,56.9 27.8,63.1 32.3,67.7 M38.6,73.4 C42.1,75 46,75.8 50,75.8 C63.8,75.8 75,64.6 75,50.8 M34,42 C38,34 46,30 50,30 C58,30 65,37 65,45 M40,55 C43,58 47,60 50,60 C53,60 57,58 60,55 M45,48 C47,46 49,45 50,45 C51,45 53,46 55,48" fill="none" stroke="#06b6d4" stroke-width="2.5" stroke-linecap="round"/>
+                                    <path d="M30,58 C32,54 36,52 40,52 C44,52 48,54 50,58 C52,62 56,64 60,64 C64,64 68,62 70,58" fill="none" stroke="#ef4444" stroke-width="2" stroke-dasharray="4 4" class="scanning-red" style="display:none;"/>
+                                </svg>
+                            </div>
+                            <div class="security-text">
+                                <div class="line">AGENT VERIFICATION</div>
+                                <small>HOLD TO SCAN FINGERPRINT</small>
+                            </div>
+                        </div>
+
+                        <!-- Card Face (Revealed State) -->
+                        <div class="card-face card-revealed">
+                            <div class="decryption-scan"></div>
+                            
+                            <!-- Normal Player Role display -->
+                            <div id="role-display-normal">
+                                <div class="role-title">สถานที่ลับของคุณ</div>
+                                <div class="role-location" id="display-location">...</div>
+                                <hr class="divider">
+                                <div class="role-label">บทบาท / หน้าที่ของคุณ</div>
+                                <div class="role-name" id="display-role">...</div>
+                                <p class="role-tip">💡 ถามเพื่อนร่วมเล่นเพื่อตามหาตัวสปาย ระวังอย่าพูดคำใบ้ตรงๆ จนสปายเดาสถานที่ได้!</p>
+                            </div>
+
+                            <!-- Spy Role display -->
+                            <div id="role-display-spy" style="display:none;">
+                                <div class="spy-alert-header">🚨 คุณคือ 🚨</div>
+                                <div class="spy-title">สายลับแฝงตัว (SPY)</div>
+                                <hr class="divider">
+                                <div class="spy-mission">ภารกิจของคุณ:</div>
+                                <p class="spy-text">ถามตอบเนียนๆ จับสังเกตเพื่อเดาว่า "สถานที่ลับคือที่ไหน" และระวังไม่ให้คนอื่นจับได้ว่าคุณคือสายลับ!</p>
+                                <p class="spy-tip">💡 ศึกษาตารางรายชื่อสถานที่ลับ 100 แห่งด่านล่างเพื่อเดาคำตอบ!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Game status and ending panel -->
+                <div class="action-buttons" style="margin-bottom: 24px;">
+                    <button id="btn-owner-stop-game" class="btn btn-primary" onclick="requestStopGame()" style="display:none;">จบเกม (End Game) / รีเซ็ตห้อง</button>
+                    <button id="btn-player-leave-game" class="btn btn-secondary" onclick="leaveRoom()">ออกจากห้อง</button>
+                </div>
+
+                <!-- POST-GAME REVEAL BOARD (Hidden by default, shown once game is ended) -->
+                <div class="card" id="post-game-reveal-panel" style="display: none; margin-bottom: 24px; border-color: var(--success-color); background: rgba(16, 185, 129, 0.05);">
+                    <h3 style="color: var(--success-color); margin-bottom: 12px; text-align: center;">🏁 สรุปเฉลยประจำรอบ</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color);">
+                            <small style="color: var(--text-muted); display: block; margin-bottom: 4px;">สถานที่ลับคือ:</small>
+                            <strong style="color: var(--success-color); font-size: 1.15rem;" id="reveal-location">---</strong>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color);">
+                            <small style="color: var(--text-muted); display: block; margin-bottom: 4px;">สายลับแฝงตัว (SPY) คือ:</small>
+                            <strong style="color: var(--spy-color); font-size: 1.15rem;" id="reveal-spy">---</strong>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color);">
+                        <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">บทบาทของแต่ละคนในเกม:</h4>
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-muted);">
+                                    <th style="padding: 6px;">ชื่อผู้เล่น</th>
+                                    <th style="padding: 6px;">บทบาท</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reveal-roles-list">
+                                <!-- Filled after game ends -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Locations Grid for reference -->
+                <div class="locations-reference">
+                    <h3>ตารางสถานที่ลับทั้งหมดในเกม 100 แห่ง (ศึกษาเพื่อจับผิด/เดาคำตอบ)</h3>
+                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; line-height: 1.4;">
+                        💡 คลิกที่ชื่อสถานที่ใดก็ได้เพื่อทำเครื่องหมายขีดฆ่า (เช่น คัดออกจากการเป็นผู้ต้องสงสัย)
+                    </p>
+                    <ul class="locations-list-grid" id="game-locations-grid">
+                        <!-- Dynamic list of active locations -->
+                    </ul>
+                </div>
+
+                <div class="players-reference">
+                    <h3>รายชื่อเพื่อนในห้อง</h3>
+                    <ul class="player-grid-mini" id="game-players-grid">
+                        <!-- Dynamic list of players -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER CREDIT -->
+        <footer class="game-footer" style="margin-top: 40px; padding: 16px 0; text-align: center; font-size: 0.85rem; color: var(--text-muted); border-top: 1px solid var(--border-color); width: 100%;">
+            <p>Developed with ❤️ by <span class="highlight-text" style="font-weight: 600;">ครูนิวตรอน</span></p>
+        </footer>
+    </div>
+
+    <!-- Alert Modal / Popup for critical errors -->
+    <div id="alert-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+            <h3 id="alert-title">ข้อความแจ้งเตือน</h3>
+            <p id="alert-message">ข้อผิดพลาดบางอย่างเกิดขึ้น</p>
+            <button class="btn btn-primary btn-sm" onclick="closeAlert()">ตกลง</button>
+        </div>
+    </div>
+
+    <!-- Paho MQTT client from CDN for serverless multiplayer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+    <script src="locations.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
