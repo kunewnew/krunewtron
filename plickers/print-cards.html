@@ -217,6 +217,12 @@
       const roomSelect = document.getElementById('roomSelect');
       roomSelect.innerHTML = `<option value="" disabled selected>-- เลือกห้องเรียน --</option>`;
       
+      // Add generic option first
+      const genericOption = document.createElement('option');
+      genericOption.value = "GENERIC_50";
+      genericOption.textContent = "ชุดการ์ดทั่วไป (เลขที่ 1-50)";
+      roomSelect.appendChild(genericOption);
+      
       Object.keys(rosterData).forEach(room => {
         const option = document.createElement('option');
         option.value = room;
@@ -262,12 +268,27 @@
       const selectedRoom = roomSelect.value;
       const cardsGrid = document.getElementById('cardsGrid');
       
-      if (!selectedRoom || !rosterData[selectedRoom]) return;
+      if (!selectedRoom) return;
       
-      const students = rosterData[selectedRoom];
+      let students = [];
+      let roomLabel = "";
+      
+      if (selectedRoom === "GENERIC_50") {
+        // Create 50 generic card slots
+        for (let i = 1; i <= 50; i++) {
+          students.push({ no: i, name: "" });
+        }
+        roomLabel = "GENERAL";
+      } else if (rosterData[selectedRoom]) {
+        students = rosterData[selectedRoom];
+        roomLabel = selectedRoom;
+      } else {
+        return;
+      }
+      
       const showName = document.getElementById('showStudentName').checked;
       const showColor = document.getElementById('coloredCard').checked;
-      const themeColor = getRoomColor(selectedRoom);
+      const themeColor = getRoomColor(roomLabel);
       
       cardsGrid.innerHTML = '';
       
@@ -299,8 +320,6 @@
 
       students.forEach((student, idx) => {
         // Student ID maps to ArUco marker ID
-        // Note: ArUco IDs should be positive, we use the student number 'no' or map to a unique ID.
-        // Plickers uses marker ID starting from 1. Standard js-aruco handles IDs up to 1023.
         const markerId = student.no; 
         
         const cardDiv = document.createElement('div');
@@ -331,6 +350,9 @@
           ? `<div class="absolute top-0 left-0 right-0 h-2 print:h-2" style="background-color: ${themeColor};"></div>` 
           : '';
 
+        const displayRoomName = roomLabel === "GENERAL" ? "การ์ดทั่วไป" : roomLabel;
+        const displayStudentName = (roomLabel !== "GENERAL" && showName) ? student.name : '';
+
         // Build HTML layout for cards
         cardDiv.innerHTML = `
           ${colorStripeHtml}
@@ -350,12 +372,12 @@
           
           <!-- Student Info (Small print on margins so it doesn't distract the camera) -->
           <div class="absolute bottom-3 left-4 text-left font-semibold ${studentInfoFontSize} leading-tight text-gray-500">
-            ${selectedRoom}<br>
+            ${displayRoomName}<br>
             NO: <span class="font-outfit font-black text-black">${student.no}</span>
           </div>
 
           <div class="absolute bottom-3 right-4 text-right font-semibold ${studentInfoFontSize} leading-tight text-gray-500">
-            ${showName ? student.name : ''}
+            ${displayStudentName}
           </div>
 
           <!-- Top indicator of ID for teacher's reference (extremely tiny on the corner) -->
