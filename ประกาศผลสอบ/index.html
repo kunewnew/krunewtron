@@ -1607,9 +1607,14 @@
         student.gpa = recalculateStudentGPA(student, currentClassData.subjects);
         
         const key = document.getElementById('teacher-class-select').value;
-        const uploadData = encodeURIComponent(JSON.stringify(currentClassData));
         
-        fetch(`${SCRIPT_URL}?action=grades_save&key=${encodeURIComponent(key)}&data=${uploadData}&teacher=${encodeURIComponent(loggedInTeacher)}`)
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: `action=grades_save&key=${encodeURIComponent(key)}&data=${encodeURIComponent(JSON.stringify(currentClassData))}&teacher=${encodeURIComponent(loggedInTeacher)}`
+        })
           .then(res => res.json())
           .then(res => {
             if (res.success) {
@@ -1661,9 +1666,13 @@
         const parsed = parseExcelData(rawText);
         const key = `${year}_${sem}_${room}`;
         
-        const uploadData = encodeURIComponent(JSON.stringify(parsed));
-        
-        fetch(`${SCRIPT_URL}?action=grades_save&key=${encodeURIComponent(key)}&data=${uploadData}&teacher=${encodeURIComponent(loggedInTeacher)}`)
+        fetch(SCRIPT_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: `action=grades_save&key=${encodeURIComponent(key)}&data=${encodeURIComponent(JSON.stringify(parsed))}&teacher=${encodeURIComponent(loggedInTeacher)}`
+        })
           .then(res => res.json())
           .then(res => {
             if (res.success) {
