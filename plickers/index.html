@@ -38,6 +38,9 @@
   <!-- SheetJS CDN (for Excel export) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
+  <!-- html2canvas CDN (for LINE report image sharing) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
   <style>
     html, body {
       background-color: #01061E;
@@ -279,11 +282,16 @@
             </div>
           </div>
 
-          <div class="flex items-center justify-between gap-2 border-t border-white/5 pt-3">
-            <button onclick="exportToExcel()" class="text-[11px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1">
-              📥 ดาวน์โหลดสถิติวิเคราะห์ (Excel)
-            </button>
-            <span class="text-[9px] text-white/30">* ข้อมูลผลสอบเก็บสะสมไว้ในเบราว์เซอร์เครื่องนี้</span>
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/5 pt-3">
+            <div class="flex flex-wrap gap-3 w-full sm:w-auto">
+              <button onclick="exportToExcel()" class="text-[11.5px] font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 active:scale-95 transition-all">
+                📥 ส่งออก Excel
+              </button>
+              <button id="lineShareBtn" onclick="shareToLine()" class="text-[11.5px] font-bold text-green-400 hover:text-green-300 flex items-center gap-1 active:scale-95 transition-all">
+                🖼️ ส่งรูปเข้า LINE
+              </button>
+            </div>
+            <span class="text-[9px] text-white/30 w-full sm:w-auto text-left sm:text-right">* บันทึกในเครื่องครู</span>
           </div>
 
         </div>
@@ -1119,6 +1127,284 @@
       // Write and download
       const fileName = `ผลสอบการ์ดสแกน_${currentRoom}_ข้อที่_${currentQuestionIdx + 1}.xlsx`;
       XLSX.writeFile(workbook, fileName);
+    }
+
+    // Custom Toast Notification
+    function showToast(message, type = 'info') {
+      let toast = document.getElementById('custom-toast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'custom-toast';
+        toast.className = 'fixed bottom-5 right-5 z-50 px-5 py-3 rounded-2xl border font-bold text-xs shadow-2xl transition-all duration-300 transform translate-y-10 opacity-0 pointer-events-none';
+        document.body.appendChild(toast);
+      }
+      
+      if (type === 'success') {
+        toast.className = 'fixed bottom-5 right-5 z-50 px-5 py-3 rounded-2xl border border-emerald-500/40 bg-emerald-950/90 text-emerald-400 font-bold text-xs shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100';
+      } else if (type === 'error') {
+        toast.className = 'fixed bottom-5 right-5 z-50 px-5 py-3 rounded-2xl border border-red-500/40 bg-red-950/90 text-red-400 font-bold text-xs shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100';
+      } else {
+        // loading/info
+        toast.className = 'fixed bottom-5 right-5 z-50 px-5 py-3 rounded-2xl border border-blue-500/40 bg-blue-950/90 text-blue-400 font-bold text-xs shadow-2xl transition-all duration-300 transform translate-y-0 opacity-100';
+      }
+      
+      toast.textContent = message;
+      
+      if (type !== 'loading') {
+        setTimeout(() => {
+          toast.className = 'fixed bottom-5 right-5 z-50 px-5 py-3 rounded-2xl border font-bold text-xs shadow-2xl transition-all duration-300 transform translate-y-10 opacity-0 pointer-events-none';
+        }, 3000);
+      }
+    }
+
+    // Build Report HTML card for html2canvas
+    function buildReportHtml(roomName, questionIdx, correctAnswer, scannedAnswers, rosterData) {
+      const students = rosterData[roomName] || [];
+      const currentAnswers = scannedAnswers[questionIdx] || {};
+      
+      let correctCount = 0;
+      let incorrectCount = 0;
+      let unansweredCount = 0;
+      let countA = 0, countB = 0, countC = 0, countD = 0;
+      
+      students.forEach(st => {
+        const choice = currentAnswers[st.no];
+        if (!choice) {
+          unansweredCount++;
+        } else {
+          if (choice === 'A') countA++;
+          else if (choice === 'B') countB++;
+          else if (choice === 'C') countC++;
+          else if (choice === 'D') countD++;
+          
+          if (correctAnswer) {
+            if (choice === correctAnswer) correctCount++;
+            else incorrectCount++;
+          }
+        }
+      });
+      
+      const totalCount = students.length;
+      const answeredCount = totalCount - unansweredCount;
+      const correctPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+      
+      let rowsHtml = '';
+      students.forEach((st, idx) => {
+        const choice = currentAnswers[st.no] || '-';
+        let statusText = 'ไม่ส่ง';
+        let statusClass = 'bg-gray-100 text-gray-500 border-gray-200';
+        
+        if (choice !== '-') {
+          if (correctAnswer) {
+            if (choice === correctAnswer) {
+              statusText = 'ถูกต้อง ✅';
+              statusClass = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold';
+            } else {
+              statusText = 'ผิด ❌';
+              statusClass = 'bg-red-50 text-red-700 border-red-200';
+            }
+          } else {
+            statusText = 'ส่งแล้ว';
+            statusClass = 'bg-blue-50 text-blue-700 border-blue-200';
+          }
+        }
+        
+        const rowBg = idx % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
+        
+        rowsHtml += `
+          <tr class="${rowBg} border-b border-slate-100 text-[11px]">
+            <td class="px-4 py-2 text-center font-bold text-slate-500 font-mono">${st.no}</td>
+            <td class="px-4 py-2 font-mono text-slate-400">${st.id || '-'}</td>
+            <td class="px-4 py-2 font-bold text-slate-700">${st.name}</td>
+            <td class="px-4 py-2 text-center font-black text-slate-800 font-mono text-xs">${choice}</td>
+            <td class="px-4 py-2 text-center">
+              <span class="inline-block px-2 py-0.5 rounded border text-[9px] ${statusClass}">${statusText}</span>
+            </td>
+          </tr>
+        `;
+      });
+      
+      const dateStr = new Date().toLocaleDateString('th-TH', {
+        year: 'numeric', month: 'long', day: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+      
+      return `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+          <script src="https://cdn.tailwindcss.com"></script>
+          <style>
+            body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; }
+          </style>
+        </head>
+        <body class="p-6">
+          <div class="wrap max-w-[800px] mx-auto bg-white border border-slate-200 shadow-xl rounded-3xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-indigo-900 to-slate-900 p-6 text-white text-center">
+              <h1 class="text-xl font-black tracking-wide">📷 รายงานคะแนนสอบ Plickers (การ์ดสแกน)</h1>
+              <p class="text-xs text-indigo-200/80 font-light mt-1">${dateStr} | ครูนิวตรอน.com</p>
+            </div>
+            
+            <!-- Room & Question Info -->
+            <div class="grid grid-cols-2 gap-4 p-5 border-b border-slate-100 bg-slate-50/55">
+              <div class="flex flex-col gap-0.5">
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">ห้องเรียน</span>
+                <span class="text-base font-bold text-indigo-950">${roomName}</span>
+              </div>
+              <div class="flex flex-col gap-0.5 text-right">
+                <span class="text-[10px] text-slate-400 uppercase font-semibold">ข้อที่</span>
+                <span class="text-base font-bold text-indigo-950">ข้อที่ ${questionIdx + 1} (เฉลยตัวเลือก: <span class="text-indigo-600 font-black font-mono">${correctAnswer || 'ยังไม่มีเฉลย'}</span>)</span>
+              </div>
+            </div>
+            
+            <!-- Summary Stats Box -->
+            <div class="p-5 grid grid-cols-4 gap-4 text-center">
+              <div class="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-3 flex flex-col gap-0.5">
+                <span class="text-[9px] font-bold text-indigo-400 uppercase">สแกนส่งคำตอบ</span>
+                <span class="text-lg font-black text-indigo-950 font-mono">${answeredCount} / ${totalCount} คน</span>
+              </div>
+              <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-3 flex flex-col gap-0.5">
+                <span class="text-[9px] font-bold text-emerald-500 uppercase">ตอบถูก</span>
+                <span class="text-lg font-black text-emerald-700 font-mono">${correctAnswer ? correctCount : '-'} คน</span>
+              </div>
+              <div class="bg-red-50 border border-red-100 rounded-2xl p-3 flex flex-col gap-0.5">
+                <span class="text-[9px] font-bold text-red-500 uppercase">ตอบผิด</span>
+                <span class="text-lg font-black text-red-700 font-mono">${correctAnswer ? incorrectCount : '-'} คน</span>
+              </div>
+              <div class="bg-amber-50 border border-amber-100 rounded-2xl p-3 flex flex-col gap-0.5">
+                <span class="text-[9px] font-bold text-amber-500 uppercase">เปอร์เซ็นต์ตอบถูก</span>
+                <span class="text-lg font-black text-amber-700 font-mono">${correctAnswer ? correctPct + '%' : '-'}</span>
+              </div>
+            </div>
+            
+            <!-- Choice Bar Stats -->
+            <div class="px-5 pb-5 border-b border-slate-100">
+              <h3 class="text-xs font-bold text-slate-500 mb-2">สรุปตัวเลือกคำตอบ</h3>
+              <div class="grid grid-cols-4 gap-3 text-[10px] font-bold">
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex justify-between items-center">
+                  <span class="text-slate-500 font-mono">A</span>
+                  <span class="text-slate-800 font-mono text-xs font-black">${countA} คน</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex justify-between items-center">
+                  <span class="text-slate-500 font-mono">B</span>
+                  <span class="text-slate-800 font-mono text-xs font-black">${countB} คน</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex justify-between items-center">
+                  <span class="text-slate-500 font-mono">C</span>
+                  <span class="text-slate-800 font-mono text-xs font-black">${countC} คน</span>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex justify-between items-center">
+                  <span class="text-slate-500 font-mono">D</span>
+                  <span class="text-slate-800 font-mono text-xs font-black">${countD} คน</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Student Table -->
+            <div class="p-5">
+              <h3 class="text-xs font-bold text-slate-500 mb-3">สรุปรายชื่อและคำตอบนักเรียน</h3>
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-[9px] font-bold text-slate-400 uppercase">
+                    <th class="px-4 py-2 text-center w-12">เลขที่</th>
+                    <th class="px-4 py-2 w-20">รหัสประจำตัว</th>
+                    <th class="px-4 py-2">ชื่อ-นามสกุล</th>
+                    <th class="px-4 py-2 text-center w-16">ตอบช้อยส์</th>
+                    <th class="px-4 py-2 text-center w-24">ผลตรวจ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rowsHtml}
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Footer Sign -->
+            <div class="bg-slate-50 p-4 text-center border-t border-slate-100 text-[10px] text-slate-400 font-light">
+              รายงานผลคะแนนนี้สร้างอัตโนมัติจากแอปพลิเคชันสแกนการ์ด Plickers ของครูนิวตรอน.com
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+    }
+
+    // Share report image to LINE
+    async function shareToLine() {
+      if (!currentRoom) {
+        alert("⚠️ กรุณาเลือกห้องเรียนก่อนส่งรายงานเข้า LINE ครับ");
+        return;
+      }
+      
+      const lineShareBtn = document.getElementById('lineShareBtn');
+      if (lineShareBtn) lineShareBtn.disabled = true;
+      showToast('⏳ กำลังสร้างรูปรายงานสำหรับแชร์เข้า LINE...', 'loading');
+      
+      let iframe = null;
+      try {
+        iframe = document.createElement('iframe');
+        iframe.style.cssText = 'position:fixed;left:-9999px;top:0;width:840px;height:200px;border:0;';
+        document.body.appendChild(iframe);
+        
+        const doc = iframe.contentDocument;
+        doc.open();
+        doc.write(buildReportHtml(currentRoom, currentQuestionIdx, correctAnswer, scannedAnswers, rosterData));
+        doc.close();
+        
+        // Wait layout & fonts
+        await new Promise(r => setTimeout(r, 450));
+        if (doc.fonts && doc.fonts.ready) {
+          try { await doc.fonts.ready; } catch(e){}
+        }
+        
+        const target = doc.querySelector('.wrap') || doc.body;
+        iframe.style.height = (doc.body.scrollHeight + 40) + 'px';
+        
+        const canvas = await html2canvas(target, {
+          backgroundColor: '#f8fafc',
+          scale: 2,
+          useCORS: true,
+          windowWidth: 840,
+          width: target.scrollWidth,
+          height: target.scrollHeight
+        });
+        
+        document.body.removeChild(iframe);
+        iframe = null;
+        
+        const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+        const fileName = `รายงานคะแนนPlickers-${currentRoom}-ข้อที่_${currentQuestionIdx + 1}.png`;
+        const file = new File([blob], fileName, { type: 'image/png' });
+        
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `รายงานคะแนน Plickers ${currentRoom} ข้อที่ ${currentQuestionIdx + 1}`
+          });
+          showToast('📲 เปิดแผ่นแชร์แล้ว — เลือก LINE เพื่อส่งได้เลยครับ!', 'success');
+        } else {
+          // PC Fallback: download PNG
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName;
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast('🖼️ บันทึกรูปรายงานสำเร็จ — สามารถนำรูปไปส่งเข้ากลุ่ม LINE ได้เลยครับ!', 'success');
+        }
+      } catch (err) {
+        if (iframe && iframe.parentNode) {
+          try { document.body.removeChild(iframe); } catch(e){}
+        }
+        console.error("LINE Share Error:", err);
+        showToast('⚠️ สร้างรูปไม่สำเร็จ: ' + err.message, 'error');
+        alert("⚠️ เกิดข้อผิดพลาดในการสร้างรูปภาพ: " + err.message);
+      } finally {
+        if (lineShareBtn) lineShareBtn.disabled = false;
+      }
     }
   </script>
 </body>
