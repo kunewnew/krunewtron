@@ -629,9 +629,23 @@ function calculateStats() {
   };
 }
 
-// Save State to LocalStorage
+// Save State to LocalStorage (stripping large base64 images to prevent QuotaExceededError)
 function saveToLocalStorage() {
-  localStorage.setItem("classfund_6_1_data", JSON.stringify(state));
+  try {
+    const strippedState = {
+      ...state,
+      transactions: state.transactions.map(tx => {
+        // Strip base64 image data from slipUrl in local storage cache
+        if (tx.slipUrl && tx.slipUrl.startsWith("data:image/")) {
+          return { ...tx, slipUrl: "cached_offline" };
+        }
+        return tx;
+      })
+    };
+    localStorage.setItem("classfund_6_1_data", JSON.stringify(strippedState));
+  } catch (e) {
+    console.error("Failed to save to localStorage:", e);
+  }
 }
 
 // Main rendering hub
