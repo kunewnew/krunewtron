@@ -533,16 +533,22 @@ async function loadInitialData() {
           renderAll();
         } else {
           console.warn("Google Sheets sync returned success=false:", gsData.error);
-          if (statusText) statusText.textContent = "ออฟไลน์ (เชื่อมต่อชีตล้มเหลว)";
+          if (statusText) statusText.textContent = `ออฟไลน์ (ชีตส่งกลับข้อผิดพลาด: ${gsData.error})`;
           if (statusDot) {
             statusDot.style.backgroundColor = "var(--warning)";
             statusDot.style.boxShadow = "0 0 8px var(--warning)";
           }
         }
+      } else {
+        if (statusText) statusText.textContent = `ออฟไลน์ (HTTP Error: ${gsResponse.status})`;
+        if (statusDot) {
+          statusDot.style.backgroundColor = "var(--warning)";
+          statusDot.style.boxShadow = "0 0 8px var(--warning)";
+        }
       }
     } catch (err) {
       console.warn("Failed to fetch Google Sheets data. Defaulting to local cache.", err);
-      if (statusText) statusText.textContent = "ออฟไลน์ (ใช้ Local Storage)";
+      if (statusText) statusText.textContent = `ออฟไลน์ (ข้อผิดพลาด: ${err.message})`;
       if (statusDot) {
         statusDot.style.backgroundColor = "var(--warning)";
         statusDot.style.boxShadow = "0 0 8px var(--warning)";
