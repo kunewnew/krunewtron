@@ -1608,6 +1608,12 @@ function setupEventListeners() {
     const oldCol = state.students.find(s => s.id === oldCollectorId) || { name: "ยังไม่มีชื่อ" };
     const newCol = state.students.find(s => s.id === newCollectorId) || { name: "ยังไม่มีชื่อ" };
 
+    // Validate Google Apps Script URL format
+    if (appsScriptUrl !== "" && (!appsScriptUrl.startsWith("https://script.google.com/macros/s/") || !appsScriptUrl.includes("/exec"))) {
+      alert("⚠️ รูปแบบ URL ของ Google Apps Script ไม่ถูกต้อง!\n\nลิงก์ต้องขึ้นต้นด้วย 'https://script.google.com/macros/s/' และมีคำว่า '/exec' (เช่น ลิงก์ที่ได้จากการ Deploy Web App ไม่ใช่ลิงก์ Google Sheets ค่ะ)");
+      return;
+    }
+
     state.config.currentCollectorId = newCollectorId;
     state.config.teacherName = teacherName;
     state.config.promptpayId = promptpayId;
